@@ -8,12 +8,14 @@ from nose.tools import *
 import logging
 
 from excalibur.detector import ExcaliburDetector, ExcaliburDetectorError
-
+from excalibur.fem import ExcaliburFem
 
 class TestExcaliburDetector():
 
     @classmethod
     def setup_class(cls):
+        
+        ExcaliburFem.use_stub_library = True
         cls.detector_fems = [('192.168.0.1', 6969), ('192.168.0.2', 6969), ('192.168.0.3', 6969)]
         root_logger = logging.getLogger()
         root_logger.setLevel(logging.DEBUG)

@@ -1,9 +1,23 @@
 from nose.tools import *
 import random
 
-from excalibur.fem import ExcaliburFem, ExcaliburFemError
+from excalibur.fem import ExcaliburFemConfig, ExcaliburFem, ExcaliburFemError
 
 
+class TestExcaliburFemConfig:
+    
+    def test_fem_config(self):
+        
+        fem_number = 1
+        fem_address = '192.168.0.100'
+        fem_port = 6969
+        data_address = '10.0.2.1'
+        config = ExcaliburFemConfig(fem_number, fem_address, fem_port, data_address)
+        assert_equal(config.fem_number, fem_number)
+        assert_equal(config.fem_address, fem_address)
+        assert_equal(config.fem_port, fem_port)
+        assert_equal(config.data_address, data_address)
+        
 class TestExcaliburFemError:
 
     def test_error_value(self):
@@ -13,11 +27,34 @@ class TestExcaliburFemError:
             raise ExcaliburFemError(value)
 
 
+class TestExcaliburMissingApiLibrary:
+    
+    @classmethod
+    def setup_class(cls):
+        
+        cls.fem_id = 1234
+        ExcaliburFem.use_stub_library = False
+        cls.library_stem_orig = ExcaliburFem.library_stem
+        ExcaliburFem.library_stem = 'missing_api'
+    
+    @classmethod
+    def teardown_class(cls):
+        ExcaliburFem.library_stem = cls.library_stem_orig
+        
+    def test_missing_library(self):
+        
+        with assert_raises_regexp(ExcaliburFemError, 'cannot open shared object file: No such file or directory'):
+            fem = ExcaliburFem(self.fem_id)
+            
 class TestExcaliburFem:
 
     @classmethod
     def setup_class(cls):
         cls.fem_id = 1234
+
+        # Enable use of stub library for testing
+        ExcaliburFem.use_stub_library = True
+
         cls.the_fem = ExcaliburFem(cls.fem_id)
 
     def test_legal_fem_id(self):
@@ -36,7 +73,7 @@ class TestExcaliburFem:
         temp_fem = ExcaliburFem(1)
         temp_fem.fem_handle = None
         with assert_raises_regexp(
-                ExcaliburFemError, 'get_id: resolved FEM object pointer to null'):
+                ExcaliburFemError, 'get_id: FEM handle is not initialised'):
             temp_fem.get_id()
 
     def test_double_close(self):
@@ -45,7 +82,7 @@ class TestExcaliburFem:
         the_fem.close()
         with assert_raises(ExcaliburFemError) as cm:
             the_fem.close()
-        assert_equal(cm.exception.value, 'close: FEM object pointer has null FEM handle')
+        assert_equal(cm.exception.value, 'close: FEM handle is not initialised')
 
     def test_legal_get_ints(self):
 
@@ -68,7 +105,7 @@ class TestExcaliburFem:
         temp_fem.fem_handle = None
 
         with assert_raises_regexp(
-                ExcaliburFemError, 'get_int: resolved FEM object pointer to null'):
+                ExcaliburFemError, 'get_int: FEM handle is not initialised'):
             temp_fem.get_int(chip_id, param_id, param_len)
 
     def test_legal_set_single_int(self):
@@ -100,7 +137,7 @@ class TestExcaliburFem:
 
         with assert_raises(ExcaliburFemError) as cm:
             rc = self.the_fem.set_int(chip_id, param_id, values)
-        assert_equal(cm.exception.value, 'set_int: non-integer value specified')
+        assert_equal(cm.exception.value, 'set_int: int expected instead of float')
 
     def test_legal_set_and_get_int(self):
 
@@ -139,5 +176,5 @@ class TestExcaliburFem:
         temp_fem.fem_handle = None
 
         with assert_raises_regexp(
-                ExcaliburFemError, 'cmd: resolved FEM object pointer to null'):
+                ExcaliburFemError, 'cmd: FEM handle is not initialised'):
             temp_fem.cmd(chip_id, cmd_id)
