@@ -4,7 +4,7 @@ from ctypes import *
 class ExcaliburFemConfig(Structure):
 
     _fields_ = [
-                ('fem_number',  c_int),
+                ('fem_number',   c_int),
                 ('fem_address',  c_char_p),
                 ('fem_port',     c_int),
                 ('data_address', c_char_p),
@@ -51,6 +51,8 @@ class ExcaliburFem(object):
         self._api.femInitialise.argtypes = [c_void_p, c_void_p, c_void_p]
         self._api.femInitialise.restype = c_void_p
 
+        self._api.femClose.argtypes = [c_void_p]
+
         self._api.femGetId.argtypes = [c_void_p]
         self._api.femGetId.restype = c_int
 
@@ -63,11 +65,12 @@ class ExcaliburFem(object):
         self._api.femCmd.argtypes = [c_void_p, c_int, c_int]
         self._api.femCmd.restype = c_int
 
-        fem_config = ExcaliburFemConfig(fem_id, fem_addr, fem_port, data_addr)
+        fem_config = ExcaliburFemConfig(fem_id, str.encode(fem_addr),
+                                        fem_port, str.encode(data_addr))
         self.fem_handle = self._api.femInitialise(None, None, byref(fem_config))
 
-        if self.fem_handle == None:
-            raise ExcaliburFemError(self._api.femErrorMsg())
+        if self.fem_handle is None:
+            raise ExcaliburFemError(self._api.femErrorMsg().decode())
 
 
     def _validate_fem_handle(self):

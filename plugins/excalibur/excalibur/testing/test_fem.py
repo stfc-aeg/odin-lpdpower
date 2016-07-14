@@ -12,11 +12,12 @@ class TestExcaliburFemConfig:
         fem_address = '192.168.0.100'
         fem_port = 6969
         data_address = '10.0.2.1'
-        config = ExcaliburFemConfig(fem_number, fem_address, fem_port, data_address)
+        config = ExcaliburFemConfig(fem_number, str.encode(fem_address),
+                                    fem_port, str.encode(data_address))
         assert_equal(config.fem_number, fem_number)
-        assert_equal(config.fem_address, fem_address)
+        assert_equal(config.fem_address, str.encode(fem_address))
         assert_equal(config.fem_port, fem_port)
-        assert_equal(config.data_address, data_address)
+        assert_equal(config.data_address, str.encode(data_address))
 
 class TestExcaliburFemError:
 
