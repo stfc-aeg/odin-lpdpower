@@ -5,9 +5,9 @@ from excalibur.fem import ExcaliburFemConfig, ExcaliburFem, ExcaliburFemError
 
 
 class TestExcaliburFemConfig:
-    
+
     def test_fem_config(self):
-        
+
         fem_number = 1
         fem_address = '192.168.0.100'
         fem_port = 6969
@@ -17,7 +17,7 @@ class TestExcaliburFemConfig:
         assert_equal(config.fem_address, fem_address)
         assert_equal(config.fem_port, fem_port)
         assert_equal(config.data_address, data_address)
-        
+
 class TestExcaliburFemError:
 
     def test_error_value(self):
@@ -28,24 +28,24 @@ class TestExcaliburFemError:
 
 
 class TestExcaliburMissingApiLibrary:
-    
+
     @classmethod
     def setup_class(cls):
-        
+
         cls.fem_id = 1234
         ExcaliburFem.use_stub_library = False
         cls.library_stem_orig = ExcaliburFem.library_stem
         ExcaliburFem.library_stem = 'missing_api'
-    
+
     @classmethod
     def teardown_class(cls):
         ExcaliburFem.library_stem = cls.library_stem_orig
-        
+
     def test_missing_library(self):
-        
-        with assert_raises_regexp(ExcaliburFemError, 'cannot open shared object file: No such file or directory'):
+
+        with assert_raises_regexp(ExcaliburFemError, 'Error loading API library'):
             fem = ExcaliburFem(self.fem_id)
-            
+
 class TestExcaliburFem:
 
     @classmethod

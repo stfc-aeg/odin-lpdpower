@@ -31,6 +31,7 @@ void* femInitialise(void* ctlHandle, const CtlCallbacks* callbacks, const CtlCon
         FemApiError().Set(e.which()) << "Error trying to initialise FEM id " << config->femNumber << ": " << e.what();
     }
 
+    std::cout << "femInitialise handle:" << theFem << std::endl;
     return (void*)theFem;
 }
 
@@ -99,5 +100,7 @@ void femClose(void* femHandle)
 {
     ExcaliburFemClient* theFem = reinterpret_cast<ExcaliburFemClient*>(femHandle);
 
-    delete theFem;
+    std::cout << "femClose handle:" << theFem << std::endl;
+
+    //delete theFem;
 }
