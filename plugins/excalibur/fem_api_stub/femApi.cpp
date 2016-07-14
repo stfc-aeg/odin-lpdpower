@@ -62,7 +62,7 @@ int femSetInt(void* femHandle, int chipId, int id, size_t size, int* value)
     return rc;
 }
 
-int femCmd(void* femHandler, int chipId, int id)
+int femCmd(void* femHandle, int chipId, int id)
 {
     int rc = FEM_RTN_OK;
 
