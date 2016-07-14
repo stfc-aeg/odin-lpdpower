@@ -94,3 +94,9 @@ ENV/
 # CTAGS tags files
 tags
 .tags
+
+# Eclipse worksapce and project metadata files
+.metadata
+.project
+.pydevproject
+
