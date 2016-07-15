@@ -5,15 +5,19 @@ import os
 with open('requirements.txt') as f:
     required = f.read().splitlines()
 
-# Define the real and stub fem_api extension modules - note these are not true python extension 
-# modules in the sense that they cannot be used directly but need to be wrapped with ctypes, but
-# we use the setuptools Extension mechanism to manage them anyway
+# Define the real and stub fem_api extension modules 
+fem_api_extension_path='fem_api_extension'
+fem_api_wrapper_source = os.path.join(fem_api_extension_path, 'fem_api_wrapper.c')
 
-fem_api_stub_source_path='fem_api_stub'
-fem_api_stub_sources = ['fem_api_wrapper.c', 'femApi.cpp', 'ExcaliburFemClient.cpp', 'FemApiError.cpp']
- 
+fem_api_stub_source_path=os.path.join(fem_api_extension_path, 'stub')
+fem_api_stub_sources = [fem_api_wrapper_source] + [
+                            os.path.join(fem_api_stub_source_path, source) for source in [
+                                'femApi.cpp', 'ExcaliburFemClient.cpp', 'FemApiError.cpp']
+                             ]
+
 fem_api_stub = Extension('excalibur.fem_api_stub', 
-    sources=[os.path.join(fem_api_stub_source_path, source) for source in fem_api_stub_sources],
+    sources=fem_api_stub_sources,
+    include_dirs=[fem_api_stub_source_path],
     define_macros=[('COMPILE_AS_STUB', None)]
 )
 

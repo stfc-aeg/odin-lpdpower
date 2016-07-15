@@ -24,13 +24,6 @@
 #if PY_MAJOR_VERSION >= 3
 #endif
 
-
-#ifdef COMPILE_AS_STUB
-#warning "Compiling as stub"
-#else
-#warning "Compiling as non-stub"
-#endif
-
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
