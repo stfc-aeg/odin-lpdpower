@@ -322,7 +322,7 @@ static PyMethodDef fem_api_methods[] =
 #ifdef COMPILE_AS_STUB
 MOD_INIT(fem_api_stub)
 #else
-MOD_INITfem_api)
+MOD_INIT(fem_api)
 #endif
 {
     PyObject* m;

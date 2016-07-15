@@ -9,7 +9,7 @@ with open('requirements.txt') as f:
 fem_api_extension_path='fem_api_extension'
 fem_api_wrapper_source = os.path.join(fem_api_extension_path, 'fem_api_wrapper.c')
 
-fem_api_stub_source_path=os.path.join(fem_api_extension_path, 'stub')
+fem_api_stub_source_path=os.path.join(fem_api_extension_path, 'api_stub')
 fem_api_stub_sources = [fem_api_wrapper_source] + [
                             os.path.join(fem_api_stub_source_path, source) for source in [
                                 'femApi.cpp', 'ExcaliburFemClient.cpp', 'FemApiError.cpp']
@@ -18,7 +18,19 @@ fem_api_stub_sources = [fem_api_wrapper_source] + [
 fem_api_stub = Extension('excalibur.fem_api_stub', 
     sources=fem_api_stub_sources,
     include_dirs=[fem_api_stub_source_path],
-    define_macros=[('COMPILE_AS_STUB', None)]
+    define_macros=[('COMPILE_AS_STUB', None)],
+)
+
+fem_api_source_path=os.path.join(fem_api_extension_path, 'api')
+fem_api_sources = [fem_api_wrapper_source] + [
+                            os.path.join(fem_api_source_path, source) for source in [
+                                'femApi.cpp', 'ExcaliburFemClient.cpp', 'FemApiError.cpp']
+                             ]
+
+fem_api = Extension('excalibur.fem_api',
+    sources=fem_api_sources,
+    include_dirs=[fem_api_source_path],
+    define_macros=[],
 )
 
 setup(
@@ -28,7 +40,7 @@ setup(
     url='https://github.com/timcnicholls/odin',
     author='Tim Nicholls',
     author_email='tim.nicholls@stfc.ac.uk',
-    ext_modules=[fem_api_stub],
+    ext_modules=[fem_api_stub, fem_api],
     packages = find_packages(),
     install_requires=required,
 )
