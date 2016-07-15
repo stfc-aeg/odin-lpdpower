@@ -5,21 +5,6 @@ import random
 from excalibur.fem import ExcaliburFem, ExcaliburFemError
 
 
-# class TestExcaliburFemConfig:
-# 
-#     def test_fem_config(self):
-# 
-#         fem_number = 1
-#         fem_address = '192.168.0.100'
-#         fem_port = 6969
-#         data_address = '10.0.2.1'
-#         config = ExcaliburFemConfig(fem_number, str.encode(fem_address),
-#                                     fem_port, str.encode(data_address))
-#         assert_equal(config.fem_number, fem_number)
-#         assert_equal(config.fem_address, str.encode(fem_address))
-#         assert_equal(config.fem_port, fem_port)
-#         assert_equal(config.data_address, str.encode(data_address))
-
 class TestExcaliburFemError:
 
     def test_error_value(self):
@@ -29,18 +14,28 @@ class TestExcaliburFemError:
             raise ExcaliburFemError(value)
 
 
-# class TestExcaliburMissingApiLibrary:
-# 
-#     @classmethod
-#     def setup_class(cls):
-# 
-#         cls.fem_id = 1234
-#         ExcaliburFem.use_stub_library = False
-# 
-#     def test_missing_library(self):
-# 
-#         with assert_raises_regexp(ExcaliburFemError, 'Error loading API library'):
-#             fem = ExcaliburFem(self.fem_id)
+class TestExcaliburMissingApiLibrary:
+ 
+    @classmethod
+    def setup_class(cls):
+ 
+        cls.fem_id = 1234
+        cls.restore_fem_api_stem = ExcaliburFem.api_stem
+        ExcaliburFem.api_stem = 'fem_api_missing'
+        ExcaliburFem.use_stub_api = False
+        ExcaliburFem._fem_api = None
+ 
+    @classmethod
+    def teardown_class(cls):
+        
+        ExcaliburFem.fem_api_stem = cls.restore_fem_api_stem
+        ExcaliburFem._fem_api = None
+        
+    def test_missing_library(self):
+ 
+        with assert_raises_regexp(ExcaliburFemError, 'Failed to load API module: No module named'):
+            fem = ExcaliburFem(self.fem_id)
+
 
 class TestExcaliburFem:
 
@@ -48,8 +43,8 @@ class TestExcaliburFem:
     def setup_class(cls):
         cls.fem_id = 1234
 
-        # Enable use of stub library for testing
-        ExcaliburFem.use_stub_library = True
+        # Enable use of stub API for testing
+        ExcaliburFem.use_stub_api = True
 
         cls.the_fem = ExcaliburFem(cls.fem_id)
 

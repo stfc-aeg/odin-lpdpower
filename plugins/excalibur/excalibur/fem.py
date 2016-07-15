@@ -1,5 +1,6 @@
 #from excalibur import fem_api
-import excalibur.fem_api_stub as fem_api
+#import excalibur.fem_api_stub as fem_api
+import importlib
 
 class ExcaliburFemError(Exception):
 
@@ -17,27 +18,44 @@ class ExcaliburFem(object):
     FEM_RTN_ILLEGALCHIP = 2
     FEM_RTN_BADSIZE = 3
     FEM_RTN_INITFAILED = 4
+    
+    use_stub_api = False
+    api_stem = 'excalibur.fem_api'
+    _fem_api = None
 
     def __init__(self, fem_id):
 
         self.fem_handle = None
+        
+        if ExcaliburFem._fem_api is None:
+            api_module = ExcaliburFem.api_stem
+            if ExcaliburFem.use_stub_api:
+                api_module = api_module + '_stub'
+                
+            try:
+                ExcaliburFem._fem_api = importlib.import_module(api_module)
+            except ImportError as e:
+                raise ExcaliburFemError('Failed to load API module: {}'.format(e))
+            else:
+                self._fem_api = ExcaliburFem._fem_api
+            
         try:
-            self.fem_handle = fem_api.initialise(fem_id)
-        except fem_api.error as e:
+            self.fem_handle = self._fem_api.initialise(fem_id)
+        except self._fem_api.error as e:
             raise ExcaliburFemError(str(e))
 
     def close(self):
 
         try:
-            fem_api.close(self.fem_handle)
-        except fem_api.error as e:
+            self._fem_api.close(self.fem_handle)
+        except self._fem_api.error as e:
             raise ExcaliburFemError(str(e))
 
     def get_id(self):
 
         try:
-            fem_id = fem_api.get_id(self.fem_handle)
-        except fem_api.error as e:
+            fem_id = self._fem_api.get_id(self.fem_handle)
+        except self._fem_api.error as e:
             raise ExcaliburFemError(str(e))
 
         return fem_id
@@ -45,8 +63,8 @@ class ExcaliburFem(object):
     def get_int(self, chip_id, param_id, size):
 
         try:
-            rc = fem_api.get_int(self.fem_handle, chip_id, param_id, size)
-        except fem_api.error as e:
+            rc = self._fem_api.get_int(self.fem_handle, chip_id, param_id, size)
+        except self._fem_api.error as e:
             raise ExcaliburFemError(str(e))
 
         return rc
@@ -54,8 +72,8 @@ class ExcaliburFem(object):
     def set_int(self, chip_id, param_id, values):
 
         try:
-            rc = fem_api.set_int(self.fem_handle, chip_id, param_id, values)
-        except fem_api.error as e:
+            rc = self._fem_api.set_int(self.fem_handle, chip_id, param_id, values)
+        except self._fem_api.error as e:
             raise ExcaliburFemError(str(e))
 
         return rc
@@ -63,8 +81,8 @@ class ExcaliburFem(object):
     def cmd(self, chip_id, cmd_id):
 
         try:
-            rc = fem_api.cmd(self.fem_handle, chip_id, cmd_id)
-        except fem_api.error as e:
+            rc = self._fem_api.cmd(self.fem_handle, chip_id, cmd_id)
+        except self._fem_api.error as e:
             raise ExcaliburFemError(str(e))
 
         return rc
