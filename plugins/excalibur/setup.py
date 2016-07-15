@@ -10,11 +10,12 @@ with open('requirements.txt') as f:
 # we use the setuptools Extension mechanism to manage them anyway
 
 fem_api_stub_source_path='fem_api_stub'
-fem_api_stub_sources = ['femApi.cpp', 'ExcaliburFemClient.cpp', 'FemApiError.cpp']
+fem_api_stub_sources = ['fem_api_wrapper.c', 'femApi.cpp', 'ExcaliburFemClient.cpp', 'FemApiError.cpp']
  
-fem_api_stub = Extension('excalibur.fem_api_stub', sources=[
-    os.path.join(fem_api_stub_source_path, source) for source in fem_api_stub_sources
-])
+fem_api_stub = Extension('excalibur.fem_api_stub', 
+    sources=[os.path.join(fem_api_stub_source_path, source) for source in fem_api_stub_sources],
+    define_macros=[('COMPILE_AS_STUB', None)]
+)
 
 setup(
     name='excalibur',
