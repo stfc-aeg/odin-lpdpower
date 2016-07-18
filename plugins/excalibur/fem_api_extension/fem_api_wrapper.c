@@ -117,9 +117,13 @@ static void log_msg(log_level level, const char* format, ...)
 
 static PyObject* _initialise(PyObject* self, PyObject* args)
 {
-    int id;
+    int fem_id;
+    char* fem_address;
+    int fem_port;
+    char* data_address;
 
-    if (!PyArg_ParseTuple(args, "i", &id)) {
+    if (!PyArg_ParseTuple(args, "isis", &fem_id, &fem_address, &fem_port,
+                          &data_address)) {
         return NULL;
     }
 
@@ -130,7 +134,10 @@ static PyObject* _initialise(PyObject* self, PyObject* args)
     }
 
     /* Set up the CtlConfig structure to pass to the FEM on initialisation */
-    fem_ptr->config.femNumber = id;
+    fem_ptr->config.femNumber = fem_id;
+    fem_ptr->config.femAddress = fem_address;
+    fem_ptr->config.femPort = fem_port;
+    fem_ptr->config.dataAddress = data_address;
 
     fem_ptr->handle = femInitialise((void*)NULL, (const CtlCallbacks*)NULL, (const CtlConfig*)&(fem_ptr->config));
     if (fem_ptr->handle == NULL) {
@@ -139,7 +146,7 @@ static PyObject* _initialise(PyObject* self, PyObject* args)
     }
     //printf("Initialised module with handle %lu\n", (unsigned long)(fem_ptr->handle));
     log_msg(debug, "Initialised fem_api module with handle %lu for FEM ID %d",
-        (unsigned long)(fem_ptr->handle), id);
+        (unsigned long)(fem_ptr->handle), fem_id);
 
     return PyCapsule_New(fem_ptr, "FemPtr", _del);
 }
