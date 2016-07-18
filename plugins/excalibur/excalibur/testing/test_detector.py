@@ -16,7 +16,11 @@ class TestExcaliburDetector():
     def setup_class(cls):
         
         ExcaliburFem.use_stub_api = True
-        cls.detector_fems = [('192.168.0.1', 6969), ('192.168.0.2', 6969), ('192.168.0.3', 6969)]
+        cls.detector_fems = [
+                             ('192.168.0.1', 6969, '10.0.2.1'), 
+                             ('192.168.0.2', 6969, '10.0.2.1'), 
+                             ('192.168.0.3', 6969, '10.0.2.1')
+                            ]
         root_logger = logging.getLogger()
         root_logger.setLevel(logging.DEBUG)
 
@@ -40,7 +44,7 @@ class TestExcaliburDetector():
 
     def test_detector_bad_fem_port(self):
         bad_detector_fems = self.detector_fems[:]
-        bad_detector_fems[0] = ('192.168.0.1', 'bad_port')
+        bad_detector_fems[0] = ('192.168.0.1', 'bad_port', '10.0.2.1')
 
         with assert_raises_regexp(ExcaliburDetectorError, "Failed to initialise detector FEM list"):
             detector = ExcaliburDetector(bad_detector_fems)

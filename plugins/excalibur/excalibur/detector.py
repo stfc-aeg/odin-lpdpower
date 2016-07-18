@@ -19,11 +19,14 @@ class ExcaliburDetectorFemConnection(object):
     STATE_DISCONNECTED = 0
     STATE_CONNECTED = 1
 
-    def __init__(self, id, host, port, fem=None, state=STATE_DISCONNECTED):
+    DEFAULT_DATA_ADDR = '10.0.2.1'
+    
+    def __init__(self, id, host_addr, port, data_addr=None, fem=None, state=STATE_DISCONNECTED):
 
         self.id = id
-        self.host = host
+        self.host_addr = host_addr
         self.port = port
+        self.data_addr = data_addr if data_addr is not None else self.DEFAULT_DATA_ADDR
         self.fem = fem
         self.state = self.STATE_DISCONNECTED
 
@@ -43,13 +46,16 @@ class ExcaliburDetector(object):
         self.fems = []
         if not isinstance(fem_connections, (list, tuple)):
             fem_connections = [fem_connections]
-        if isinstance(fem_connections, tuple) and len(fem_connections) == 2:
+        if isinstance(fem_connections, tuple) and len(fem_connections) >= 2:
             fem_connections = [fem_connections]
 
         try:
             id = 1
-            for (host, port) in fem_connections:
-                self.fems.append(ExcaliburDetectorFemConnection(id, host, int(port)))
+            for connection in fem_connections:
+                (host_addr, port) = connection[:2]
+                data_addr = connection[2] if len(connection) > 2 else None
+                   
+                self.fems.append(ExcaliburDetectorFemConnection(id, host_addr, int(port), data_addr))
                 id += 1
         except Exception as e:
             raise ExcaliburDetectorError('Failed to initialise detector FEM list: {}'.format(e))
@@ -57,5 +63,5 @@ class ExcaliburDetector(object):
     def connect(self):
         """Establish connection to the detectors FEMs."""
         for idx in range(len(self.fems)):
-            the_fem = ExcaliburFem(self.fems[idx].id)
+            the_fem = ExcaliburFem(self.fems[idx].id, self.fems[idx].host_addr, self.fems[idx].port, self.fems[idx].data_addr)
             self.fems[idx].fem = the_fem
