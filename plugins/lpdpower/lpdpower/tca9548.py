@@ -33,10 +33,20 @@ class TCA9548(I2CDevice):
 		else:
 			raise I2CExpection("%s was not properly detached from the TCA" % device)	
 
-	def attachDevice(self, device, line):
+	def attachDevice(self, line, device, *args, **kwargs):
+		if callable(device):
+			self.write8(0, 1 << line)
+			device = device(*args, **kwargs)
+			self.write8(0, self.__buff)
+
+		if not isinstance(device, I2CDevice):
+			raise I2CException("The device %s must be a type or an instance of I2CDevice" % device)
+
 		self.__attachedDevices[device] = line
 		device.preRead = self.__deviceCallback
 		device.preWrite = self.__deviceCallback
+
+		return device
 
 	def removeDevice(self, device):
 		if device in self.__attachedDevices:

@@ -77,13 +77,15 @@ class LPDPowerAdapter(ApiAdapter):
 	def __init__(self, **kwargs):
 		super(LPDPowerAdapter, self).__init__(**kwargs)
 
-		tmp = LM92()
-		mcp = MCP23008()
-
-		#TCA setup
 		self.tca = TCA9548()
-		self.tca.attachDevice(mcp, 0)
-		self.tca.attachDevice(tmp, 1)
+
+		tmp = self.tca.attachDevice(1, LM92)
+		tmp.setHysteresis(0.5)
+		tmp.setLowPoint(24.0)
+		tmp.setHighPoint(29.0)
+		tmp.setCritical(31.0)
+
+		mcp = self.tca.attachDevice(0, MCP23008)
 
 		self.sensorHandler = LM92Handler(tmp)
 		self.outputHandler = MCP23008Handler(mcp)

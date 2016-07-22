@@ -14,13 +14,23 @@ class LM92(I2CDevice):
 		
 		return self.__stored
 
+	def __reverse2Bytes(self, data):
+		return ((data & 0xff) << 8) + ((data & 0xff00) >> 8)
+
+	def __convertTemp(self, temp):
+		var = int(temp / 0.0625)
+		if var < 0:
+			var += 8192
+		return self.__reverse2Bytes(var << 3)
+		
+
 	def readTemperatureRaw(self):
 		return self.__pollSensor()
 
 	def readTemperatureDegrees(self):
-		data = self.reverseByteOrder(self.__pollSensor()) >> 3
+		data = self.__reverse2Bytes(self.__pollSensor()) >> 3
 		if data & 4096:
-			data = -data + 4096
+			data -= 8192
 		return data * 0.0625
 
 	def enable(self, value):
@@ -35,29 +45,25 @@ class LM92(I2CDevice):
 		return bool(~self.readU8(1) & 1)
 
 	def setHysteresis(self, val):
-		data = self.reverseByteOrder(int(val / 0.0625) << 3)
-		self.write16(2, data)
+		self.write16(2, self.__convertTemp(val))
 
 	def setCritical(self, val):
-		data = self.reverseByteOrder(int(val / 0.0625) << 3)
-		self.write16(3, data)
+		self.write16(3, self.__convertTemp(val))
 
 	def setLowPoint(self, val):
-		data = self.reverseByteOrder(int(val / 0.0625) << 3)
-                self.write16(4, data)
+                self.write16(4, self.__convertTemp(val))
 
 	def setHighPoint(self, val):
-                data = self.reverseByteOrder(int(val / 0.0625) << 3)
-                self.write16(5, data)
+                self.write16(5, self.__convertTemp(val))
 
 	def isCritical(self):
-		return bool(self.reverseByteOrder(self.__pollSensor()) & 4)
+		return bool(self.__reverse2Bytes(self.__pollSensor()) & 4)
 
 	def isHigh(self):
-                return bool(self.reverseByteOrder(self.__pollSensor()) & 2)
+                return bool(self.__reverse2Bytes(self.__pollSensor()) & 2)
 
 	def isLow(self):
-                return bool(self.reverseByteOrder(self.__pollSensor()) & 1)
+                return bool(self.__reverse2Bytes(self.__pollSensor()) & 1)
 
 
 

@@ -43,12 +43,19 @@
           <p>API version is:&nbsp;<span id="api-version">&nbsp;</span></p>
           <p>Registered API adapters:&nbsp;<span id="api-adapters">&nbsp;</span></p>
 	  <p>Temp. Sensor:&nbsp;<span id="api-temp">&nbsp;</span></p>
+		<div style="padding:0 20%;">
+			<div class="progress">
+				<div id="progress-bar" aria-valuemax="40" aria-valuenow="20" style="width: 80%;" class="progress-bar" role="progressbar" aria-valuemin="0">
+					<span id="temp-label" style="float: right; margin-right: 20px;">20&deg;C</span>
+ 				</div>
+			</div>
+		</div>
 	  <p>Push button:&nbsp;<span id="api-button">&nbsp;</span></p>
 	  <div style="display:table;position:absolute;width:60%;padding:0 15%;">
 		<div style="display:table-row">
-			<div style = "display:table-cell;margins:20px;width:33%"><button type="button" class="btn btn-success" onclick="apiButton(1)">Output 1</button></div>	
-			<div style = "display:table-cell;margins:20px;width:33%"><button type="button" class="btn btn-success" onclick="apiButton(2)">Output 2</button></div>
-			<div style = "display:table-cell;margins:20pxwidth:33%"><button type="button" class="btn btn-success" onclick="apiButton(3)">Output 3</button></div>
+			<div style = "display:table-cell;margins:20px;width:33%"><button id="btn0" type="button" class="btn" onclick="apiButton(0)">Output 1</button></div>	
+			<div style = "display:table-cell;margins:20px;width:33%"><button id="btn1" type="button" class="btn" onclick="apiButton(1)">Output 2</button></div>
+			<div style = "display:table-cell;margins:20pxwidth:33%"><button id="btn2" type="button" class="btn" onclick="apiButton(2)">Output 3</button></div>
 		</div>
 	  </div>
         </div>
