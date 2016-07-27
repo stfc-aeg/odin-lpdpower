@@ -10,62 +10,66 @@
     <!-- Bootstrap -->
     <link href="js/bootstrap-3.3.6-dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="css/odin-server.css" rel="stylesheet">
+    <link href="css/lpdpower.css" rel="stylesheet">
 
   </head>
   <body>
 
-      <nav class="navbar navbar-inverse navbar-fixed-top">
-        <div class="container">
-          <div class="navbar-header">
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-              <span class="sr-only">Toggle navigation</span>
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="#">ODIN</a>
-          </div>
-          <div id="navbar" class="collapse navbar-collapse">
-            <ul class="nav navbar-nav">
-              <li class="active"><a href="#">Home</a></li>
-              <li><a href="#about">About</a></li>
-              <li><a href="#contact">Contact</a></li>
-            </ul>
-          </div><!--/.nav-collapse -->
-        </div>
-      </nav>
-
+    <nav class="navbar navbar-inverse navbar-fixed-top">
       <div class="container">
-
-        <div class="odin-server">
-          <h1>ODIN Server</h1>
-          <p class="lead">Welcome to the ODIN server<br> All you get is this text and a mostly barebones HTML document.</p>
-          <p>API version is:&nbsp;<span id="api-version">&nbsp;</span></p>
-          <p>Registered API adapters:&nbsp;<span id="api-adapters">&nbsp;</span></p>
-	  <p>Temp. Sensor:&nbsp;<span id="api-temp">&nbsp;</span></p>
-		<div style="padding:0 20%;">
-			<div class="progress">
-				<div id="progress-bar" aria-valuemax="40" aria-valuenow="20" style="width: 80%;" class="progress-bar" role="progressbar" aria-valuemin="0">
-					<span id="temp-label" style="float: right; margin-right: 20px;">20&deg;C</span>
- 				</div>
-			</div>
-		</div>
-	  <p>Push button:&nbsp;<span id="api-button">&nbsp;</span></p>
-	  <div style="display:table;position:absolute;width:60%;padding:0 15%;">
-		<div style="display:table-row">
-			<div style = "display:table-cell;margins:20px;width:33%"><button id="btn0" type="button" class="btn" onclick="apiButton(0)">Output 1</button></div>	
-			<div style = "display:table-cell;margins:20px;width:33%"><button id="btn1" type="button" class="btn" onclick="apiButton(1)">Output 2</button></div>
-			<div style = "display:table-cell;margins:20pxwidth:33%"><button id="btn2" type="button" class="btn" onclick="apiButton(2)">Output 3</button></div>
-		</div>
-	  </div>
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          <a class="navbar-brand" href="#">ODIN</a>
         </div>
+        <div id="navbar" class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="#">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#contact">Contact</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
 
-      </div><!-- /.container -->
+    <div id="overall-box">
+      <h3 id="overall-title">Overall Health: </h3>
+      <span id="overall-status" class="status"></span>
+	
+      <h5 id="overall-trace-label">Trace test:</h5>
+      <span id="overall-trace-status" class="status"></span><div></div>
+
+      <table>
+        <tr>
+          <td class="text-center">	
+            <button id="overall-enable" class="btn btn-success" type="button" onclick="enableQuads()">Enable Quads</button>
+          </td>
+        </tr>
+        <tr>
+          <td class="text-center">
+            <button id="overall-arm" class="btn btn-success" type="button" onclick="armInterlock()">Disarm Interlock</button>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="container">
+      <div class="odin-server">
+        <h1>LPD Power Supply Control Unit</h1>
+
+ 	<div id="lpdpower"></div> 
+  
+      </div>
+    </div> <!-- Container -->
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="js/jquery-2.2.3.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="js/bootstrap-3.3.6-dist/js/bootstrap.min.js"></script>
+    <script src="js/lpdpower.js"></script>
     <script src="js/odin_server.js"></script>
   </body>
 </html>

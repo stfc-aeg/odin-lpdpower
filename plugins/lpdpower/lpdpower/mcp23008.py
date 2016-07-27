@@ -39,6 +39,11 @@ class MCP23008(I2CDevice):
 				self.__gpioBuff &= ~(1 << pin)
 		self.write8(9, self.__gpioBuff)
 
+	#Sets all outputs low
+	def disableOutputs(self):
+		self.write8(9, 0)
+		self.__gpioBuff = 0
+
 	#Sets the pullup of a pin
 	def pullup(self, pin, enabled):
 		if enabled:

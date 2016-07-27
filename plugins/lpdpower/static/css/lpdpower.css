@@ -1,0 +1,80 @@
+.table {
+	width:70%;
+	margin: 0 15% 50px 15%;
+}
+
+.table > tbody > tr > td, .table > tbody > tr > th {
+	vertical-align: middle;
+}
+
+.caption {
+	float: left;
+	width: 250px;
+}
+
+#lpdpower {
+	margin-top: 50px;
+}
+
+.status {
+	height: 20px;
+	width: 80%;
+	margin: 0 10%;
+	border-radius: 3px;
+}
+
+.error {
+	color: red;
+	font-weight: 700;
+}
+
+#overall-box
+{
+	position: fixed;
+	left: 0px;
+	top: 20%;
+	width: 220px;
+	height: 380px;
+	background-color: #f9f9f9;
+}
+
+#overall-title
+{
+	position:absolute;
+	left:20px;
+	top:20px;
+}
+
+#overall-status
+{
+	position: absolute;
+	top: 80px;
+}
+
+#overall-trace-label
+{
+	position:absolute;
+	left: 20px;
+	top: 120px;
+}
+
+#overall-trace-status
+{
+	position: absolute;
+	margin: 0;
+	right: 22px;
+	top: 128px;
+	width: 60px;
+}
+
+#overall-box > table
+{
+	position: absolute;
+	top: 250px;
+	width: 100%;
+}
+
+#overall-box > table button
+{
+	margin: 10px 0;
+}

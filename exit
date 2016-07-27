@@ -1,0 +1,774 @@
+commit 7b2474da5023eb2398c015418c9b2da2ac38e395
+Merge: 409303b 37c41b9
+Author: James Hogge <jameshogge@gmail.com>
+Date:   Fri Jul 22 10:43:37 2016 +0000
+
+    Merge branch 'master' of https://github.com/jamesh1999/odin
+
+commit 409303b309b6d5aa2aaf085b3da303449b19461f
+Author: Demo User <debian@beaglebone.(none)>
+Date:   Fri Jul 22 10:30:37 2016 +0000
+
+    Fixed bug in LM92 & Used bootstrap widgets
+
+commit 37c41b9b23d887d1d303564bed46298bc09cf54c
+Author: Demo User <debian@beaglebone.(none)>
+Date:   Fri Jul 22 10:30:37 2016 +0000
+
+    Fixed bug in LM92 & Used bootstrap widgets
+
+commit f41b5ea5e47468dbcb5ef33e3b84760273b45731
+Author: Demo User <debian@beaglebone.(none)>
+Date:   Fri Jul 22 07:52:41 2016 +0000
+
+    Added LPD PSCU adapter and I2C Devices/Data Tree
+
+commit dd959818f42f04b83e30891aa8f37167e6b3abfc
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Thu May 26 17:02:37 2016 +0100
+
+    Adding action/resource parsing to ExcaliburAdapter
+
+commit 0abf5580ca03786e68a4bbc62c8011e5909a8f00
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Tue May 24 16:07:15 2016 +0100
+
+    Adding Excalibur detector infrastructure to plugin
+
+commit 46644e66f23abc55ed98cd1a708b6ccbd6ddb5f6
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Fri May 20 16:02:07 2016 +0100
+
+    First outline of ExcaliburDetector.
+
+commit 18dafd7865f00040e74eeb81223c546318d4ae4c
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Fri May 20 13:17:33 2016 +0100
+
+    Flattening over-deep package structure in excalibur plugin
+
+commit 64d3e2ec34c3e799f0b11300532f533182054f11
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Thu May 19 16:52:38 2016 +0100
+
+    Pragma to handle unavoidable loss of coverage on LogCaptureFilter
+
+commit 4c2b4ce879b79c7d9ff6faff0b659df1a1e78e46
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Thu May 19 14:14:28 2016 +0100
+
+    Refactored LogCaptureFilter to deal with handlers.
+    
+    Avoided need for repeated boilerplate code in test classes using
+    LogCaptureFilter to add filter to a handler in the root logger. Also
+    tests if root logger has any handlers and, if not, adds a MemoryHandler
+    so that messages are processed but not emitted. This avoids breaking the
+    log capture behaviour of nosetests while allowing the capture filter to
+    work if nose log capture is disabled in instances where a module is being
+    tested that has no handler defined.
+
+commit fc59ff329bd0af49d8ae808501774f9cf6cba13f
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Thu May 19 13:55:22 2016 +0100
+
+    Allowed API clients to resolved list of loaded adapters.
+    
+    Implemented additional handler in ApiRoute that responds to GET requests
+    at URI /api/<version>/adapters and returns a JSON-encoded list of adapters
+    loaded by the server. Added test cases to cover this code, demo list of
+    adapters in the static home page.
+    
+    Closes #12
+
+commit c21181a38911122b247ee9f7f7bf2500abee5190
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Wed May 18 16:38:07 2016 +0100
+
+    Excluding JS library and testing paths from CodeClimate analysis
+
+commit 2a5ca8374467ceb246d34367205d4776f79888bf
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Wed May 18 16:22:49 2016 +0100
+
+    Added demo display of API version to index.html.
+
+commit 84488b9a3c9c0e3a59b9a41d65c1907566a004a7
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Wed May 18 14:43:04 2016 +0100
+
+    Added bootstrap/jquery basic template for static content
+
+commit 81904681e4856a90fc44b75cad01abf07370b492
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Wed May 18 13:58:39 2016 +0100
+
+    Refactored default route handling to be configurable.
+    
+    DefaultRoute now explicitly maps onto a static handler, rather than
+    simply redirecting to a path in the static_path defined globally. The
+    static path is now a configuration option, either resolved relative to the
+    module source or as an absolute path.
+    
+    This mechanism is much cleaner in terms of static URLs, allowing a top-level
+    directory-like URL to be served from static content.
+    
+    Closes #10
+
+commit ecc6640f602ca986ac14da3c5ca0c26e098e2051
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Fri May 13 13:54:05 2016 +0100
+
+    More docstring goodness
+
+commit c00ee550b81ddb19a8a7a33c235ac808a51628a8
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Fri May 13 09:59:57 2016 +0100
+
+    Pinned coverage package version to 4.1b2 in requirements.txt
+    
+    Latest version of coverage package (4.1b3) changes reporter mechanism and
+    breaks coveralls reporter:
+    
+    $ coveralls
+    Submitting coverage to coveralls.io...
+    Traceback (most recent call last):
+      File "/Users/tcn/Develop/projects/odin/venv-2.7/bin/coveralls", line 11, in <module>
+        sys.exit(main())
+      File "/Users/tcn/Develop/projects/odin/venv-2.7/lib/python2.7/site-packages/coveralls/cli.py", line 62, in main
+        result = coverallz.wear()
+      File "/Users/tcn/Develop/projects/odin/venv-2.7/lib/python2.7/site-packages/coveralls/api.py", line 89, in wear
+        json_string = self.create_report()
+      File "/Users/tcn/Develop/projects/odin/venv-2.7/lib/python2.7/site-packages/coveralls/api.py", line 107, in create_report
+        data = self.create_data()
+      File "/Users/tcn/Develop/projects/odin/venv-2.7/lib/python2.7/site-packages/coveralls/api.py", line 156, in create_data
+        self._data = {'source_files': self.get_coverage()}
+      File "/Users/tcn/Develop/projects/odin/venv-2.7/lib/python2.7/site-packages/coveralls/api.py", line 174, in get_coverage
+        return reporter.report()
+      File "/Users/tcn/Develop/projects/odin/venv-2.7/lib/python2.7/site-packages/coveralls/reporter.py", line 29, in report
+        units = self.code_units if hasattr(self, 'code_units') else self.file_reporters
+    AttributeError: 'CoverallReporter' object has no attribute 'file_reporters'
+
+commit 1ac1043438f93a94a463f1235b683c28bff7f263
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Fri May 13 09:15:36 2016 +0100
+
+    Improved docstrings in server.py, changed singal handler to user lambda
+
+commit 01544fd9c7cad07af4ac1a3e7734210c1e050d55
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Thu May 12 19:55:26 2016 +0100
+
+    Docstringifying dummy.py
+
+commit abd3fe944c0531d21d0d63350b1667c1a412392f
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Thu May 12 19:10:29 2016 +0100
+
+    Fixed broken 3.5 build caused by installing futures
+    
+    Having futures package in requirements.txt (needed to use
+    concurrent features for background tasks) breaks v3.5
+    environments badly and causes travis build to fail.
+
+commit 2a28d340cab2738dfb82220cbf941d0a8bda7edd
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Thu May 12 16:32:18 2016 +0100
+
+    Added background task demo to DummyAdapter
+    
+    Demonstrates how to use a thread pool executor to run a background
+    task in an adapter for e.g. background monitoring of a subsystem
+    from within an adapter.
+    
+    Note that, while this mechanism has the advantage that long-running
+    background tasks will not block the main IOLoop, it may require
+    the use of synchronisation primitives to guard access to underlying
+    data and/or resources. The alternative would be to use the tornado
+    PeriodicCallback mechanism to perform monitoring within the IOLoop
+    context.
+
+commit 079ff80854a7a462b163b7db5c47b7ab65f6efaf
+Author: Tim Nicholls <timcnicholls@gmail.com>
+Date:   Wed May 11 20:07:59 2016 +0100
+
+    Completing docstrings for api.py
+
+commit c5f1a71d19c65e685ec1c3dcc4acf76d9075cbc0
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Wed May 11 18:52:09 2016 +0100
+
+    Added flake8 stanza to setup.cfg files for server and excalibur plugin
+
+commit 36f36e3f5937f77145d906b35267823365a87202
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Mon May 9 13:58:25 2016 +0100
+
+    Interim commit of work on excalibur plugin extension
+
+commit 5b73ecac86a77ba65332f9f4942a407f9eaaebb1
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Mon May 9 13:12:50 2016 +0100
+
+    Added .tags to .gitignore
+
+commit 0a26e45e939019f5fde144f1beda881c4f66ceb9
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Mon May 9 13:02:58 2016 +0100
+
+    Added ctags tags file to .gitignore
+
+commit 9486cf68917ab3ede16fb3b4a17808bc50d81c61
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Thu May 5 16:14:31 2016 +0100
+
+    Fixed caps typo of include of femApi.h in ExcaliburFemClient.h
+
+commit 285097ce9e378c4cc587232f6102e0f430eed988
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Thu May 5 16:11:27 2016 +0100
+
+    First steps to make fem_api initialisation calls match original FEM API library
+
+commit 5d9dba6040caeb8fa3f26e2384774a6b23f4ca9f
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Thu May 5 12:48:36 2016 +0100
+
+    Cleaned up some pep8 and pylint warnings
+
+commit b6b181589e5aa907034ba7fa3216c5b7787fc99c
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Thu May 5 12:01:23 2016 +0100
+
+    Allowed adapters to receive additional configuration options
+    
+    Refactored register_adapter in api.py to be passed entire AdapterConfig object instead of resolved name
+    and module path only. AdapterConfig class updated to allow access to all options, which are now passed to
+    adapter at initialisation as keyword arguments. ApiAdapter base class (and all derived classes) now handle
+    variable argument lists and store options internally for use by the adapter as necessary.
+    
+    This closes #9
+
+commit 8a2b20cb48301ceede6966d379440a3188379cb7
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Wed May 4 13:16:38 2016 +0100
+
+    Added skeleton test class for end-to-end testing of Excalibur plugin.
+
+commit b26922e3c3ae974d0c5e867566cb53721a6cf8a1
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Wed May 4 13:15:47 2016 +0100
+
+    Created odin.testing.utils package with OdinTestServer class
+    
+    Refactored test_server.py to extract startup and teardown of a test server instance into new OdinTestServer
+    class, which can be re-used as a base class for unit test classes for the server, plugins etc.
+
+commit 86f1ce52fc13125ba4790ce57cb0127b37eb2c22
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Tue May 3 16:26:25 2016 +0100
+
+    Modified excalibur extension module build to put within package path - fem_api becomes excalibur.fem_api
+
+commit 2b0c173fda1b518a4ca33faa48c752a5d9ae953e
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Tue May 3 15:54:03 2016 +0100
+
+    Fixed broken travis-ci build: use find_packages() in server/setup.py to ensure entire odin package & submodules actually installed.
+
+commit d9c13a56bb54d0c08cc8625541f399c0e501aa08
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Tue May 3 15:36:34 2016 +0100
+
+    Fixed sphinx docstring errors
+
+commit 2b5eab5e0abbf8ede621e9f0b4dd71a9b3bbb9a2
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Tue May 3 15:22:52 2016 +0100
+
+    Added basic Sphinx docs structure
+
+commit d7b3a54fa580040ed1583d50ac8e3cfe71222c69
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Tue May 3 13:29:59 2016 +0100
+
+    Added stub adapter, tests and config to excalibur plugin
+
+commit d0f4f5f72b24bc5cfe40af936fffdd47a96341dd
+Author: Tim Nicholls <timcnicholls@gmail.com>
+Date:   Fri Apr 29 19:53:04 2016 +0100
+
+    Making fem_api extension module python 3 compatible
+    
+    Changed fem_api_wrapper.cpp to handle changes to module initialisation and int vs long types. Updated
+    test cases to handle change in behaviour of range() - need to wrap in list() call for py3.
+
+commit 5f3fd948187aa8c307dc96c4a920b233976163da
+Author: Tim Nicholls <timcnicholls@gmail.com>
+Date:   Fri Apr 29 16:05:26 2016 +0100
+
+    Adding plugins structure to travis CI build
+
+commit 1389e52cac689042e606ccf560d92721a9a5f3e8
+Author: Tim Nicholls <timcnicholls@gmail.com>
+Date:   Fri Apr 29 16:02:39 2016 +0100
+
+    Increased test coverage of ExcaliburFem
+
+commit 9bb42d7152268e4ba55927c45702a22a96b90216
+Merge: 89589d6 9a7749d
+Author: Tim Nicholls <timcnicholls@gmail.com>
+Date:   Fri Apr 29 15:33:00 2016 +0100
+
+    Merge remote-tracking branch 'origin/master'
+
+commit 89589d6ea32c193a6b33b20e79f2558a2371f15e
+Author: Tim Nicholls <timcnicholls@gmail.com>
+Date:   Fri Apr 29 15:32:15 2016 +0100
+
+    Restructured excalibur plugin to separate setup/build from package sources
+    
+    Preparing to add more modules to excalibur package, moved fem & testing modules down a level into a
+    new excalibur package directory. Updated setup.py to match (needed find_packages for some reason?),
+    added setup.cfg to steer nosetests as for server. Moved pacakge requirements into external file.
+
+commit 9a7749d116e3fa7166b3e474240057003643f65b
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Fri Apr 29 11:20:14 2016 +0100
+
+    Adding CodeClimate integration to repo
+
+commit 65f9bdcb69c65c3a1758247d6f24dbc830bdedf1
+Author: Tim Nicholls <timcnicholls@gmail.com>
+Date:   Thu Apr 28 17:00:09 2016 +0100
+
+    ApiRoute constructor now calls superclass
+
+commit a3599bf88ccf7298c58b79cd2c44f919ff014c16
+Author: Tim Nicholls <timcnicholls@gmail.com>
+Date:   Thu Apr 28 16:30:09 2016 +0100
+
+    More lint pedantry
+
+commit f52bb1ca727e8499e0928d4763a6793902d78ab5
+Author: Tim Nicholls <timcnicholls@gmail.com>
+Date:   Thu Apr 28 16:10:44 2016 +0100
+
+    Fixing more is not None smells in parser.py
+
+commit 9080ba8a500af150ee9ec463fcba17d46c7ba3bf
+Author: Tim Nicholls <timcnicholls@gmail.com>
+Date:   Thu Apr 28 15:57:50 2016 +0100
+
+    Taking mock out of requirements.txt to investigate travis build failure
+
+commit 2e7ec8b6deb5670309c34ec3842fb9eac0c73359
+Author: Tim Nicholls <timcnicholls@gmail.com>
+Date:   Thu Apr 28 15:50:14 2016 +0100
+
+    Refactored parser to reduce complexity and improve lint score
+
+commit d6d79335705c6f268388f8480430108bd2b43f55
+Author: Tim Nicholls <timcnicholls@gmail.com>
+Date:   Thu Apr 28 14:40:38 2016 +0100
+
+    Added missing mock package to requirements.txt
+
+commit 9dd49939ce0d8390a5dd624c7c4bc12d61f6c4a5
+Author: Tim Nicholls <timcnicholls@gmail.com>
+Date:   Thu Apr 28 14:40:03 2016 +0100
+
+    Improved docstring coverage in adapter.py
+
+commit b2f3fce0dbbc5731039ccb546942e1fd29b949b4
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Fri Apr 22 09:38:06 2016 +0100
+
+    Improved test coverage, use pragma to avoid false reporting on unreachable clauses due to e.g. python version
+
+commit 0092b4a6dbe5fef279c86e8539591429d795e5ff
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Fri Apr 22 09:36:19 2016 +0100
+
+    Travis build now runs nosetests from setup script
+
+commit 8e6c4097fe55da237a2484e0f87d01f1d3033f40
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Fri Apr 22 09:35:16 2016 +0100
+
+    Added setup.cfg to configure nose testing
+
+commit d885c9fee0e89569559f4c56bbdd6ddbf9f8833a
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Wed Apr 20 18:22:51 2016 +0100
+
+    Added test coverage of main server startup configuration parsing failure
+
+commit edff85d679310032c6c4788093d2edd27b1aab28
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Wed Apr 20 09:58:42 2016 +0100
+
+    Added test_config case to complete coverage of parser.py
+
+commit 945b260868c8968b31e16de6e7db1b026da31e0e
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Wed Apr 20 08:27:56 2016 +0100
+
+    Added test cases to improve coverage of parser.py
+
+commit f7973344bf986ff458c2a92a3de5517a8b2ec132
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Tue Apr 19 19:44:04 2016 +0100
+
+    Fixed py3 issue of mocking RequestHandler
+    
+    Removed mocking of __bases__ of ApiHandler, create mock
+    application and request objects instead. Not as neat, but it
+    works at least!
+
+commit 2336917d24c1bf94c71a441b26df150b3b46aeb8
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Tue Apr 19 17:00:00 2016 +0100
+
+    Partially working attempt to mock ApiHandler base class - works OK for 2.7, fails on 3.5 [ci skip]
+
+commit 40c203b2e36f31940db97392faece1961d09c6ca
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Tue Apr 19 07:54:24 2016 +0100
+
+    Commit of work in progress from overnight [ci skip]
+
+commit c1532759c95a0e80769226405b27c81c52bdf1d7
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Mon Apr 18 19:55:00 2016 +0100
+
+    Added adapter unit test case to test ApiAdapterResponse setters
+
+commit 9de54058cd4a06b6f4c8bd43d6e4573b1987e26f
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Mon Apr 18 16:57:32 2016 +0100
+
+    Major refactor of adapter handling
+    
+    Request is now passed and validated at level of adapter verb
+    methods, rather than in handler. Removed Handler base class
+    as it no longer contains anything useful following this refactor
+
+commit fac9db3c2d43446ef387d2aa67090b4ed4950a9e
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Mon Apr 18 10:50:14 2016 +0100
+
+    Removed stray print call from test_server.py
+
+commit 8c3b00c78ed26b575847dd184a6bc42634cc52b1
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Mon Apr 18 10:48:21 2016 +0100
+
+    Improved default handling in handler response_types decorator
+
+commit 48ed460bca50815d716cf66020bf7533fc39b7e0
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Mon Apr 18 08:57:56 2016 +0100
+
+    Fixed missing import of sys in server.py
+
+commit 4848b3384df3f485f8436a1670b782ff132ffde0
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Fri Apr 15 16:23:25 2016 +0100
+
+    Fixed request decoding for python 3 in test_server.py
+
+commit 9841ac248dc2a8a3874d4775c1451da5057800d8
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Fri Apr 15 16:17:26 2016 +0100
+
+    Adding test cases to improve coverage in api and config modules
+
+commit f4af6bea89bb143e38e33122d79a335ff32c05ba
+Author: Tim Nicholls <timcnicholls@gmail.com>
+Date:   Thu Apr 14 19:24:24 2016 +0100
+
+    Moved validate_api_request decorator out of ApiHandler class
+
+commit 61ffcde8c268ec339d65951d3e68dbac8a48ea21
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Thu Apr 14 19:01:49 2016 +0100
+
+    Modifications for python 3.5 support
+
+commit d6d82a6f31e9f5265cf3fc0fcb7184cab76941d1
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Thu Apr 14 19:01:05 2016 +0100
+
+    Added landscape.io badge to README.me
+
+commit 05a7906334e4e85d61ff1cc66c78a9f9c3ddd527
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Thu Apr 14 15:53:02 2016 +0100
+
+    Modified README.md for new github repo path on badges
+    
+    Github repo moved to percival-detector organisation - updating badge URLs for travis, waffle and coveralls to match
+
+commit 1b09373463b93258edf2860a6361cb192e0b187d
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Wed Apr 13 16:34:57 2016 +0100
+
+    Added test cases for ApiAdapter and DummyAdapter classes
+
+commit 786e26d37d85632007f358fee856f47c1b8f9e8f
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Wed Apr 13 15:58:51 2016 +0100
+
+    Adding coveralls.io support to project
+
+commit 7ec88cb872124fee73b1434ec7c071ec38584984
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Wed Apr 13 15:28:39 2016 +0100
+
+    Fixing travis build
+    
+    Attmpted to add libzmq3-dev as apt package to avoid pyzmq building from scratch
+    Fixed cd step in install/script
+
+commit 75079c2c71746f0fb54e5b8c6a887cc3e8f92ea3
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Wed Apr 13 15:18:19 2016 +0100
+
+    Setting up for travis-ci build
+    
+    Added .travis.yml, factored server requirements out into requirements.txt and changed setup.py to load this file into the install_requires section.
+
+commit ed1abf442e220fc4396032511ad95ed0156f7690
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Wed Apr 13 14:53:05 2016 +0100
+
+    Trying to add more waffle.io badges
+
+commit 4ee75aebf7c5607ed5c24ff84b257e2d9594bb7d
+Merge: c925199 c989524
+Author: Tim Nicholls <timcnicholls@gmail.com>
+Date:   Wed Apr 13 13:55:23 2016 +0100
+
+    Merge pull request #8 from waffle-iron/master
+    
+    waffle.io Badge
+
+commit c98952410f736b507175aa717b19b9cc68441870
+Author: Making GitHub Delicious <iron@waffle.io>
+Date:   Wed Apr 13 06:54:38 2016 -0600
+
+    add waffle.io badge
+
+commit c925199914a6a7f76869970e9c2abd7f500bc66c
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Wed Apr 13 13:51:20 2016 +0100
+
+    Trapped ConfigError exception on parsing bad config file
+
+commit 449707655a897d7fc3d0e33487425c89f08f42f3
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Wed Apr 13 13:40:44 2016 +0100
+
+    Fixed server argv list mechanism and server test to allow arguments to be passed to server running in test thread
+
+commit 8849f25bdb51c6d8edfe977c79c3cad076c62a46
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Wed Apr 13 11:47:02 2016 +0100
+
+    Added adapter config parsing and resolution to server
+
+commit fb2110c8234163cdd84d478d97df63c069a96c1f
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Wed Apr 13 11:03:39 2016 +0100
+
+    Completed ConfigParser
+    
+    First complete implementaiton of ConfigParser, documented and with test cases written.
+
+commit 6b1c8dc26157d0a1e48d12542ac5c6120f320995
+Author: Tim Nicholls <timcnicholls@gmail.com>
+Date:   Tue Apr 12 19:59:19 2016 +0100
+
+    Completed parsing and population of AdapterConfig option
+
+commit dc0f1cf2ce12ebc4804cc5fe02567736819a7b8b
+Author: Tim Nicholls <timcnicholls@gmail.com>
+Date:   Tue Apr 12 19:13:52 2016 +0100
+
+    Ensure temporary config file is flushed after writing
+
+commit 4f4c49fe7a2164ef524a2d2f4e9057a4b7151dda
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Tue Apr 12 17:13:57 2016 +0100
+
+    Interim commit of adapter parsing, not yet functioning
+
+commit bdac6e767c56f53eedc17546790dc8215b922bea
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Tue Apr 12 14:25:22 2016 +0100
+
+    Added support for multiple-valued configuration options
+    
+    ConfigParser now supports configuration options with multiple, comma-separated values at both the command line and in configuration files.
+
+commit 759ed153c2237ab3c83db15744f4e32404040486
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Tue Apr 12 11:08:25 2016 +0100
+
+    Robust handling of file parsing errors in ConfigParser
+    
+    Make file parsing fail if missing file, trap all errors and raise as ConfigError.
+    Also added test cases to match.
+
+commit 03380cc8491146028ab390cd341c531ce627c42c
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Tue Apr 12 10:21:32 2016 +0100
+
+    More completed implementation of ConfigParser plus better test coverage
+
+commit ce74c09814d00bbbbdd4c3b62a13db3eb389f8bb
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Tue Apr 12 08:41:28 2016 +0100
+
+    Added PyCharm .idea to .gitignore
+
+commit d62d2284a0351ad50f4600bc363cc45d692d5bde
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Tue Apr 12 08:38:00 2016 +0100
+
+    First working version of ConfigParser
+
+commit 216b5e4e547d33b81ed1ca453549ca92b522f2e8
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Mon Apr 11 17:00:48 2016 +0100
+
+    Rollup commit of partially completed config file parsing
+
+commit da7f7ac5db8959c51d626a53a9a164a4f62a85e9
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Mon Apr 11 09:42:49 2016 +0100
+
+    Undo regression in tornado.options import
+
+commit b208e5071cb30e107254e209961bbc3b5b550544
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Sun Apr 10 19:58:38 2016 +0100
+
+    Added failsafe import/installation of 0MQ ioloop to allow 0MQ adapters to be implemented
+
+commit d5ad0bfacb9a4453756522347fd2f2ee2751793d
+Author: Tim Nicholls <timcnicholls@gmail.com>
+Date:   Fri Apr 8 17:59:31 2016 +0100
+
+    REALLY removed duplicate respond() method in ApiVersionHandler
+
+commit db49b0d6e352db2c456620655e91fefdfdaf0ca6
+Author: Tim Nicholls <timcnicholls@gmail.com>
+Date:   Fri Apr 8 17:56:20 2016 +0100
+
+    Removed duplicate respond() method in ApiVersionHandler
+
+commit 470e0ff0ad7a74ede5a6f25991d59a615ead46e8
+Author: Tim Nicholls <timcnicholls@gmail.com>
+Date:   Fri Apr 8 17:42:31 2016 +0100
+
+    Refactored handlers to create base class, added request and response content type validation
+
+commit 49243fc953f87c44d6bf40a00605c9c462636576
+Author: Tim Nicholls <timcnicholls@gmail.com>
+Date:   Fri Apr 8 14:42:01 2016 +0100
+
+    Refactored routes functionality
+    
+    Renamed routes stored within routes to handlers, added add_handler
+    functionality, added test fixtures
+
+commit 5e45f6f7a3e71f97020a05c675f84f27d5be6b68
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Fri Apr 8 12:08:24 2016 +0100
+
+    Refactored route mechanism to support multiple handlers per route
+
+commit 55d8f81b42a3b300dd4c3bbf18a3fcd5a62650dc
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Fri Apr 8 10:42:06 2016 +0100
+
+    Added server unit tests, mods to allow server to run in thread for testing
+
+commit b6e06a379a49901f3527993bf9bdf24862c926c8
+Author: Tim Nicholls <tcn@rome.local>
+Date:   Thu Apr 7 19:43:32 2016 +0100
+
+    Set default handler to redirect to static page
+
+commit 5c3421290450a0dbdd4d1d8092371681600ac79f
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Thu Apr 7 17:00:00 2016 +0100
+
+    Defined ApiAdapter base class with fallback verb methods
+
+commit a666a11d8e16e57629d265aef6d343f13e2b78d5
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Thu Apr 7 15:59:19 2016 +0100
+
+    Further implementation and error checking of API dispatcher/adapter model
+
+commit 52c2eda814a900f33de92f25292465a89de9b6b3
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Thu Apr 7 14:40:52 2016 +0100
+
+    Rollup commit of refactoring and extending ODIN server framework
+
+commit ea880ec834bca3b3599f5f97b7866f3bd252064e
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Wed Apr 6 16:59:10 2016 +0100
+
+    Added skeleton ODIN server
+
+commit 7d0ddfc6eb2ed5306516e2e7e872e2cbdc223403
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Wed Apr 6 15:37:16 2016 +0100
+
+    Added set_int() support to EXACLIBUR API
+
+commit d3a5f43aa091fc4ec5a9799bee158565e4a3e4d6
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Wed Apr 6 13:30:26 2016 +0100
+
+    Modified API wrapper get_int() method to return list rather than tuple
+
+commit 013cbb386388a8dba4bd6873b494597bf93d347a
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Wed Apr 6 11:58:24 2016 +0100
+
+    Added test_fem case for getting integer parameters
+
+commit 509c44a4b9698d11c274096d385fa9e128bd9330
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Wed Apr 6 11:47:58 2016 +0100
+
+    Make test_fem.test_illegal_fem_id assertion test match ID
+
+commit 2245d3a8213821cc82a64982ca7def648975dffd
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Wed Apr 6 11:46:01 2016 +0100
+
+    Added FemApiError helper class, added femCmd functionality
+
+commit 64356ef6b65acdb3109c8a0f1878067e4f5b5f46
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Wed Apr 6 09:48:11 2016 +0100
+
+    Fixed description/URL in excalibur setup.py
+
+commit 05f8425195721bfccf7605630990ab6a444e6e70
+Author: Tim Nicholls <timcnicholls@gmail.com>
+Date:   Wed Apr 6 09:43:26 2016 +0100
+
+    Created README.md
+
+commit c586a53092c6b1cba4edd1bb4b9634ff311cff20
+Author: Tim Nicholls <tim.nicholls@stfc.ac.uk>
+Date:   Wed Apr 6 09:40:50 2016 +0100
+
+    Initial commit of ODIN protoype for evaluation of detector C API bindings

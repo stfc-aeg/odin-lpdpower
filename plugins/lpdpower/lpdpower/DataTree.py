@@ -17,7 +17,7 @@ class DataTree(object):
 
                 #Convert lists/tuples to dict
                 if isinstance(subtree, list) or isinstance(subtree, tuple):
-                        return {str(i): subtree[i] for i in range(len(subtree))}
+                        subtree =  {str(i): subtree[i] for i in range(len(subtree))}
 
                 #Recursively check child elements
                 if isinstance(subtree, dict):
