@@ -59,5 +59,6 @@ class LPDPowerAdapter(ApiAdapter):
 	#@run_on_executor
 	def update_loop(self):	
 		self.pscuData.pscu.updateLCD()
+		self.pscuData.pscu.pollAllSensors()
 		time.sleep(self.update_interval)
 		IOLoop.instance().add_callback(self.update_loop)

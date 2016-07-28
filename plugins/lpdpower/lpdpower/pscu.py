@@ -33,13 +33,13 @@ class PSCU(I2CContainer):
 			self.mcpTempMon[0].setup(i, GPIO.OUT if i < 7 else GPIO.IN)
 		self.mcpTempMon.append(self.tca.attachDevice(4, MCP23008, 0x25))
 		for i in range(8):
-			self.mcpTempMon.setup(i, GPIO.IN)
+			self.mcpTempMon[1].setup(i, GPIO.IN)
 		self.mcpTempMon.append(self.tca.attachDevice(4, MCP23008, 0x26))
 		for i in range(8):
-                        self.mcpTempMon.setup(i, GPIO.IN)
+                        self.mcpTempMon[2].setup(i, GPIO.IN)
 		self.mcpTempMon.append(self.tca.attachDevice(4, MCP23008, 0x27))
 		for i in range(8):
-                        self.mcpTempMon.setup(i, GPIO.IN)
+                        self.mcpTempMon[3].setup(i, GPIO.IN)
 
 		#Attach bus 5 devices
 		#Misc AD7998s
@@ -50,9 +50,17 @@ class PSCU(I2CContainer):
 		#Misc MCP23008s
 		self.mcpMisc = []
 		self.mcpMisc.append(self.tca.attachDevice(5, MCP23008, 0x24))
+		for i in range(8):
+			self.mcpMisc[0].setup(i, GPIO.OUT if i < 2 else GPIO.IN)
 		self.mcpMisc.append(self.tca.attachDevice(5, MCP23008, 0x25))
+		for i in range(8):
+			self.mcpMisc[1].setup(i, GPIO.IN)
 		self.mcpMisc.append(self.tca.attachDevice(5, MCP23008, 0x26))
+		for i in range(8):
+			self.mcpMisc[2].setup(i, GPIO.IN)
 		self.mcpMisc.append(self.tca.attachDevice(5, MCP23008, 0x27))
+		for i in range(8):
+			self.mcpMisc[3].setup(i, GPIO.IN)
 
 		#Fan speed AD5321
                 #self.fanSpd = self.tca.attachDevice(5, AD5321, 0x0c)
@@ -99,49 +107,49 @@ class PSCU(I2CContainer):
                 if sensor > 10 or sensor < 0:
                         raise I2CException("There is not sensor %s" % sensor)
 
-		return self.__tempValues[i]
+		return self.__tempValues[sensor]
 
         def getTempSetPoint(self, sensor):
                 if sensor > 10 or sensor < 0:
                         raise I2CException("There is not sensor %s" % sensor)
 
-                return self.__tempSetPoints[i]
+                return self.__tempSetPoints[sensor]
 
         def getTempTripped(self, sensor):
                 if sensor > 10 or sensor < 0:
                         raise I2CException("There is not sensor %s" % sensor)
 
-                return self.__tempTrips[i]
+                return self.__tempTrips[sensor]
 
 	def getTempTrace(self, sensor):
 		if sensor > 10 or sensor < 0:
                         raise I2CException("There is not sensor %s" % sensor)
 
-                return self.__tempTraces[i]
+                return self.__tempTraces[sensor]
 	
 	def getHumidity(self, sensor):
 		if sensor > 1 or sensor < 0:
                         raise I2CException("There is not sensor %s" % sensor)
 
-                return self.__hValues[i]
+                return self.__hValues[sensor]
 
 	def getHSetPoint(self, sensor):
                 if sensor > 1 or sensor < 0:
                         raise I2CException("There is not sensor %s" % sensor)
 
-                return self.__hSetPoints[i]
+                return self.__hSetPoints[sensor]
 
 	def getHTripped(self, sensor):
                 if sensor > 1 or sensor < 0:
                         raise I2CException("There is not sensor %s" % sensor)
 
-                return self.__hTrips[i]
+                return self.__hTrips[sensor]
 
 	def getHTrace(self, sensor):
                 if sensor > 1 or sensor < 0:
                         raise I2CException("There is not sensor %s" % sensor)
 
-                return self.__hTraces[i]
+                return self.__hTraces[sensor]
 
 	def getPumpFlow(self):
 		return self.__pumpFlow
@@ -158,7 +166,7 @@ class PSCU(I2CContainer):
 	def getFanSetPoint(self):
 		return self.__fanSetPoint
 
-	def getFanPont(self):
+	def getFanPot(self):
 		return self.__fanPot
 
 	def getFanTripped(self):
@@ -173,7 +181,7 @@ class PSCU(I2CContainer):
 	def getArmed(self):
 		return self.__armed
 
-	def getTripped(self):
+	def getHealth(self):
 		return self.__tripped
 
 	def getTempOutput(self):
@@ -244,7 +252,7 @@ class PSCU(I2CContainer):
 		for i in range(8):
 			self.__tempSetPoints[i] = self.adcTempMon[0].readInput01(i) * 3 / 0.05
 
-		for i in range(8)
+		for i in range(8):
 			self.__tempValues[i] = self.adcTempMon[1].readInput01(i) * 3 / 0.05
 
 		for i in range(3):
@@ -286,7 +294,7 @@ class PSCU(I2CContainer):
 		self.__armed = bool(buff[0])
 		for i in range(1, 5):
 			self.__sensorOutputs[i] = bool(buff[i])
-		self.__tripped = bool(buff[7])
+		self.__tripped = bool(buff[5])
 
 		buff = self.mcpMisc[1].input_pins([0,1,2,3])
 		self.__fanTrip = bool(buff[0])

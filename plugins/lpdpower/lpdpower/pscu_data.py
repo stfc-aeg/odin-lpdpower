@@ -15,23 +15,53 @@ from tca9548 import TCA9548
 class TempData(object):
 	def __init__(self, pscu, number):
 		self.dataTree = DataTree({
-			"setpoint" : 0,
-			"temperature" : 0,
-			"trace" : True, #Output
-			"tripped" : False,
+			"setpoint" : self.getSetPoint,
+			"temperature" : self.getTemp,
+			"trace" : self.getTrace,
+			"tripped" : self.getTripped,
 			"disable" : False, #Output
 		})
+
+		self.pscu = pscu
+		self.number = number
+
+	def getSetPoint(self):
+		return self.pscu.getTempSetPoint(self.number)
+
+	def getTemp(self):
+		return self.pscu.getTemperature(self.number)
+
+	def getTrace(self):
+		return self.pscu.getTempTrace(self.number)
+
+	def getTripped(self):
+		return self.pscu.getTempTripped(self.number)
 
 #Data container for an individual humidity sensor
 class HumidityData(object):
 	def __init__(self, pscu, number):
 		self.dataTree = DataTree({
-			"humidity" : 0,
-			"setpoint" : 0,
-			"tripped" : False,
-			"trace" : True, #Output
+			"humidity" : self.getHumidity,
+			"setpoint" : self.getSetPoint,
+			"tripped" : self.getTripped,
+			"trace" : self.getTrace,
 			"disable" : False #Output
 		})
+
+		self.pscu = pscu
+		self.number = number
+
+	def getHumidity(self):
+		return self.pscu.getHumidity(self.number)
+
+	def getSetPoint(self):
+                return self.pscu.getHSetPoint(self.number)
+
+	def getTripped(self):
+                return self.pscu.getHTripped(self.number)
+
+	def getTrace(self):
+                return self.pscu.getHTrace(self.number)
 
 #Data container for entire PSCU & Quads
 class PSCUData(object):
@@ -48,34 +78,34 @@ class PSCUData(object):
 		self.dataTree = DataTree({
 			"quad" : {
 				"quads" : [q.dataTree for q in self.quadData],
-				"trace" : [True, True, True, True]
+				"trace" : [self.traceQ0, self.traceQ1, self.traceQ2, self.traceQ3]
 			},
 			"temperature" : {
 				"sensors" : [t.dataTree for t in self.tempData],
-				"overall" : True
+				"overall" : self.pscu.getTempOutput
 			},
 			"humidity" : {
 				"sensors" : [h.dataTree for h in self.humidityData],
-				"overall" : True
+				"overall" : self.pscu.getHumidityOutput
 			},
 			"fan" : {
 				"target" : 0,
-				"currentspeed" : 0,
-				"setpoint" : 0,
-				"potentiometer" : 0,
-				"tripped" : False,
-				"overall" : True
+				"currentspeed" : self.pscu.getFanSpeed,
+				"setpoint" : self.pscu.getFanSetPoint,
+				"potentiometer" : self.pscu.getFanPot,
+				"tripped" : self.pscu.getFanTripped,
+				"overall" : self.pscu.getFanOutput
 			},
 			"pump" : {
-				"flow" : 0,	
-				"setpoint" : 0,
-				"tripped" : False,
-				"overall" : True
+				"flow" : self.pscu.getPumpFlow,	
+				"setpoint" : self.pscu.getPumpSetPoint,
+				"tripped" : self.pscu.getPumpTripped,
+				"overall" : self.pscu.getPumpOutput
 			},
-			"trace" : True,
-			"overall": True,
+			"trace" : self.pscu.getTraceOutput,
+			"overall": self.pscu.getHealth,
 			"arm" : True, #Output
-			"isarmed" : True,
+			"isarmed" : self.pscu.getArmed,
 			"enableall" : False
 		})
 
@@ -83,3 +113,16 @@ class PSCUData(object):
 
 	def enableAll(self):
 		self.pscu.enableAll()
+
+	def traceQ0(self):
+		return self.pscu.getQuadTrace(0)
+
+	def traceQ1(self):
+                return self.pscu.getQuadTrace(1)
+
+	def traceQ2(self):
+                return self.pscu.getQuadTrace(2)
+
+	def traceQ3(self):
+                return self.pscu.getQuadTrace(3)
+
