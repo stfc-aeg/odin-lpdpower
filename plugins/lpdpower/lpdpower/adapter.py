@@ -1,5 +1,8 @@
 from odin.adapters.adapter import ApiAdapter, ApiAdapterResponse, request_types, response_types
 from tornado.escape import json_decode
+from concurrent import futures
+from tornado.ioloop import IOLoop
+from tornado.concurrent import run_on_executor
 from tca9548 import TCA9548
 from quad import Quad
 from mcp23008 import MCP23008
@@ -10,8 +13,12 @@ from DataTree import DataTree
 #from test_data import *
 #from quad_data import QuadData
 from pscu_data import PSCUData
+import time
 
 class LPDPowerAdapter(ApiAdapter):
+
+	# Thread executor used for background tasks
+	executor = futures.ThreadPoolExecutor(max_workers=1)
 
 	def __init__(self, **kwargs):
 		super(LPDPowerAdapter, self).__init__(**kwargs)
@@ -34,6 +41,9 @@ class LPDPowerAdapter(ApiAdapter):
 
 		self.pscuData = PSCUData()
 
+		self.update_interval = self.options.get('update_interval', 0.05)
+		self.update_loop()
+
 	@request_types('application/json')
 	@response_types('application/json')
 	def get(self, path, request):
@@ -46,4 +56,8 @@ class LPDPowerAdapter(ApiAdapter):
 		self.pscuData.dataTree.setData(path, data)
 		return ApiAdapterResponse(self.pscuData.dataTree.getData(path))  
 
-
+	#@run_on_executor
+	def update_loop(self):	
+		self.pscuData.pscu.updateLCD()
+		time.sleep(self.update_interval)
+		IOLoop.instance().add_callback(self.update_loop)

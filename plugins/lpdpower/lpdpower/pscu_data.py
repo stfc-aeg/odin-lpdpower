@@ -1,15 +1,15 @@
 from quad_data import QuadData
 from DataTree import DataTree
-#from pscu import PSCU
+from pscu import PSCU
 from quad import Quad
 from tca9548 import TCA9548
 
 #Dummy class
-class PSCU(object):
-	def __init__(self):
-		self.tca = TCA9548(0x70)
-		quad = self.tca.attachDevice(5, Quad)
-		self.quads = [quad] * 4
+#class PSCU(object):
+#	def __init__(self):
+#		self.tca = TCA9548(0x70)
+#		quad = self.tca.attachDevice(5, Quad)
+#		self.quads = [quad] * 4
 
 #Data container for an individual temp sensor
 class TempData(object):
@@ -41,7 +41,7 @@ class PSCUData(object):
 		else:
 			self.pscu = PSCU(*args, **kwargs)
 
-		self.quadData = [QuadData(q) for q in self.pscu.quads]
+		self.quadData = [QuadData(q) for q in self.pscu.quad]
 		self.tempData = [TempData(self.pscu, i) for i in range(11)]
 		self.humidityData = [HumidityData(self.pscu, i) for i in range(2)]
 
