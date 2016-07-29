@@ -27,9 +27,9 @@ function generateQuad(id)
 {
 	return `
 <div class="caption">
-	<h3>Quad ${id}:</h3>
+	<h3>Quad ${id+1}:</h3>
 	<p>Supply Voltage: <span id="q${id}-sv"></span>V</p>
-	<p class="error" id="q${id}-trace">Quad ${id} was not detected!</p>
+	<p class="error" id="q${id}-trace">Quad ${id+1} was not detected!</p>
 </div>
 <table class="table table-striped">
 	<thead>
@@ -207,7 +207,7 @@ function generateTempSensors(count)
 	{
 		ret += `
 		<tr> 
-			<th class="text-center">Sensor ${id}</th>
+			<th class="text-center">Temp ${id+1}</th>
 			<td><span id="tmp${id}-tmp"></span>°C</td>
 			<td><span id="tmp${id}-set"></span>°C</td>
 			<td><div id="tmp${id}-trace" class="status" ></div></td>
@@ -276,7 +276,7 @@ function generateHumiditySensors(count)
 	{
 		ret += `
 		<tr> 
-			<th class="text-center">Sensor ${id}</th>
+			<th class="text-center">Humid ${id+1}</th>
 			<td><span id="h${id}-h"></span>%</td>
 			<td><span id="h${id}-set"></span>%</td>
 			<td><div id="h${id}-trace" class="status" ></div></td>
@@ -344,7 +344,7 @@ function generatePumpSensors(count)
 	{
 		ret += `
 		<tr> 
-			<th class="text-center">Sensor ${id}</th>
+			<th class="text-center">Pump ${id+1}</th>
 			<td><span id="p${id}-flow">0</span>l/min</td>
 			<td><span id="p${id}-set">0</span>l/min</td>
 			<td></td>
@@ -409,7 +409,7 @@ function generateFanSensors(count)
 	{
 		ret += `
 		<tr> 
-			<th class="text-center">Sensor ${id}</th>
+			<th class="text-center">Fan ${id+1}</th>
 			<td><span id="f${id}-speed">0</span>Hz</td>
 			<td><span id="f${id}-set">0</span>Hz</td>
 			<td><span id="f${id}-pot">0</span>%</td>
