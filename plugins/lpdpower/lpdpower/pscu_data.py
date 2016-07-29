@@ -116,13 +116,13 @@ class PSCUData(object):
 		})
 
 		self.dataTree.addCallback("enableall/", self.enableAll)
-		self.dataTree.addCallback("arm/", self.arm)
+		self.dataTree.addCallback("arm/", self.setArmed)
 		self.dataTree.addCallback("fan/target/", self.fanTarget)
 
 	def enableAll(self, path, value):
 		self.pscu.enableAll()
 
-	def arm(self, path, value):
+	def setArmed(self, path, value):
 		self.pscu.setArmed(value)
 
 	def fanTarget(self, path, value):

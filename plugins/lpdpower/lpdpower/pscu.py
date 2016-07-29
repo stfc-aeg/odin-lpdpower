@@ -234,7 +234,7 @@ class PSCU(I2CContainer):
 		self.mcpMisc[0].output(pin, GPIO.LOW)
 
 	def setFanSpeed(self, value):
-		self.fanSpd.setOutput01(value / 100)
+		self.fanSpd.setOutput01(1.0 - (value / 100.0))
 
 	def updateLCD(self):
 		#Get input

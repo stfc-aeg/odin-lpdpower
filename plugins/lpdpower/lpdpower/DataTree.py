@@ -60,7 +60,6 @@ class DataTree(object):
 		
 		#Override value
 		if not isinstance(data_tree, dict):
-
 			#Check for callbacks
 			for c in self.__callbacks:
 				if cur_path.startswith(c[0]):
@@ -90,9 +89,13 @@ class DataTree(object):
                                 merge_point = merge_point[l]
                         else:
                                 raise InvalidRequest("The path %s is invalid" % path)
+
+		#Add trailing / to paths where necessary
+		if len(path) and path[-1] != '/':
+			path += '/'
 		
 		#Merge data with tree
-		merged = self.__recursiveMergeTree(merge_point, data, path + '/')
+		merged = self.__recursiveMergeTree(merge_point, data, path)
 
 		#Add merged part to tree
 		if levels == []:

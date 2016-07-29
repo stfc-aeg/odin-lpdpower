@@ -245,7 +245,7 @@ class TempSensor
 		this.map.get("trace").style.backgroundColor = data.trace ? colorOk : colorFail;
 		this.map.get("tmp").innerHTML = round2dp(data.temperature);
 		this.map.get("set").innerHTML = round2dp(data.setpoint);
-		this.map.get("enable").style.backgroundColor = data.disable ? colorFail : colorOk;
+		this.map.get("enable").style.backgroundColor = data.disabled ? colorFail : colorOk;
 	}
 }
 
@@ -314,7 +314,7 @@ class HumiditySensor
 		this.map.get("trace").style.backgroundColor = data.trace ? colorOk : colorFail;
 		this.map.get("h").innerHTML = round2dp(data.humidity);
 		this.map.get("set").innerHTML = round2dp(data.setpoint);
-		this.map.get("enable").style.backgroundColor = data.disable ? colorFail : colorOk;
+		this.map.get("enable").style.backgroundColor = data.disabled ? colorFail : colorOk;
 	}
 }
 
@@ -416,7 +416,7 @@ function generateFanSensors(count)
 			<td>
 				<div class="input-group">
 					<input class="form-control" type="text" id="f${id}-target" aria-label="Target fan speed (Hz)">
-					<span class="input-group-addon">Hz</span>
+					<span class="input-group-addon">%</span>
 					<span class="input-group-btn">
 					        <button class="btn btn-default" type="button" onclick="updateSpeed(${id})">Set</button>
 				        </span>
@@ -454,10 +454,10 @@ class FanSensor
 		this.map.get("trip").style.backgroundColor = data.tripped ? colorFail : colorOk;
 		this.map.get("speed").innerHTML = round2dp(data.currentspeed);
 		this.map.get("pot").innerHTML = round2dp(data.potentiometer);
-    this.map.get("set").innerHTML = round2dp(data.setpoint);
+    		this.map.get("set").innerHTML = round2dp(data.setpoint);
 
 		if(data.target != this.target)
-		    {
+		{
 			this.map.get("target").placeholder = data.target.toString();
 			this.target = data.target;
 		}
@@ -500,9 +500,7 @@ $(document).ready(function()
 
 	var elems = document.querySelectorAll("[id$='-health']");
 	for(var i = 0; i < elems.length; ++i)
-	{
 		global_elems.set(elems[i].id, elems[i]);
-	}
 	global_elems.set("overall-status", document.querySelector("#overall-status"));
 	global_elems.set("overall-trace", document.querySelector("#overall-trace-status"));
 	global_elems.set("enable", document.querySelector("#overall-enable"));
@@ -546,21 +544,21 @@ function updateAll()
 		global_elems.get("overall-trace").style.backgroundColor = response.trace ? colorOk : colorFail;
 
 		if(response.isarmed && !armed)
-		    {
+		{
 			var el = global_elems.get("arm");
 			el.classList.add(buttonOn);
 			el.classList.remove(buttonOff);
 			el.innerHTML = "Disarm Interlock";
 			armed = true;
-		    }
+		}
 		else if(!response.isarmed && armed)
-		    {
+		{
 			var el = global_elems.get("arm");
 			el.classList.add(buttonOff);
 			el.classList.remove(buttonOn);
 			el.innerHTML = "Arm Interlock";
 			armed = false;
-		    }
+		}
 	});
 }
 
@@ -579,7 +577,7 @@ function tmpEnable(tmpid)
 		{method: 'PUT',
 		contentType: 'application/json',
 		processData: false,
-			data: JSON.stringify({disable: temp_sensors[tmpid].active})});
+		data: JSON.stringify({disable: temp_sensors[tmpid].active})});
 }
 
 function humidityEnable(hid)
@@ -588,7 +586,7 @@ function humidityEnable(hid)
 		{method: 'PUT',
 		contentType: 'application/json',
 		processData: false,
-			data: JSON.stringify({disable: humidity_sensors[hid].active})});
+		data: JSON.stringify({disable: humidity_sensors[hid].active})});
 }
 
 function armInterlock()
@@ -597,7 +595,7 @@ function armInterlock()
 		{method: 'PUT',
 		contentType: 'application/json',
 		processData: false,
-			data: JSON.stringify({arm: global_elems.get("arm").classList.contains(buttonOff)})});
+		data: JSON.stringify({arm: global_elems.get("arm").classList.contains(buttonOff)})});
 }
 
 function enableQuads()
@@ -606,7 +604,7 @@ function enableQuads()
 		{method: 'PUT',
 		contentType: 'application/json',
 		processData: false,
-			data: JSON.stringify({enableall: true})});
+		data: JSON.stringify({enableall: true})});
 }
 
 function updateSpeed(fid)
@@ -624,6 +622,6 @@ function updateSpeed(fid)
 		{method: 'PUT',
 		contentType: 'application/json',
 		processData: false,
-			data: JSON.stringify({target: value})});
+		data: JSON.stringify({target: value})});
 }
 
