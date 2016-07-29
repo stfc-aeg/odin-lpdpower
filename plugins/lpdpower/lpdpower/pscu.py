@@ -1,6 +1,7 @@
 from I2CContainer import I2CContainer
 from tca9548 import TCA9548
 from ad7998 import AD7998
+from ad5321 import AD5321
 from mcp23008 import MCP23008
 from quad import Quad
 from usblcd import UsbLcd
@@ -18,29 +19,32 @@ class PSCU(I2CContainer):
 		self.quad = []
 		for i in range(4):
 			self.quad.append(self.tca.attachDevice(i, Quad))
-
+		
 		#Attach bus 4 devices
 		#Temperature monitor AD7998s
 		self.adcTempMon = []
 		self.adcTempMon.append(self.tca.attachDevice(4, AD7998, 0x21))
 		self.adcTempMon.append(self.tca.attachDevice(4, AD7998, 0x22))
 		self.adcTempMon.append(self.tca.attachDevice(4, AD7998, 0x23))
-
+		
 		#Temperature control MCP23008s
 		self.mcpTempMon = []
 		self.mcpTempMon.append(self.tca.attachDevice(4, MCP23008, 0x24))
 		for i in range(8):
-			self.mcpTempMon[0].setup(i, GPIO.OUT if i < 7 else GPIO.IN)
+			self.mcpTempMon[0].setup(i, GPIO.IN if i < 7 else GPIO.IN)
+		
 		self.mcpTempMon.append(self.tca.attachDevice(4, MCP23008, 0x25))
 		for i in range(8):
 			self.mcpTempMon[1].setup(i, GPIO.IN)
+		
 		self.mcpTempMon.append(self.tca.attachDevice(4, MCP23008, 0x26))
 		for i in range(8):
                         self.mcpTempMon[2].setup(i, GPIO.IN)
+		
 		self.mcpTempMon.append(self.tca.attachDevice(4, MCP23008, 0x27))
 		for i in range(8):
                         self.mcpTempMon[3].setup(i, GPIO.IN)
-
+		
 		#Attach bus 5 devices
 		#Misc AD7998s
 		self.adcMisc = []
@@ -63,33 +67,40 @@ class PSCU(I2CContainer):
 			self.mcpMisc[3].setup(i, GPIO.IN)
 
 		#Fan speed AD5321
-                #self.fanSpd = self.tca.attachDevice(5, AD5321, 0x0c)
-
+                self.fanSpd = self.tca.attachDevice(5, AD5321, 0x0c)
+		
                 #Buffers for all I2C sensors
 		#Temperature
                 self.__tempValues = [0,0,0,0,0,0,0,0,0,0,0]
                 self.__tempSetPoints = [0,0,0,0,0,0,0,0,0,0,0]
                 self.__tempTrips = [0,0,0,0,0,0,0,0,0,0,0]
                 self.__tempTraces = [0,0,0,0,0,0,0,0,0,0,0]
+		self.__tempDisabled = [0,0,0,0,0,0,0,0,0,0,0]
+
 		#Humidity
                 self.__hValues = [0,0]
 		self.__hSetPoints = [0,0]
 		self.__hTrips = [0,0]
 		self.__hTraces = [0,0]
+		self.__hDisabled = [0,0]
+
 		#Pump
 		self.__pumpFlow = 0
 		self.__pumpSetPoint = 0
 		self.__pumpTrip = False
+
 		#Fan
 		self.__fanSpeed = 0
 		self.__fanSetPoint = 0
 		self.__fanPot = 0
 		self.__fanTrip = False
+
 		#Quad traces
 		self.__qTraces = [0,0,0,0]
+
 		#Overall
 		self.__armed = False
-		self.__tripped = False
+		self.__healthy = False
 		self.__sensorOutputs = [0,0,0,0,0] #Tmp, F, P, H, T
 		self.__latchedOutputs = [0,0,0,0,0] #Tmp, F, P, T, H
 
@@ -98,10 +109,11 @@ class PSCU(I2CContainer):
                 self.lcdScreen = 0
                 self.lcdScreenCount = 5
 		self.__lcdBuff = ""
-                GPIO.setup("P9_27", GPIO.IN)
-                GPIO.setup("P9_23", GPIO.IN)
-                GPIO.add_event_detect("P9_23", GPIO.RISING)
-                GPIO.add_event_detect("P9_27", GPIO.RISING)
+		self.__lcdColor = 0
+                GPIO.setup("P9_11", GPIO.IN)
+                GPIO.setup("P9_12", GPIO.IN)
+                GPIO.add_event_detect("P9_11", GPIO.RISING)
+                GPIO.add_event_detect("P9_12", GPIO.RISING)
 
         def getTemperature(self, sensor):
                 if sensor > 10 or sensor < 0:
@@ -126,6 +138,12 @@ class PSCU(I2CContainer):
                         raise I2CException("There is not sensor %s" % sensor)
 
                 return self.__tempTraces[sensor]
+
+	def getTempDisabled(self, sensor):
+		if sensor > 10 or sensor < 0:
+                        raise I2CException("There is not sensor %s" % sensor)
+
+                return self.__tempDisabled[sensor]
 	
 	def getHumidity(self, sensor):
 		if sensor > 1 or sensor < 0:
@@ -150,6 +168,12 @@ class PSCU(I2CContainer):
                         raise I2CException("There is not sensor %s" % sensor)
 
                 return self.__hTraces[sensor]
+
+	def getHDisabled(self, sensor):
+                if sensor > 1 or sensor < 0:
+                        raise I2CException("There is not sensor %s" % sensor)
+
+                return self.__hDisabled[sensor]
 
 	def getPumpFlow(self):
 		return self.__pumpFlow
@@ -182,13 +206,14 @@ class PSCU(I2CContainer):
 		return self.__armed
 
 	def getHealth(self):
-		return self.__tripped
+		return self.__healthy
 
 	def getTempOutput(self):
 		return self.__sensorOutputs[0]
 
 	def getTraceOutput(self):
                 return self.__sensorOutputs[4]
+
 
 	def getFanOutput(self):
                 return self.__sensorOutputs[1]
@@ -202,18 +227,36 @@ class PSCU(I2CContainer):
 	def enableAll(self):
 		pass #Enable quads in turn
 
+	def setArmed(self, value):
+		pin = 0 if value else 1
+		self.mcpMisc[0].output(pin, GPIO.LOW)
+		self.mcpMisc[0].output(pin, GPIO.HIGH)
+		self.mcpMisc[0].output(pin, GPIO.LOW)
+
+	def setFanSpeed(self, value):
+		self.fanSpd.setOutput01(value / 100)
+
 	def updateLCD(self):
 		#Get input
-		if GPIO.event_detected("P9_27"):
+		if GPIO.event_detected("P9_11"):
 			self.lcdScreen += 1
-		elif GPIO.event_detected("P9_23"):
+		elif GPIO.event_detected("P9_12"):
 			self.lcdScreen -= 1
 
 		self.lcdScreen %= self.lcdScreenCount
 
+		if self.__healthy:
+			col = UsbLcd.GREEN
+		else:
+			col = UsbLcd.RED
+		
+		if not col ==	self.__lcdColor:
+			self.lcd.set_backlight_colour(col)
+			self.__lcdColor = col
+
 		#Redraw screen
 		if self.lcdScreen == 0:
-			if True:#
+			if self.__armed:
 				newDisplay = "Interlock System:\rArmed"
 			else:
 				newDisplay = "Interlock System:\rDisarmed"
@@ -248,6 +291,7 @@ class PSCU(I2CContainer):
 			self.lcd.write(self.__lcdBuff)
 
 	def pollAllSensors(self):
+		
 		#Temperature ADCs
 		for i in range(8):
 			self.__tempSetPoints[i] = self.adcTempMon[0].readInput01(i) * 3 / 0.05
@@ -259,48 +303,54 @@ class PSCU(I2CContainer):
 			self.__tempValues[i + 8] = self.adcTempMon[2].readInput01(i) * 3 / 0.05
 		for i in range(4, 7):
 			self.__tempSetPoints[i + 4] = self.adcTempMon[2].readInput01(i) * 3 / 0.05
-
+		
+		
 		#Temperature MCPs
-		self.__sensorOutputs[0] = self.mcpTempMon[0].input(7)
+		buff = self.mcpTempMon[0].input_pins([0,1,2,3,4,5,7])
+		for i in range(4):
+			self.__tempDisabled[i + 4] = buff[i]
+		self.__tempDisabled[10] = buff[4]
+		self.__hDisabled[1] = buff[5]
+		self.__sensorOutputs[0] = buff[6]
 
 		buff = self.mcpTempMon[1].input_pins(self.ALL_PINS)
 		for i in range(8):
-			self.__tempTrips[i] = bool(buff[i])
-
+			self.__tempTrips[i] = not bool(buff[i])
+		
 		buff = self.mcpTempMon[2].input_pins(self.ALL_PINS)
 		for i in range(8):
 			self.__tempTraces[i] = bool(buff[i])
-
+		
 		buff = self.mcpTempMon[3].input_pins([0,1,2,3,4,5])
 		for i in range(3):
-			self.__tempTrips[i + 8] = bool(buff[i])
+			self.__tempTrips[i + 8] = not bool(buff[i])
 		for i in range(3, 6):
 			self.__tempTraces[i + 5] = bool(buff[i])
-
+		
 		#Misc. ADCs
-		self.__fanSpeed = self.adcMisc[0].readInput01(0) * 5 / 4.5 * 50
-		self.__hValues[0] = self.adcMisc[0].readInput01(1) * 100 * 5 / 3.9
-		self.__hValues[1] = self.adcMisc[0].readInput01(2) * 100 * 5 / 3.9
-		self.__pumpFlow = self.adcMisc[0].readInput01(3) * 5 / 4.32 * 35
-		self.__fanPot = self.adcMisc[0].readInput01(4) * 100
+		self.__fanSpeed = self.adcMisc[1].readInput01(0) * 5 / 4.5 * 50
+		self.__hValues[0] = self.adcMisc[1].readInput01(1) * 100 * 5 / 3.9
+		self.__hValues[1] = self.adcMisc[1].readInput01(2) * 100 * 5 / 3.9
+		self.__pumpFlow = self.adcMisc[1].readInput01(3) * 5 / 4.32 * 35
+		self.__fanPot = self.adcMisc[1].readInput01(4) * 100
 
-		self.__fanSetPoint = self.adcMisc[1].readInput01(0) * 5 / 4.5 * 50
-		self.__hSetPoints[0] = self.adcMisc[1].readInput01(1) * 100 * 5 / 3.9
-		self.__hSetPoints[1] = self.adcMisc[1].readInput01(2) * 100 * 5 / 3.9
-		self.__pumpSetPoint = self.adcMisc[1].readInput01(3) * 5 / 4.32 * 35
+		self.__fanSetPoint = self.adcMisc[0].readInput01(0) * 5 / 4.5 * 50
+		self.__hSetPoints[0] = self.adcMisc[0].readInput01(1) * 100 * 5 / 3.9
+		self.__hSetPoints[1] = self.adcMisc[0].readInput01(2) * 100 * 5 / 3.9
+		self.__pumpSetPoint = self.adcMisc[0].readInput01(3) * 5 / 4.32 * 35
 
 		#Misc. MCPs
 		buff = self.mcpMisc[0].input_pins([2,3,4,5,6,7])
 		self.__armed = bool(buff[0])
 		for i in range(1, 5):
 			self.__sensorOutputs[i] = bool(buff[i])
-		self.__tripped = bool(buff[5])
+		self.__healthy = bool(buff[5])
 
 		buff = self.mcpMisc[1].input_pins([0,1,2,3])
-		self.__fanTrip = bool(buff[0])
-		self.__hTrips[0] = bool(buff[1])
-		self.__hTrips[1] = bool(buff[2])
-		self.__pumpTrip = bool(buff[3])
+		self.__fanTrip = not bool(buff[0])
+		self.__hTrips[0] = not bool(buff[1])
+		self.__hTrips[1] = not bool(buff[2])
+		self.__pumpTrip = not bool(buff[3])
 
 		buff = self.mcpMisc[2].input_pins([1,2,4,5,6,7])
 		self.__hTraces[0] = bool(buff[0])

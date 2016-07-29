@@ -192,11 +192,11 @@ function generateTempSensors(count)
 	<thead>
 		<tr>
 			<th class="text-center" style="width:20%;">Sensor</th>
-			<th class="text-center" style="width:20%;">Temp.</th>
-			<th class="text-center" style="width:20%;">Set Point</th>
-			<th class="text-center" style="width:10%;">Tripped</th>
+			<th class="text-center" style="width:25%;">Temp.</th>
+			<th class="text-center" style="width:25%;">Set Point</th>
 			<th class="text-center" style="width:10%;">Trace</th>
-			<th class="text-center" style="width:20%;">Enable</th>
+			<th class="text-center" style="width:10%;">Enable</th>
+			<th class="text-center" style="width:10%;">Tripped</th>
 		</tr>
 	</thead>
 
@@ -210,9 +210,9 @@ function generateTempSensors(count)
 			<th class="text-center">Sensor ${id}</th>
 			<td><span id="tmp${id}-tmp"></span>°C</td>
 			<td><span id="tmp${id}-set"></span>°C</td>
-			<td><div id="tmp${id}-trip" class="status"></div></td>
 			<td><div id="tmp${id}-trace" class="status" ></div></td>
-			<td><button id="tmp${id}-enable" type="button" class="btn btn-success" onclick="tmpEnable(${id})">Disable</button></td>
+			<td><div id="tmp${id}-enable" class="status" ></div></td>
+		        <td><div id="tmp${id}-trip" class="status"></div></td>
 		</tr>
 		`;
 	}
@@ -228,7 +228,6 @@ class TempSensor
 	{
 		this.map = new Map();
 		this.active = true;
-		this.canDisable = (id > 3 && id < 8) || id == 10; //The sensors that can be disabled
 	
 		var elements = document.querySelectorAll(`[id^='tmp${id}-']`);
 		for (var i = 0; i < elements.length; ++i)
@@ -238,34 +237,15 @@ class TempSensor
 						elements[i].id.length - start);
 			this.map.set(key, elements[i]);
 		}
-
-		if(!this.canDisable)
-		{
-			this.map.get("enable").setAttribute("disabled", "disabled");
-		}
 	}
 
 	update(data)
 	{
 		this.map.get("trip").style.backgroundColor = data.tripped ? colorFail : colorOk;
 		this.map.get("trace").style.backgroundColor = data.trace ? colorOk : colorFail;
-		this.map.get("tmp").innerHTML = data.temperature;
-		this.map.get("set").innerHTML = data.setpoint;
-
-		if(this.canDisable)
-		{
-			var el = this.map.get("enable");
-			if(data.disable && this.active)
-			{
-				disableButton(el);
-				this.active = false;
-			}
-			else if(!data.disable && !this.active)
-			{
-				enableButton(el);
-				this.active = true;
-			}
-		}
+		this.map.get("tmp").innerHTML = round2dp(data.temperature);
+		this.map.get("set").innerHTML = round2dp(data.setpoint);
+		this.map.get("enable").style.backgroundColor = data.disable ? colorFail : colorOk;
 	}
 }
 
@@ -281,11 +261,11 @@ function generateHumiditySensors(count)
 	<thead>
 		<tr>
 			<th class="text-center" style="width:20%;">Sensor</th>
-			<th class="text-center" style="width:20%;">Humidity.</th>
-			<th class="text-center" style="width:20%;">Set Point</th>
-			<th class="text-center" style="width:10%;">Tripped</th>
+			<th class="text-center" style="width:25%;">Humidity.</th>
+			<th class="text-center" style="width:25%;">Set Point</th>
 			<th class="text-center" style="width:10%;">Trace</th>
-			<th class="text-center" style="width:20%;">Enable</th>
+			<th class="text-center" style="width:10%;">Enable</th>
+			<th class="text-center" style="width:10%;">Tripped</th>
 		</tr>
 	</thead>
 
@@ -299,9 +279,9 @@ function generateHumiditySensors(count)
 			<th class="text-center">Sensor ${id}</th>
 			<td><span id="h${id}-h"></span>%</td>
 			<td><span id="h${id}-set"></span>%</td>
-			<td><div id="h${id}-trip" class="status"></div></td>
 			<td><div id="h${id}-trace" class="status" ></div></td>
-			<td><button id="h${id}-enable" type="button" class="btn btn-success" onclick="humidityEnable(${id})">Disable</button></td>
+			<td><div id="h${id}-enable" class="status" ></div></td>
+			<td><div id="h${id}-trip" class="status"></div></td>
 		</tr>
 		`;
 	}
@@ -317,7 +297,6 @@ class HumiditySensor
 	{
 		this.map = new Map();
 		this.active = true;
-		this.canDisable = id == 1; //Only sensor 1 can be disabled
 		
 		var elements = document.querySelectorAll(`[id^='h${id}-']`);
 		for (var i = 0; i < elements.length; ++i)
@@ -327,34 +306,15 @@ class HumiditySensor
 						elements[i].id.length - start);
 			this.map.set(key, elements[i]);
 		}
-
-		if(!this.canDisable)
-		{
-			this.map.get("enable").setAttribute("disabled", "disabled");
-		}
 	}
 
 	update(data)
 	{
 		this.map.get("trip").style.backgroundColor = data.tripped ? colorFail : colorOk;
 		this.map.get("trace").style.backgroundColor = data.trace ? colorOk : colorFail;
-		this.map.get("h").innerHTML = data.humidity;
-		this.map.get("set").innerHTML = data.setpoint;
-
-		if(this.canDisable)
-		{
-			var el = this.map.get("enable");
-			if(data.disable && this.active)
-			{
-				disableButton(el);
-				this.active = false;
-			}
-			else if(!data.disable && !this.active)
-			{
-				enableButton(el);
-				this.active = true;
-			}
-		}
+		this.map.get("h").innerHTML = round2dp(data.humidity);
+		this.map.get("set").innerHTML = round2dp(data.setpoint);
+		this.map.get("enable").style.backgroundColor = data.disable ? colorFail : colorOk;
 	}
 }
 
@@ -370,10 +330,10 @@ function generatePumpSensors(count)
 	<thead>
 		<tr>
 			<th class="text-center" style="width:20%;">Sensor</th>
-			<th class="text-center" style="width:20%;">Flow</th>
-			<th class="text-center" style="width:20%;">Set Point</th>
+			<th class="text-center" style="width:25%;">Flow</th>
+			<th class="text-center" style="width:25%;">Set Point</th>
+			<th class="text-center" style="width:20%;"></th>
 			<th class="text-center" style="width:10%;">Tripped</th>
-			<th class="text-center" style="width:30%;"></th>
 		</tr>
 	</thead>
 
@@ -387,8 +347,8 @@ function generatePumpSensors(count)
 			<th class="text-center">Sensor ${id}</th>
 			<td><span id="p${id}-flow">0</span>l/min</td>
 			<td><span id="p${id}-set">0</span>l/min</td>
-			<td><div style="background-color: rgb(92, 184, 92);" id="p${id}-trip" class="status"></div></td>
 			<td></td>
+			<td><div id="p${id}-trip" class="status"></div></td>
 		</tr>
 		`;
 	}
@@ -417,8 +377,8 @@ class PumpSensor
 	update(data)
 	{
 		this.map.get("trip").style.backgroundColor = data.tripped ? colorFail : colorOk;
-		this.map.get("flow").innerHTML = data.flow;
-		this.map.get("set").innerHTML = data.setpoint;
+		this.map.get("flow").innerHTML = round2dp(data.flow);
+		this.map.get("set").innerHTML = round2dp(data.setpoint);
 	}
 }
 
@@ -433,12 +393,12 @@ function generateFanSensors(count)
 
 	<thead>
 		<tr>
-			<th class="text-center" style="width:15%;">Sensor</th>
-			<th class="text-center" style="width:15%;">Current Speed</th>
-			<th class="text-center" style="width:15%;">Set Point</th>
-			<th class="text-center" style="width:15%;">Potentiometer</th>
-			<th class="text-center" style="width:10%;">Tripped</th>
+			<th class="text-center" style="width:20%;">Sensor</th>
+			<th class="text-center" style="width:14%;">Current Speed</th>
+			<th class="text-center" style="width:13%;">Set Point</th>
+			<th class="text-center" style="width:14%;">Potentiometer</th>
 			<th class="text-center" style="width:30%;">Target Speed</th>
+			<th class="text-center" style="width:10%;">Tripped</th>
 		</tr>
 	</thead>
 	  
@@ -454,9 +414,6 @@ function generateFanSensors(count)
 			<td><span id="f${id}-set">0</span>Hz</td>
 			<td><span id="f${id}-pot">0</span>%</td>
 			<td>
-				<div style="background-color: rgb(92, 184, 92);" id="f${id}-trip" class="status"></div>
-			</td>
-			<td>
 				<div class="input-group">
 					<input class="form-control" type="text" id="f${id}-target" aria-label="Target fan speed (Hz)">
 					<span class="input-group-addon">Hz</span>
@@ -465,6 +422,7 @@ function generateFanSensors(count)
 				        </span>
 				</div>
 			</td>
+			<td><div id="f${id}-trip" class="status"></div></td>
 		</tr>
 		`;
 	}
@@ -494,9 +452,9 @@ class FanSensor
 	update(data)
 	{
 		this.map.get("trip").style.backgroundColor = data.tripped ? colorFail : colorOk;
-		this.map.get("speed").innerHTML = data.currentspeed;
-		this.map.get("pot").innerHTML = data.potentiometer;
-		this.map.get("set").innerHTML = data.setpoint;
+		this.map.get("speed").innerHTML = round2dp(data.currentspeed);
+		this.map.get("pot").innerHTML = round2dp(data.potentiometer);
+    this.map.get("set").innerHTML = round2dp(data.setpoint);
 
 		if(data.target != this.target)
 		    {
@@ -668,3 +626,4 @@ function updateSpeed(fid)
 		processData: false,
 			data: JSON.stringify({target: value})});
 }
+

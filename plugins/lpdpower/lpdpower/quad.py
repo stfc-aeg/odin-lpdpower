@@ -34,7 +34,7 @@ class Quad(I2CContainer):
 		if channel > 3 or channel < 0:
                 	raise I2CException("%s is not a channel on the Quad. Must be between 0 & 3" % channel)
 
-                return self.adcPower.readInput01(channel + 4) * 5 * 16 #Unsure of coefficients
+                return self.adcPower.readInput01(channel + 4) * 5 * 4
 
 	#Gets the voltage after the fuse should be more or less equal to 48V
 #	def getFuseVoltage(self, channel):

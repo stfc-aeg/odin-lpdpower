@@ -19,7 +19,7 @@ class TempData(object):
 			"temperature" : self.getTemp,
 			"trace" : self.getTrace,
 			"tripped" : self.getTripped,
-			"disable" : False, #Output
+			"disabled" : self.getDisabled
 		})
 
 		self.pscu = pscu
@@ -37,6 +37,9 @@ class TempData(object):
 	def getTripped(self):
 		return self.pscu.getTempTripped(self.number)
 
+	def getDisabled(self):
+		return self.pscu.getTempDisabled(self.number)
+
 #Data container for an individual humidity sensor
 class HumidityData(object):
 	def __init__(self, pscu, number):
@@ -45,7 +48,7 @@ class HumidityData(object):
 			"setpoint" : self.getSetPoint,
 			"tripped" : self.getTripped,
 			"trace" : self.getTrace,
-			"disable" : False #Output
+			"disabled" : self.getDisabled,
 		})
 
 		self.pscu = pscu
@@ -62,6 +65,9 @@ class HumidityData(object):
 
 	def getTrace(self):
                 return self.pscu.getHTrace(self.number)
+
+	def getDisabled(self):
+		return self.pscu.getHDisabled(self.number)
 
 #Data container for entire PSCU & Quads
 class PSCUData(object):
@@ -106,13 +112,21 @@ class PSCUData(object):
 			"overall": self.pscu.getHealth,
 			"arm" : True, #Output
 			"isarmed" : self.pscu.getArmed,
-			"enableall" : False
+			"enableall" : False #Output
 		})
 
 		self.dataTree.addCallback("enableall/", self.enableAll)
+		self.dataTree.addCallback("arm/", self.arm)
+		self.dataTree.addCallback("fan/target/", self.fanTarget)
 
-	def enableAll(self):
+	def enableAll(self, path, value):
 		self.pscu.enableAll()
+
+	def arm(self, path, value):
+		self.pscu.setArmed(value)
+
+	def fanTarget(self, path, value):
+		self.pscu.setFanSpeed(value)
 
 	def traceQ0(self):
 		return self.pscu.getQuadTrace(0)

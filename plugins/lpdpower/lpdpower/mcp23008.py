@@ -1,5 +1,5 @@
 from I2CDevice import I2CDevice, I2CException
-import Adafruit_GPIO as GPIO
+import Adafruit_BBIO.GPIO as GPIO
 
 #Class for the MCP23008 designed to be drop-in replacement for Adafruit class
 class MCP23008(I2CDevice):
