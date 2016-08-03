@@ -21,6 +21,7 @@
 	width: 80%;
 	margin: 0 10%;
 	border-radius: 3px;
+	color: #ffffff;
 }
 
 .error {
@@ -51,20 +52,33 @@
 	top: 80px;
 }
 
-#overall-trace-label
+#trace-label
 {
 	position:absolute;
 	left: 20px;
 	top: 120px;
 }
 
-#overall-trace-status
+#trace-status
 {
 	position: absolute;
 	margin: 0;
-	right: 22px;
-	top: 128px;
+	left: 70px;
+	top: 120px;
 	width: 60px;
+	text-align: center;
+	color: #ffffff;
+}
+
+#trace-latched
+{
+	position: absolute;
+	margin: 0;
+	top: 120px;
+	left: 140px;
+	width: 60px;
+	text-align: center;
+	color: #ffffff;
 }
 
 #overall-box > table

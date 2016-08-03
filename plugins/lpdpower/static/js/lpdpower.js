@@ -186,7 +186,8 @@ function generateTempSensors(count)
 	var ret = `
 <div class="caption">
 	<h3>Temperature:</h3>
-	<div class="status" id="tmp-health"></div>
+	<div class="status" id="tmp-health">Status</div>
+	<div class="status" id="tmp-latched">Latched</div>
 </div>
 <table class="table table-striped">
 
@@ -255,7 +256,8 @@ function generateHumiditySensors(count)
 	var ret = `
 <div class="caption">
 	<h3>Humidity:</h3>
-	<div class="status" id="h-health"></div>
+	<div class="status" id="h-health">Status</div>
+	<div class="status" id="h-latched">Latched</div>
 </div>
 <table class="table table-striped">
 
@@ -324,7 +326,8 @@ function generatePumpSensors(count)
 	var ret = `
 <div class="caption">
 	<h3>Pump:</h3>
-	<div class="status" id="p-health"></div>
+	<div class="status" id="p-health">Status</div>
+	<div class="status" id="p-latched">Latched</div>
 </div>
 <table class="table table-striped">
 
@@ -388,7 +391,8 @@ function generateFanSensors(count)
 	var ret = `
 <div class="caption">
 	<h3>Fan:</h3>
-	<div class="status" id="f-health"></div>
+	<div class="status" id="f-health">Status</div>
+	<div class="status" id="f-latched">Latched</div>
 </div>
 <table class="table table-striped">
 
@@ -502,8 +506,14 @@ $(document).ready(function()
 	var elems = document.querySelectorAll("[id$='-health']");
 	for(var i = 0; i < elems.length; ++i)
 		global_elems.set(elems[i].id, elems[i]);
+
+        var latched_elems = document.querySelectorAll("[id$='-latched']");
+        for(var i = 0; i < latched_elems.length; i++) 
+            global_elems.set(latched_elems[i].id, latched_elems[i]);
+
 	global_elems.set("overall-status", document.querySelector("#overall-status"));
-	global_elems.set("overall-trace", document.querySelector("#overall-trace-status"));
+	global_elems.set("trace-status", document.querySelector("#trace-status"));
+        global_elems.set("trace-latched", document.querySelector("#trace-latched"));
 	global_elems.set("enable", document.querySelector("#overall-enable"));
 	global_elems.set("arm", document.querySelector("#overall-arm"));
 
@@ -542,7 +552,14 @@ function updateAll()
 		global_elems.get("p-health").style.backgroundColor = response.pump.overall ? colorOk : colorFail;
 		global_elems.get("f-health").style.backgroundColor = response.fan.overall ? colorOk : colorFail;
 		global_elems.get("overall-status").style.backgroundColor = response.overall ? colorOk : colorFail;
-		global_elems.get("overall-trace").style.backgroundColor = response.trace ? colorOk : colorFail;
+		global_elems.get("trace-status").style.backgroundColor = response.trace.overall ? colorOk : colorFail;
+
+	        // Handler latched states
+                global_elems.get("tmp-latched").style.backgroundColor = response.temperature.latched ? colorOk: colorFail;
+                global_elems.get("trace-latched").style.backgroundColor = response.trace.latched ? colorOk: colorFail;
+                global_elems.get("h-latched").style.backgroundColor = response.humidity.latched ? colorOk: colorFail;
+                global_elems.get("f-latched").style.backgroundColor = response.fan.latched ? colorOk: colorFail;
+                global_elems.get("p-latched").style.backgroundColor = response.pump.latched ? colorOk: colorFail;
 
 		if(response.isarmed && !armed)
 		{
