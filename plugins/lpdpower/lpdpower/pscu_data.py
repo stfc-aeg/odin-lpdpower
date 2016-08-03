@@ -88,11 +88,13 @@ class PSCUData(object):
 			},
 			"temperature" : {
 				"sensors" : [t.dataTree for t in self.tempData],
-				"overall" : self.pscu.getTempOutput
+				"overall" : self.pscu.getTempOutput,
+				"latched" : self.pscu.getTempLatched,
 			},
 			"humidity" : {
 				"sensors" : [h.dataTree for h in self.humidityData],
-				"overall" : self.pscu.getHumidityOutput
+				"overall" : self.pscu.getHumidityOutput,
+				"latched" : self.pscu.getHumidityLatched,
 			},
 			"fan" : {
 				"target" : 0,
@@ -100,15 +102,20 @@ class PSCUData(object):
 				"setpoint" : self.pscu.getFanSetPoint,
 				"potentiometer" : self.pscu.getFanPot,
 				"tripped" : self.pscu.getFanTripped,
-				"overall" : self.pscu.getFanOutput
+				"overall" : self.pscu.getFanOutput,
+				"latched" : self.pscu.getFanLatched,
 			},
 			"pump" : {
 				"flow" : self.pscu.getPumpFlow,	
 				"setpoint" : self.pscu.getPumpSetPoint,
 				"tripped" : self.pscu.getPumpTripped,
-				"overall" : self.pscu.getPumpOutput
+				"overall" : self.pscu.getPumpOutput,
+				"latched" : self.pscu.getPumpLatched,
 			},
-			"trace" : self.pscu.getTraceOutput,
+			"trace" : {
+				 "overall" : self.pscu.getTraceOutput,
+				 "latched" : self.pscu.getTraceLatched,
+                        },
 			"overall": self.pscu.getHealth,
 			"arm" : True, #Output
 			"isarmed" : self.pscu.getArmed,

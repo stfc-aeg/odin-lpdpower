@@ -212,18 +212,32 @@ class PSCU(I2CContainer):
 	def getTempOutput(self):
 		return self.__sensorOutputs[0]
 
+	def getTempLatched(self):
+		return self.__latchedOutputs[0]
+
 	def getTraceOutput(self):
                 return self.__sensorOutputs[4]
 
+	def getTraceLatched(self):
+		return self.__latchedOutputs[3]
 
 	def getFanOutput(self):
                 return self.__sensorOutputs[1]
 
+	def getFanLatched(self):
+		return self.__latchedOutputs[1]
+
 	def getPumpOutput(self):
                 return self.__sensorOutputs[2]
 
+	def getPumpLatched(self):
+		return self.__latchedOutputs[2]
+
 	def getHumidityOutput(self):
                 return self.__sensorOutputs[3]
+
+        def getHumidityLatched(self):
+		return self.__latchedOutputs[4]
 
 	def enableAll(self):
 		pass #Enable quads in turn
@@ -372,4 +386,4 @@ class PSCU(I2CContainer):
 			self.__qTraces[i - 2] = bool(buff[i])
 
 		buff = self.mcpMisc[3].input_pins([0,1,2,3,4])
-		self.__latchedOutputs[i] = [bool(i) for i in buff]
+		self.__latchedOutputs = [bool(i) for i in buff]
