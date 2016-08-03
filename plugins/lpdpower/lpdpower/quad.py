@@ -3,8 +3,9 @@ from I2CContainer import I2CContainer
 from tca9548 import TCA9548
 from mcp23008 import MCP23008
 from ad7998 import AD7998
-import Adafruit_GPIO as GPIO
+import Adafruit_BBIO.GPIO as GPIO
 import time
+import logging
 
 class Quad(I2CContainer):
 	
@@ -16,7 +17,7 @@ class Quad(I2CContainer):
 
 		for i in range(4):
 			self.mcp.setup(i, GPIO.OUT)
-			self.mcp.pullup(i, True)
+			#self.mcp.pullup(i, True)
 
 		for i in range(4, 8):
 			self.mcp.setup(i, GPIO.IN)
@@ -59,11 +60,12 @@ class Quad(I2CContainer):
 			if self.isEnabled(channel) != channels[channel]:
 				data[channel] = True
 
+
 		#No channels to toggle
                 if not len(data):
                         return
 
-                self.mcp.disableOutputs()
+		self.mcp.disableOutputs()
                 self.mcp.output_pins(data)
                 self.mcp.disableOutputs()
 
@@ -76,7 +78,10 @@ class Quad(I2CContainer):
 
 if __name__ == "__main__":
 	tca = TCA9548(0x70)
-	quad = tca.attachDevice(5, Quad)
+	quad = tca.attachDevice(0, Quad)
 
-	quad.setChannels({0: True, 1: True, 2: False, 3:True})
-	quad.printTest()
+	quad.setChannels({0: True, 1: True, 2: True, 3:True})
+	for chan in range(4):
+		enabled = quad.isEnabled(chan)
+
+	#quad.printTest()

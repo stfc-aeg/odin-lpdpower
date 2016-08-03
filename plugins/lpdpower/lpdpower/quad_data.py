@@ -1,5 +1,6 @@
 from quad import Quad
 from DataTree import DataTree
+import logging
 
 #Data tree to represent one channel on a quad
 class ChannelData(object):
