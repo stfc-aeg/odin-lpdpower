@@ -28,23 +28,23 @@ class PSCU(I2CContainer):
 		self.adcTempMon.append(self.tca.attachDevice(4, AD7998, 0x22))
 		self.adcTempMon.append(self.tca.attachDevice(4, AD7998, 0x23))
 		
-		#Temperature control MCP23008s
+		#Temperature monitor MCP23008s
 		self.mcpTempMon = []
 		self.mcpTempMon.append(self.tca.attachDevice(4, MCP23008, 0x24))
 		for i in range(8):
-			self.mcpTempMon[0].setup(i, GPIO.IN if i < 7 else GPIO.IN)
+			self.mcpTempMon[0].setup(i, MCP23008.IN if i < 7 else MCP23008.IN)
 		
 		self.mcpTempMon.append(self.tca.attachDevice(4, MCP23008, 0x25))
 		for i in range(8):
-			self.mcpTempMon[1].setup(i, GPIO.IN)
+			self.mcpTempMon[1].setup(i, MCP23008.IN)
 		
 		self.mcpTempMon.append(self.tca.attachDevice(4, MCP23008, 0x26))
 		for i in range(8):
-                        self.mcpTempMon[2].setup(i, GPIO.IN)
+                        self.mcpTempMon[2].setup(i, MCP23008.IN)
 		
 		self.mcpTempMon.append(self.tca.attachDevice(4, MCP23008, 0x27))
 		for i in range(8):
-                        self.mcpTempMon[3].setup(i, GPIO.IN)
+                        self.mcpTempMon[3].setup(i, MCP23008.IN)
 		
 		#Attach bus 5 devices
 		#Misc AD7998s
@@ -56,16 +56,16 @@ class PSCU(I2CContainer):
 		self.mcpMisc = []
 		self.mcpMisc.append(self.tca.attachDevice(5, MCP23008, 0x24))
 		for i in range(8):
-			self.mcpMisc[0].setup(i, GPIO.OUT if i < 2 else GPIO.IN)
+			self.mcpMisc[0].setup(i, MCP23008.OUT if i < 2 else MCP23008.IN)
 		self.mcpMisc.append(self.tca.attachDevice(5, MCP23008, 0x25))
 		for i in range(8):
-			self.mcpMisc[1].setup(i, GPIO.IN)
+			self.mcpMisc[1].setup(i, MCP23008.IN)
 		self.mcpMisc.append(self.tca.attachDevice(5, MCP23008, 0x26))
 		for i in range(8):
-			self.mcpMisc[2].setup(i, GPIO.IN)
+			self.mcpMisc[2].setup(i, MCP23008.IN)
 		self.mcpMisc.append(self.tca.attachDevice(5, MCP23008, 0x27))
 		for i in range(8):
-			self.mcpMisc[3].setup(i, GPIO.IN)
+			self.mcpMisc[3].setup(i, MCP23008.IN)
 
 		#Fan speed AD5321
                 self.fanSpd = self.tca.attachDevice(5, AD5321, 0x0c)
@@ -230,9 +230,9 @@ class PSCU(I2CContainer):
 
 	def setArmed(self, value):
 		pin = 0 if value else 1
-		self.mcpMisc[0].output(pin, GPIO.LOW)
-		self.mcpMisc[0].output(pin, GPIO.HIGH)
-		self.mcpMisc[0].output(pin, GPIO.LOW)
+		self.mcpMisc[0].output(pin, MCP23008.LOW)
+		self.mcpMisc[0].output(pin, MCP23008.HIGH)
+		self.mcpMisc[0].output(pin, MCP23008.LOW)
 
 	def setFanSpeed(self, value):
 		self.fanSpd.setOutput01(1.0 - (value / 100.0))

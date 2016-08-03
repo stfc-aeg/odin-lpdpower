@@ -38,7 +38,7 @@ class MCP23008(I2CDevice):
 	def output(self, pin, value):
 		self.output_pins({pin : value})
 
-	#Sets the output of multiple pins {pin:GPIO.OUT, pin:GPIO...}
+	#Sets the output of multiple pins {pin:MCP23008.OUT, pin:MCP230008.IN et}
 	def output_pins(self, pins):
 		for pin, val in pins.items():
 			if val:
@@ -71,6 +71,6 @@ class MCP23008(I2CDevice):
 		elif value == self.OUT:
 			self.__iodir &= ~(1 << pin)
 		else:
-			raise ValueError("MCP23008::setup() expected a value of GPIO.IN or GPIO.OUT")
+			raise ValueError("MCP23008::setup() expected a value of MCP23008.IN or MCP23008.OUT")
 
 		self.write8(self.IODIR, self.__iodir)
