@@ -3,7 +3,7 @@ from I2CContainer import I2CContainer
 from tca9548 import TCA9548
 from mcp23008 import MCP23008
 from ad7998 import AD7998
-import Adafruit_BBIO.GPIO as GPIO
+
 import time
 import logging
 
@@ -16,11 +16,11 @@ class Quad(I2CContainer):
 		self.mcp = self.attachDevice(MCP23008, 0x20)
 
 		for i in range(4):
-			self.mcp.setup(i, GPIO.OUT)
+			self.mcp.setup(i, MCP23008.OUT)
 			#self.mcp.pullup(i, True)
 
 		for i in range(4, 8):
-			self.mcp.setup(i, GPIO.IN)
+			self.mcp.setup(i, MCP23008.IN)
 
 		self.adcPower = self.attachDevice(AD7998, 0x22)
 #		self.adcFuse = self.attachDevice(AD7998, 0x21)
@@ -74,7 +74,7 @@ class Quad(I2CContainer):
 		if i > 3 or i < 0:
                         raise I2CException("%s is not a channel on the Quad. Must be between 0 & 3" % i)
 
-		return self.mcp.input(i + 4) == GPIO.HIGH
+		return self.mcp.input(i + 4) == 1
 
 if __name__ == "__main__":
 	tca = TCA9548(0x70)
