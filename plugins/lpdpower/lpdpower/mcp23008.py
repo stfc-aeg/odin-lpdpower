@@ -12,6 +12,9 @@ class MCP23008(I2CDevice):
 	IN       = 0
         OUT      = 1
 
+	LOW      = 0
+	HIGH     = 1
+
 	def __init__(self, address = 0x20, **kwargs):
 
 		I2CDevice.__init__(self, address, **kwargs)
