@@ -4,9 +4,10 @@ const buttonOff = "btn-danger";
 const colorOk = "#5cb85c";
 const colorFail = "#d9534f";
 
-function round2dp(flt)
+function round1dp(flt)
 {
-	return Math.round(flt * 100) / 100;
+	//return Math.round(flt * 10) / 10;
+    return flt.toFixed(1);
 }
 
 function enableButton(el)
@@ -101,22 +102,22 @@ class Quad
 		//Update all the values in the table
 		//Channel voltages
 		this.map.get("sv").innerHTML = data.supply;
-		this.map.get("v0").innerHTML = round2dp(data.channels[0].voltage);
-		this.map.get("v1").innerHTML = round2dp(data.channels[1].voltage);
-		this.map.get("v2").innerHTML = round2dp(data.channels[2].voltage);
-		this.map.get("v3").innerHTML = round2dp(data.channels[3].voltage);
+		this.map.get("v0").innerHTML = round1dp(data.channels[0].voltage);
+		this.map.get("v1").innerHTML = round1dp(data.channels[1].voltage);
+		this.map.get("v2").innerHTML = round1dp(data.channels[2].voltage);
+		this.map.get("v3").innerHTML = round1dp(data.channels[3].voltage);
 
 		//Channel voltages after fuse
-		this.map.get("f0").innerHTML = round2dp(data.channels[0].fusevoltage);
-		this.map.get("f1").innerHTML = round2dp(data.channels[1].fusevoltage);
-		this.map.get("f2").innerHTML = round2dp(data.channels[2].fusevoltage);
-		this.map.get("f3").innerHTML = round2dp(data.channels[3].fusevoltage);
+		this.map.get("f0").innerHTML = round1dp(data.channels[0].fusevoltage);
+		this.map.get("f1").innerHTML = round1dp(data.channels[1].fusevoltage);
+		this.map.get("f2").innerHTML = round1dp(data.channels[2].fusevoltage);
+		this.map.get("f3").innerHTML = round1dp(data.channels[3].fusevoltage);
 
 		//Channel currents
-		this.map.get("a0").innerHTML = round2dp(data.channels[0].current);
-		this.map.get("a1").innerHTML = round2dp(data.channels[1].current);
-		this.map.get("a2").innerHTML = round2dp(data.channels[2].current);
-		this.map.get("a3").innerHTML = round2dp(data.channels[3].current);
+		this.map.get("a0").innerHTML = round1dp(data.channels[0].current);
+		this.map.get("a1").innerHTML = round1dp(data.channels[1].current);
+		this.map.get("a2").innerHTML = round1dp(data.channels[2].current);
+		this.map.get("a3").innerHTML = round1dp(data.channels[3].current);
 
 		var el = this.map.get("btn0");
 		if(data.channels[0].feedback && !this.enabled[0])
@@ -243,8 +244,8 @@ class TempSensor
 	{
 		this.map.get("trip").style.backgroundColor = data.tripped ? colorFail : colorOk;
 		this.map.get("trace").style.backgroundColor = data.trace ? colorOk : colorFail;
-		this.map.get("tmp").innerHTML = round2dp(data.temperature);
-		this.map.get("set").innerHTML = round2dp(data.setpoint);
+		this.map.get("tmp").innerHTML = round1dp(data.temperature);
+		this.map.get("set").innerHTML = round1dp(data.setpoint);
 		this.map.get("enable").style.backgroundColor = data.disabled ? colorFail : colorOk;
 	}
 }
@@ -312,8 +313,8 @@ class HumiditySensor
 	{
 		this.map.get("trip").style.backgroundColor = data.tripped ? colorFail : colorOk;
 		this.map.get("trace").style.backgroundColor = data.trace ? colorOk : colorFail;
-		this.map.get("h").innerHTML = round2dp(data.humidity);
-		this.map.get("set").innerHTML = round2dp(data.setpoint);
+		this.map.get("h").innerHTML = round1dp(data.humidity);
+		this.map.get("set").innerHTML = round1dp(data.setpoint);
 		this.map.get("enable").style.backgroundColor = data.disabled ? colorFail : colorOk;
 	}
 }
@@ -377,8 +378,8 @@ class PumpSensor
 	update(data)
 	{
 		this.map.get("trip").style.backgroundColor = data.tripped ? colorFail : colorOk;
-		this.map.get("flow").innerHTML = round2dp(data.flow);
-		this.map.get("set").innerHTML = round2dp(data.setpoint);
+		this.map.get("flow").innerHTML = round1dp(data.flow);
+		this.map.get("set").innerHTML = round1dp(data.setpoint);
 	}
 }
 
@@ -452,9 +453,9 @@ class FanSensor
 	update(data)
 	{
 		this.map.get("trip").style.backgroundColor = data.tripped ? colorFail : colorOk;
-		this.map.get("speed").innerHTML = round2dp(data.currentspeed);
-		this.map.get("pot").innerHTML = round2dp(data.potentiometer);
-    		this.map.get("set").innerHTML = round2dp(data.setpoint);
+		this.map.get("speed").innerHTML = round1dp(data.currentspeed);
+		this.map.get("pot").innerHTML = round1dp(data.potentiometer);
+    		this.map.get("set").innerHTML = round1dp(data.setpoint);
 
 		if(data.target != this.target)
 		{
