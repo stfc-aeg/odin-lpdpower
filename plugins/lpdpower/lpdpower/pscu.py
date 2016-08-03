@@ -7,6 +7,7 @@ from quad import Quad
 from usblcd import UsbLcd
 import Adafruit_BBIO.GPIO as GPIO
 
+import logging
 
 #PSCU consisting of 4x Quads & Other sensors
 class PSCU(I2CContainer):
@@ -290,19 +291,31 @@ class PSCU(I2CContainer):
 			self.lcd.clear()
 			self.lcd.write(self.__lcdBuff)
 
+	def convert_ad7998_temp(self, fs_val):
+
+		temp_vref = 3.0
+		temp_scale_v_kelvin = 0.005
+		temp_val = ((fs_val * temp_vref) / temp_scale_v_kelvin) - 273.15
+
+		return temp_val
+
 	def pollAllSensors(self):
 		
 		#Temperature ADCs
 		for i in range(8):
-			self.__tempSetPoints[i] = self.adcTempMon[0].readInput01(i) * 3 / 0.05
+			adc_input_fs = self.adcTempMon[0].readInput01(i)
+			set_point    = self.convert_ad7998_temp(adc_input_fs)
+			#logging.debug("pollAllSensors %d %f %f %f " %( i, adc_input_fs, adc_input_fs*4095, set_point))
+			self.__tempSetPoints[i] = set_point # self.convert_ad7998_temp(self.adcTempMon[0].readInput01(i))
 
 		for i in range(8):
-			self.__tempValues[i] = self.adcTempMon[1].readInput01(i) * 3 / 0.05
+			self.__tempValues[i] = self.convert_ad7998_temp(self.adcTempMon[1].readInput01(i))
 
 		for i in range(3):
-			self.__tempValues[i + 8] = self.adcTempMon[2].readInput01(i) * 3 / 0.05
+			self.__tempValues[i + 8] = self.convert_ad7998_temp(self.adcTempMon[2].readInput01(i))
+
 		for i in range(4, 7):
-			self.__tempSetPoints[i + 4] = self.adcTempMon[2].readInput01(i) * 3 / 0.05
+			self.__tempSetPoints[i + 4] = self.convert_ad7998_temp(self.adcTempMon[2].readInput01(i))
 		
 		
 		#Temperature MCPs
