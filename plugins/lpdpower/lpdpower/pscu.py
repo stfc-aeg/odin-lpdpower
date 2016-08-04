@@ -4,10 +4,11 @@ from ad7998 import AD7998
 from ad5321 import AD5321
 from mcp23008 import MCP23008
 from quad import Quad
-from usblcd import UsbLcd
+from lcd_display import LcdDisplay
 import Adafruit_BBIO.GPIO as GPIO
 
 import logging
+import time
 
 #PSCU consisting of 4x Quads & Other sensors
 class PSCU(I2CContainer):
@@ -106,11 +107,8 @@ class PSCU(I2CContainer):
 		self.__latchedOutputs = [0,0,0,0,0] #Tmp, F, P, T, H
 
                 #LCD Display
-                self.lcd = UsbLcd("/dev/ttyACM0", 57600, rows=4, cols=20)
-                self.lcdScreen = 0
-                self.lcdScreenCount = 5
-		self.__lcdBuff = ""
-		self.__lcdColor = 0
+		self.lcd = LcdDisplay(self, "/dev/ttyACM0", 57600, rows=4, cols=20)
+
                 GPIO.setup("P9_11", GPIO.IN)
                 GPIO.setup("P9_12", GPIO.IN)
                 GPIO.add_event_detect("P9_11", GPIO.RISING)
@@ -239,6 +237,9 @@ class PSCU(I2CContainer):
         def getHumidityLatched(self):
 		return self.__latchedOutputs[4]
 
+	def getAllLatched(self):
+		return self.__latchedOutputs
+
 	def enableAll(self):
 		pass #Enable quads in turn
 
@@ -254,56 +255,16 @@ class PSCU(I2CContainer):
 	def updateLCD(self):
 		#Get input
 		if GPIO.event_detected("P9_11"):
-			self.lcdScreen += 1
+			self.lcd.previous_screen()
 		elif GPIO.event_detected("P9_12"):
-			self.lcdScreen -= 1
-
-		self.lcdScreen %= self.lcdScreenCount
-
+			self.lcd.next_screen()
+				     
 		if self.__healthy:
-			col = UsbLcd.GREEN
-		else:
-			col = UsbLcd.RED
-		
-		if not col ==	self.__lcdColor:
-			self.lcd.set_backlight_colour(col)
-			self.__lcdColor = col
+		    self.lcd.set_colour(LcdDisplay.GREEN)
+                else:
+		    self.lcd.set_colour(LcdDisplay.RED)
 
-		#Redraw screen
-		if self.lcdScreen == 0:
-			if self.__armed:
-				newDisplay = "Interlock System:\rArmed"
-			else:
-				newDisplay = "Interlock System:\rDisarmed"
-
-		elif self.lcdScreen == 1:
-			newDisplay = "Channel 0A: " + ("Enabled " if self.quad[0].isEnabled(0) else "Disabled") \
-					+ "Channel 0B: " + ("Enabled " if self.quad[0].isEnabled(1) else "Disabled") \
-					+ "Channel 0C: " + ("Enabled " if self.quad[0].isEnabled(2) else "Disabled") \
-					+ "Channel 0D: " + ("Enabled " if self.quad[0].isEnabled(3) else "Disabled")
-
-		elif self.lcdScreen == 2:
-                        newDisplay = "Channel 1A: " + ("Enabled " if self.quad[1].isEnabled(0) else "Disabled") \
-                        		 + "Channel 1B: " + ("Enabled " if self.quad[1].isEnabled(1) else "Disabled") \
-                        		 + "Channel 1C: " + ("Enabled " if self.quad[1].isEnabled(2) else "Disabled") \
-                        		 + "Channel 1D: " + ("Enabled " if self.quad[1].isEnabled(3) else "Disabled")
-
-		elif self.lcdScreen == 3:
-                        newDisplay = "Channel 2A: " + ("Enabled " if self.quad[2].isEnabled(0) else "Disabled") \
-                        		 + "Channel 2B: " + ("Enabled " if self.quad[2].isEnabled(1) else "Disabled") \
-                        		 + "Channel 2C: " + ("Enabled " if self.quad[2].isEnabled(2) else "Disabled") \
-                        		 + "Channel 2D: " + ("Enabled " if self.quad[2].isEnabled(3) else "Disabled")
-
-		elif self.lcdScreen == 4:
-                        newDisplay = "Channel 3A: " + ("Enabled " if self.quad[3].isEnabled(0) else "Disabled") \
-                        		 + "Channel 3B: " + ("Enabled " if self.quad[3].isEnabled(1) else "Disabled") \
-                        		 + "Channel 3C: " + ("Enabled " if self.quad[3].isEnabled(2) else "Disabled") \
-                        		 + "Channel 3D: " + ("Enabled " if self.quad[3].isEnabled(3) else "Disabled")
-
-		if newDisplay != self.__lcdBuff:
-			self.__lcdBuff = newDisplay
-			self.lcd.clear()
-			self.lcd.write(self.__lcdBuff)
+                self.lcd.update()
 
 	def convert_ad7998_temp(self, fs_val):
 
