@@ -18,8 +18,9 @@ class PSCU(I2CContainer):
 		self.tca = TCA9548(0x70)
 		
 		#Attach quads to tca
+		self.numQuads = 4
 		self.quad = []
-		for i in range(4):
+		for i in range(self.numQuads):
 			self.quad.append(self.tca.attachDevice(i, Quad))
 		
 		#Attach bus 4 devices
@@ -73,18 +74,20 @@ class PSCU(I2CContainer):
 		
                 #Buffers for all I2C sensors
 		#Temperature
-                self.__tempValues = [0,0,0,0,0,0,0,0,0,0,0]
-                self.__tempSetPoints = [0,0,0,0,0,0,0,0,0,0,0]
-                self.__tempTrips = [0,0,0,0,0,0,0,0,0,0,0]
-                self.__tempTraces = [0,0,0,0,0,0,0,0,0,0,0]
-		self.__tempDisabled = [0,0,0,0,0,0,0,0,0,0,0]
+		self.numTemperatures = 11
+                self.__tempValues = [0]*self.numTemperatures
+                self.__tempSetPoints = [0]*self.numTemperatures
+                self.__tempTrips = [0]*self.numTemperatures
+                self.__tempTraces = [0]*self.numTemperatures
+		self.__tempDisabled = [0]*self.numTemperatures
 
 		#Humidity
-                self.__hValues = [0,0]
-		self.__hSetPoints = [0,0]
-		self.__hTrips = [0,0]
-		self.__hTraces = [0,0]
-		self.__hDisabled = [0,0]
+		self.numHumidities = 2
+                self.__hValues = [0]*self.numHumidities
+		self.__hSetPoints = [0]*self.numHumidities
+		self.__hTrips = [0]*self.numHumidities
+		self.__hTraces = [0]*self.numHumidities
+		self.__hDisabled = [0]*self.numHumidities
 
 		#Pump
 		self.__pumpFlow = 0
@@ -93,12 +96,13 @@ class PSCU(I2CContainer):
 
 		#Fan
 		self.__fanSpeed = 0
+		self.__fanTarget = 100
 		self.__fanSetPoint = 0
 		self.__fanPot = 0
 		self.__fanTrip = False
 
 		#Quad traces
-		self.__qTraces = [0,0,0,0]
+		self.__qTraces = [0] * self.numQuads
 
 		#Overall
 		self.__armed = False
@@ -192,6 +196,9 @@ class PSCU(I2CContainer):
 	def getFanPot(self):
 		return self.__fanPot
 
+	def getFanTarget(self):
+		return self.__fanTarget
+
 	def getFanTripped(self):
 		return self.__fanTrip
 
@@ -250,14 +257,15 @@ class PSCU(I2CContainer):
 		self.mcpMisc[0].output(pin, MCP23008.LOW)
 
 	def setFanSpeed(self, value):
+		self.__fanTarget = value
 		self.fanSpd.setOutput01(1.0 - (value / 100.0))
 
 	def updateLCD(self):
 		#Get input
 		if GPIO.event_detected("P9_11"):
-			self.lcd.previous_screen()
+			self.lcd.previous_page()
 		elif GPIO.event_detected("P9_12"):
-			self.lcd.next_screen()
+			self.lcd.next_page()
 				     
 		if self.__healthy:
 		    self.lcd.set_colour(LcdDisplay.GREEN)

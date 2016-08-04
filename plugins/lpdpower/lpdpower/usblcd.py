@@ -11,6 +11,7 @@ class UsbLcd(object):
 
     CMD_START         = 0xFE
     CMD_LCD_SIZE      = 0xD1
+    CMD_HOME          = 0x48
     CMD_CLEAR         = 0x58
     CMD_SET_SPLASH    = 0x40
     CMD_RGB_BACKLIGHT = 0xD0
@@ -32,6 +33,10 @@ class UsbLcd(object):
         cmd_list.insert(0, UsbLcd.CMD_START)
         for i in range(0, len(cmd_list)):
              self.ser.write(chr(cmd_list[i]))
+
+    def home(self):
+        
+        self.write_cmd([UsbLcd.CMD_HOME])
 
     def clear(self):
 
