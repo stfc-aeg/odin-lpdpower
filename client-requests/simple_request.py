@@ -8,3 +8,5 @@ temp0 = theLot.json()['temperature']['sensors']['0']['temperature']
 
 for index in range(11):
     print "Temp{}: {:.1f}C".format(index, theLot.json()['temperature']['sensors'][str(index)]['temperature'])
+
+print "All Done"
