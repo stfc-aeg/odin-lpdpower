@@ -1,4 +1,4 @@
-# odin
+# odin (test)
 Prototype of ODIN framework for evaluation purposes only
 
 [![Build Status](https://travis-ci.org/percival-detector/odin.svg)](https://travis-ci.org/percival-detector/odin)
