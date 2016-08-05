@@ -17,7 +17,7 @@ class LcdDisplay(object):
 
         self.lcd.clear()
 
-        self.current_page = 7
+        self.current_page = 0
         self.registered_pages = []
 
         self.registered_pages.append(self.overview_page)
