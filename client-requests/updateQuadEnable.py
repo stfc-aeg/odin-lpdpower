@@ -1,6 +1,6 @@
 #!~/develop/projects/odin/venv/bin/python
 
-#Trying to enable a channel in Quad0... But doesn't work because
+#Trying to enable a channel in a Quad... but key value becomes nestled dictionary like this:
 #
 #         u'enable': False,
 # becomes:
@@ -22,8 +22,6 @@ def tryUpdateQuadEnable(quad, channel, bEnable):
     pp = pprint.PrettyPrinter(indent=2)
     pp.pprint(quads[str(quad)]['channels'][str(channel)])
 
-    # Set key value to True (to enable)
-
     payload = {"enable": bEnable}
 
     path = 'quad/quads/{}/channels/{}/enable'.format(quad, channel)
@@ -41,7 +39,7 @@ def tryUpdateQuadEnable(quad, channel, bEnable):
     if rp.status_code != 200:
         print "error:  {} Couldn't confirm quad channel set".format(rp.status_code)
 
-    print "Quad {}, channel {} enable value before finished executing this script:".format(quad, channel)
+    print "Quad {}, channel {} enable modified value".format(quad, channel)
 
     response = requests.get(url)
     dQuads   = response.json()
@@ -53,5 +51,5 @@ def tryUpdateQuadEnable(quad, channel, bEnable):
 
 if __name__ == "__main__":
     (quad, channel) = (0, 0)
-    bEnable = False
+    bEnable = False #True
     tryUpdateQuadEnable(quad, channel, bEnable)
