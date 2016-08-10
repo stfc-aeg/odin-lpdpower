@@ -2,11 +2,10 @@
 
 import requests, sys, time
 
-theLot = requests.get('http://beagle03.aeg.lan:8888/api/0.1/lpdpower/')
-
 print "Reading all of the temperatures: (Use Ctrl-C to close script)"
 try:
     while True:
+        theLot = requests.get('http://beagle03.aeg.lan:8888/api/0.1/lpdpower/')
         # Read all 11 temperatures, display on the same line
         for index in range(11):
             print "{}: {:.1f}C  ".format(index, theLot.json()['temperature']['sensors'][str(index)]['temperature']),
