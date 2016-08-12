@@ -2,7 +2,7 @@
 
 import requests, sys, time
 
-print "Reading all of the temperatures: (Use Ctrl-C to close script)"
+print "Continuously reading all temperatures: (Use Ctrl-C to close script)"
 try:
     while True:
         theLot = requests.get('http://beagle03.aeg.lan:8888/api/0.1/lpdpower/')

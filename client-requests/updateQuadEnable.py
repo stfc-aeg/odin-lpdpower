@@ -1,7 +1,7 @@
 #!~/develop/projects/odin/venv/bin/python
 
 #Trying to enable a channel in a Quad... but key value becomes nestled dictionary like this:
-#
+# I.e.
 #         u'enable': False,
 # becomes:
 #         u'enable': { u'enable': True},
