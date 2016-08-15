@@ -21,9 +21,7 @@ if __name__ == "__main__":
     print "________________________________________________________________"
     
 
-    # Developments..
-
-    # Quads - Displays all key/value pairs, that needs wrapping in proper function call(s)
+    # Quads
     quads = thePSCU.getKey(thePSCU.url + 'quad/quads', 'quads')
     channels = quads['0']['channels']
     print "Quads:"
@@ -40,7 +38,7 @@ if __name__ == "__main__":
             chVoltage     = quads[str(quad)]['channels'][str(channel)]['voltage']
             print "Channel{}:  ".format(channel),
             print "{0:.3f}A  ".format(chCurrent),
-            print "Ena? {}  Fdbk? {}  Fuse: {}  ".format(chEnable,chFeedback, chFuseVoltage),
+            print "Enable: {}  Fdbck: {}  Fuse: {}  ".format(chEnable,chFeedback, chFuseVoltage),
             print "Volt: {0:.3}V".format(chVoltage)
 
     print "________________________________________________________________"
@@ -56,7 +54,7 @@ if __name__ == "__main__":
         chInfo        = dTemperature['sensors'][str(channel)]
         print "Temp{0:>2}:  ".format(channel),
         print "{0:>6.1f}C  Setpoint {1:>6.1f}C  ".format(chInfo['temperature'], chInfo['setpoint']),
-        print "Trace? {}  Enable? {:<1}  Tripped: {} ".format(chInfo['trace'], chInfo['disabled'],
+        print "Trace: {}  Enable: {}  Tripped: {} ".format(chInfo['trace'], (True if chInfo['disabled'] == 0 else False),
                                                            chInfo['tripped'])
     print "________________________________________________________________"
 
@@ -71,7 +69,7 @@ if __name__ == "__main__":
         chInfo        = dHumidity['sensors'][str(channel)]
         print "Humidity{0:>2}:  ".format(channel),
         print "{0:>6.1f}%  Setpoint {1:>6.1f}%  ".format(chInfo['humidity'], chInfo['setpoint']),
-        print "Trace? {}  Enable? {:<1}  Tripped: {} ".format(chInfo['trace'], chInfo['disabled'],
+        print "Trace: {}  Enable: {}  Tripped: {} ".format(chInfo['trace'], (True if chInfo['disabled'] == 0 else False),
                                                            chInfo['tripped'])
     print "________________________________________________________________"
 

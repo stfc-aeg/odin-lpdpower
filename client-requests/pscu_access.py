@@ -99,17 +99,17 @@ if __name__ == "__main__":
 
     # Toggle arm - Switch off if armed, Switch on if not
     bArmStatus = thePSCU.getArm()
-    print "Arm set to: {}, system is: {}".format(bArmStatus, ("Armed" if thePSCU.getIsarmed() == True else "Not Armed"))
+    print "Arm is set to: {}, while the system is: {}".format(bArmStatus, ("Armed" if thePSCU.getIsarmed() == True else "Not Armed"))
     bToggle = (True if bArmStatus == False else False)
 
     # Toggle arm, pause before checking 'arm'
     thePSCU.setArm(bToggle)    
     time.sleep(0.2)
     bArmStatus = thePSCU.getArm()
-    print "Arm set to: {}, system is: {}".format(bArmStatus, ("Armed" if thePSCU.getIsarmed() == True else "Not Armed"))
+    print "Setting arm to: {}, Now system is: {}".format(bArmStatus, ("Armed" if thePSCU.getIsarmed() == True else "Not Armed"))
 
     # Enable/Disabled a quad channel:
-    (bEnable, quad, channel) = (True, 0, 3)
+    (bEnable, quad, channel) = (True, 0, 1)
     print "Quad {}, channel {} after change:".format(quad, channel)
     print "[key 'enable' type changes..]"
     pp = pprint.PrettyPrinter(indent=2)
