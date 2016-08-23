@@ -101,7 +101,7 @@ class Quad
 	{
 		//Update all the values in the table
 		//Channel voltages
-		this.map.get("sv").innerHTML = data.supply;
+    	        this.map.get("sv").innerHTML = round1dp(data.supply);
 		this.map.get("v0").innerHTML = round1dp(data.channels[0].voltage);
 		this.map.get("v1").innerHTML = round1dp(data.channels[1].voltage);
 		this.map.get("v2").innerHTML = round1dp(data.channels[2].voltage);
