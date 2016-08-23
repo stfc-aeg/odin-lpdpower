@@ -10,9 +10,8 @@ class ChannelData(object):
 
 		self.dataTree = DataTree({
 			"voltage" : self.getVoltage,
-			"fusevoltage" : 0, #Placeholder
 			"current" : self.getCurrent,
-#			"fusevoltage" : self.getFuse,
+			"fusevoltage" : self.getFuse,
 			"feedback" : self.isEnabled,
 			"enable" : self.quad.isEnabled(channel)
 			})
@@ -22,8 +21,8 @@ class ChannelData(object):
 	def getVoltage(self):
 		return self.quad.getChannelVoltage(self.channel)
 
-#	def getFuse(self):
-#		return self.quad.getFuseVoltage(self.channel)
+	def getFuse(self):
+		return self.quad.getFuseVoltage(self.channel)
 
 	def getCurrent(self):
 		return self.quad.getChannelCurrent(self.channel)

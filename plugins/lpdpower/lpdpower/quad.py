@@ -23,7 +23,7 @@ class Quad(I2CContainer):
 			self.mcp.setup(i, MCP23008.IN)
 
 		self.adcPower = self.attachDevice(AD7998, 0x22)
-#		self.adcFuse = self.attachDevice(AD7998, 0x21)
+		self.adcFuse = self.attachDevice(AD7998, 0x21)
 
 	def getChannelVoltage(self, channel):
 		if channel > 3 or channel < 0:
@@ -38,11 +38,11 @@ class Quad(I2CContainer):
                 return self.adcPower.readInput01(channel + 4) * 5 * 4
 
 	#Gets the voltage after the fuse should be more or less equal to 48V
-#	def getFuseVoltage(self, channel):
-#		if channel > 3 or channel < 0:
-#			raise I2CException("%s is not a channel on the Quad. Must be between 0 & 3" % channel)
-#		
-#		return self.adcFuse.readInput01(channel) * 5 * 16
+	def getFuseVoltage(self, channel):
+		if channel > 3 or channel < 0:
+			raise I2CException("%s is not a channel on the Quad. Must be between 0 & 3" % channel)
+		
+		return self.adcFuse.readInput01(channel) * 5 * 16
 
 	#Sets an individual channel on or off
 	def setChannel(self, channel, enabled):
