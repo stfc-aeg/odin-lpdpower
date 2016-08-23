@@ -50,5 +50,8 @@ class QuadData(object):
 				self.channels[2].dataTree,
 				self.channels[3].dataTree
 				],
-			"supply" : 0
+			"supply" : self.getSupplyVoltage,
 			})
+
+	def getSupplyVoltage(self):
+		return self.quad.getSupplyVoltage()

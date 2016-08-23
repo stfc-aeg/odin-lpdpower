@@ -44,6 +44,9 @@ class Quad(I2CContainer):
 		
 		return self.adcFuse.readInput01(channel) * 5 * 16
 
+	def getSupplyVoltage(self):
+		return self.adcFuse.readInput01(4) * 5 * 16
+
 	#Sets an individual channel on or off
 	def setChannel(self, channel, enabled):
 		self.setChannels({channel : enabled})
