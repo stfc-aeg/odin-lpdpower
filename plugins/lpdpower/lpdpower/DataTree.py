@@ -1,4 +1,4 @@
-class InvalidRequest(Exception):
+class DataTreeError(Exception):
     pass
 
 
@@ -51,7 +51,7 @@ class DataTree(object):
             if isinstance(subtree, dict) and l in subtree:
                 subtree = subtree[l]
             else:
-                raise InvalidRequest("The path %s is invalid" % path)
+                raise DataTreeError("The path %s is invalid" % path)
 
         return self.__recursivePopulateTree({levels[-1]: subtree})
 
@@ -60,14 +60,14 @@ class DataTree(object):
 
         # Functions are read only
         if callable(data_tree):
-            raise InvalidRequest(
+            raise DataTreeError(
                 "Cannot set value of read only path {}".format(cur_path[:-1]))
 
         # Override value
         if not isinstance(data_tree, dict):
             # Validate type of new node matches existing
             if type(data_tree) is not type(new_data):
-                raise InvalidRequest('Type mismatch updating {}: got {} expected {}'.format(
+                raise DataTreeError('Type mismatch updating {}: got {} expected {}'.format(
                     cur_path[:-1], type(new_data).__name__, type(data_tree).__name__
                 ))
             # Check for callbacks
@@ -81,7 +81,7 @@ class DataTree(object):
                 data_tree[k], v, cur_path + k + '/') for k, v in new_data.iteritems()})
             return data_tree
         except KeyError as e:
-            raise InvalidRequest('Invalid path: {}{}'.format(cur_path, str(e)[1:-1]))
+            raise DataTreeError('Invalid path: {}{}'.format(cur_path, str(e)[1:-1]))
 
     def setData(self, path, data):
 
@@ -100,7 +100,7 @@ class DataTree(object):
             if isinstance(merge_point, dict) and l in merge_point:
                 merge_point = merge_point[l]
             else:
-                raise InvalidRequest("Invalid path: {}".format(path))
+                raise DataTreeError("Invalid path: {}".format(path))
 
         # Add trailing / to paths where necessary
         if len(path) and path[-1] != '/':

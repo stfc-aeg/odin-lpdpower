@@ -5,8 +5,7 @@ Tim Nicholls, STFC Application Engingeering
 
 from copy import deepcopy
 from nose.tools import *
-from lpdpower.DataTree import DataTree, InvalidRequest
-import pprint
+from lpdpower.DataTree import DataTree, DataTreeError
 
 class TestDataTree():
 
@@ -85,7 +84,7 @@ class TestDataTree():
 
     def test_simple_tree_missing_value(self):
 
-        with assert_raises_regexp(InvalidRequest, 'The path missing is invalid'):
+        with assert_raises_regexp(DataTreeError, 'The path missing is invalid'):
             self.simple_tree.getData('missing')
 
     def test_nested_tree_returns_nested_dict(self):
@@ -119,7 +118,7 @@ class TestDataTree():
         branch_data = deepcopy(self.nested_dict['branch'])
         branch_data['extraParam'] = 'oops'
 
-        with assert_raises_regexp(InvalidRequest, 'Invalid path'):
+        with assert_raises_regexp(DataTreeError, 'Invalid path'):
             self.callback_tree.setData('branch', branch_data)
 
     def test_complex_tree_calls_leaf_nodes(self):
@@ -130,13 +129,13 @@ class TestDataTree():
 
     def test_complex_tree_callable_readonly(self):
 
-        with assert_raises_regexp(InvalidRequest, "Cannot set value of read only path"):
+        with assert_raises_regexp(DataTreeError, "Cannot set value of read only path"):
             self.complex_tree.setData('callableIntParam', 1234)
 
     def test_complex_tree_set_invalid_path(self):
 
         invalid_path = 'invalidPath/toNothing'
-        with assert_raises_regexp(InvalidRequest, 'Invalid path: {}'.format(invalid_path)):
+        with assert_raises_regexp(DataTreeError, 'Invalid path: {}'.format(invalid_path)):
             self.complex_tree.setData(invalid_path, 0)
 
     def test_complex_tree_set_top_level(self):
@@ -153,5 +152,5 @@ class TestDataTree():
 
         param_data = {'intParam': 9876}
 
-        with assert_raises_regexp(InvalidRequest, 'Type mismatch updating intParam'):
+        with assert_raises_regexp(DataTreeError, 'Type mismatch updating intParam'):
             self.complex_tree.setData('intParam', param_data)
