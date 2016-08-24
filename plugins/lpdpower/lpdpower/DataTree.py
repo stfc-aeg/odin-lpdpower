@@ -24,7 +24,8 @@ class DataTree(object):
 
         # Recursively check child elements
         if isinstance(subtree, dict):
-            return {k: self.__recursiveTreeCheck(v, path=path + k + '/') for k, v in subtree.iteritems()}
+            return {k: self.__recursiveTreeCheck(
+                v, path=path + k + '/') for k, v in subtree.iteritems()}
 
         return subtree
 
@@ -60,10 +61,15 @@ class DataTree(object):
         # Functions are read only
         if callable(data_tree):
             raise InvalidRequest(
-                "Tried to write to %s which is read only" % cur_path)
+                "Cannot set value of read only path {}".format(cur_path[:-1]))
 
         # Override value
         if not isinstance(data_tree, dict):
+            # Validate type of new node matches existing
+            if type(data_tree) is not type(new_data):
+                raise InvalidRequest('Type mismatch updating {}: got {} expected {}'.format(
+                    cur_path[:-1], type(new_data).__name__, type(data_tree).__name__
+                ))
             # Check for callbacks
             for c in self.__callbacks:
                 if cur_path.startswith(c[0]):
@@ -74,11 +80,11 @@ class DataTree(object):
             data_tree.update({k: self.__recursiveMergeTree(
                 data_tree[k], v, cur_path + k + '/') for k, v in new_data.iteritems()})
             return data_tree
-        except KeyError:
-            raise InvalidRequest("The path %s is invalid" %
-                                 (cur_path + k + '/'))
+        except KeyError as e:
+            raise InvalidRequest('Invalid path: {}{}'.format(cur_path, str(e)[1:-1]))
 
     def setData(self, path, data):
+
         # Expand out any lists/tuples
         data = self.__recursiveTreeCheck(data)
 
@@ -94,7 +100,7 @@ class DataTree(object):
             if isinstance(merge_point, dict) and l in merge_point:
                 merge_point = merge_point[l]
             else:
-                raise InvalidRequest("The path %s is invalid" % path)
+                raise InvalidRequest("Invalid path: {}".format(path))
 
         # Add trailing / to paths where necessary
         if len(path) and path[-1] != '/':
