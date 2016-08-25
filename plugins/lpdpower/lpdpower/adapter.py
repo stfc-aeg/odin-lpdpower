@@ -17,9 +17,6 @@ class NullDevice():
 
 class LPDPowerAdapter(ApiAdapter):
 
-        # Thread executor used for background tasks
-    executor = futures.ThreadPoolExecutor(max_workers=1)
-
     def __init__(self, **kwargs):
         super(LPDPowerAdapter, self).__init__(**kwargs)
 
@@ -57,9 +54,8 @@ class LPDPowerAdapter(ApiAdapter):
             status_code = 400
         return ApiAdapterResponse(response, status_code=status_code)
 
-    #@run_on_executor
     def update_loop(self):
+        self.pscuData.pscu.handle_deferred()
         self.pscuData.pscu.updateLCD()
         self.pscuData.pscu.pollAllSensors()
-        time.sleep(self.update_interval)
-        IOLoop.instance().add_callback(self.update_loop)
+        IOLoop.instance().call_later(self.update_interval, self.update_loop)
