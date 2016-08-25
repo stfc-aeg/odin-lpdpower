@@ -1,3 +1,5 @@
+import logging
+
 from quad_data import QuadData
 from DataTree import DataTree, DataTreeError
 from pscu import PSCU
@@ -152,7 +154,7 @@ class PSCUData(object):
             raise PSCUDataError(e)
 
     def enableAll(self, path, value):
-        self.pscu.enableAll()
+        self.pscu.enableAll(value)
 
     def setArmed(self, path, value):
         self.pscu.setArmed(value)

@@ -5,6 +5,8 @@ from ad5321 import AD5321
 from mcp23008 import MCP23008
 from quad import Quad
 from lcd_display import LcdDisplay
+from deferred_executor import DeferredExecutor
+
 import Adafruit_BBIO.GPIO as GPIO
 
 import logging
@@ -119,6 +121,11 @@ class PSCU(I2CContainer):
         GPIO.setup("P9_12", GPIO.IN)
         GPIO.add_event_detect("P9_11", GPIO.RISING)
         GPIO.add_event_detect("P9_12", GPIO.RISING)
+
+        self.deferred_executor = DeferredExecutor()
+
+    def handle_deferred(self):
+        self.deferred_executor.process()
 
     def getTemperature(self, sensor):
         if sensor > 10 or sensor < 0:
