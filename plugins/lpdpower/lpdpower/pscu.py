@@ -256,8 +256,31 @@ class PSCU(I2CContainer):
     def getAllLatched(self):
         return self.__latchedOutputs
 
-    def enableAll(self):
-        pass  # Enable quads in turn
+    def quadEnableTrace(self, quad_idx, channel):
+        logging.debug("Enabling quad {} channel {} output".format(quad_idx, channel))
+        self.quad[quad_idx].setChannel(channel, True)
+
+    def enableAll(self, enable):
+        logging.debug("Called enableAll with value {}".format(enable))
+
+        # Loop over all quads in system
+        for quad_idx in range(len(self.quad)):
+
+            # Loop over all channels in the quad
+            for channel in range(Quad.NUM_CHANNELS):
+                # If turning on, add channel to deferred executor queue to sequence power up,
+                # otherwise turn off immediately, having first cleared any pending turn-on commands
+                # from the queue.
+                if enable:
+                    self.deferred_executor.enqueue(self.quadEnableTrace, 1.0, quad_idx, channel)
+                else:
+                    num_enables_pending = self.deferred_executor.pending()
+                    if num_enables_pending > 0:
+                        logging.debug("Clearing {} pending quad enable commands from queue".format(
+                            num_enables_pending
+                        ))
+                        self.deferred_executor.clear()
+                    self.quad[quad_idx].setChannel(channel, False)
 
     def setArmed(self, value):
         pin = 0 if value else 1
