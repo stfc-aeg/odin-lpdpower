@@ -22,9 +22,14 @@ class LPDPowerAdapter(ApiAdapter):
 
         sys.stdout = NullDevice()  # Prevent I2C spam if devices aren't connected
 
-        self.pscuData = PSCUData()
+        # Retrieve adapter options from config file
+        self.update_interval = float(self.options.get('update_interval', 0.05))
+        quad_enable_interval = float(self.options.get('quad_enable_interval', 1.0))
 
-        self.update_interval = self.options.get('update_interval', 0.05)
+        # Create a PSCUData instance
+        self.pscuData = PSCUData(quad_enable_interval=quad_enable_interval)
+
+        # Start the update loop
         self.update_loop()
 
     @request_types('application/json')

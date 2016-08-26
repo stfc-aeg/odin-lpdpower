@@ -17,8 +17,12 @@ import time
 
 class PSCU(I2CContainer):
     ALL_PINS = [0, 1, 2, 3, 4, 5, 6, 7]
+    DEFAULT_QUAD_ENABLE_INTERVAL = 1.0
 
-    def __init__(self):
+    def __init__(self, quad_enable_interval=DEFAULT_QUAD_ENABLE_INTERVAL):
+
+        self.quad_enable_interval = quad_enable_interval
+
         self.tca = TCA9548(0x70)
 
         # Attach quads to tca
@@ -262,6 +266,9 @@ class PSCU(I2CContainer):
     def getAllLatched(self):
         return self.__latchedOutputs
 
+    def getEnableInterval(self):
+        return self.quad_enable_interval
+
     def quadEnableTrace(self, quad_idx, channel):
         logging.debug("Enabling quad {} channel {} output".format(quad_idx, channel))
         self.quad[quad_idx].setEnable(channel, True)
@@ -274,7 +281,9 @@ class PSCU(I2CContainer):
             # executor queue
             for quad_idx in range(len(self.quad)):
                 for channel in range(Quad.NUM_CHANNELS):
-                    self.deferred_executor.enqueue(self.quadEnableTrace, 1.0, quad_idx, channel)
+                    self.deferred_executor.enqueue(
+                        self.quadEnableTrace, self.quad_enable_interval, quad_idx, channel
+                    )
             self.__allEnabled = True
         else:
             # Clear any pending turn-on command from the queue first, then turn off all channels
