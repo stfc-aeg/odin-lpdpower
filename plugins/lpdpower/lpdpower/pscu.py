@@ -264,7 +264,7 @@ class PSCU(I2CContainer):
 
     def quadEnableTrace(self, quad_idx, channel):
         logging.debug("Enabling quad {} channel {} output".format(quad_idx, channel))
-        self.quad[quad_idx].setChannel(channel, True)
+        self.quad[quad_idx].setEnable(channel, True)
 
     def enableAll(self, enable):
         logging.debug("Called enableAll with value {}".format(enable))
@@ -287,7 +287,7 @@ class PSCU(I2CContainer):
                 self.deferred_executor.clear()
             for quad_idx in range(len(self.quad)):
                 for channel in range(Quad.NUM_CHANNELS):
-                    self.quad[quad_idx].setChannel(channel, False)
+                    self.quad[quad_idx].setEnable(channel, False)
             self.__allEnabled = False
 
     def setArmed(self, value):
@@ -404,3 +404,7 @@ class PSCU(I2CContainer):
         # automatically turns off all quad outputs
         if not self.__armed:
             self.__allEnabled = False
+
+        # Poll sensors for all quads also
+        for quad in self.quad:
+            quad.pollAllSensors()

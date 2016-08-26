@@ -120,51 +120,51 @@ class Quad
 		this.map.get("a3").innerHTML = round1dp(data.channels[3].current);
 
 		var el = this.map.get("btn0");
-		if(data.channels[0].feedback && !this.enabled[0])
+		if(data.channels[0].enabled && !this.enabled[0])
 		{
 			enableButton(el);
-			this.enabled[0] = data.channels[0].feedback;
+			this.enabled[0] = data.channels[0].enabled;
 		}
-		else if(!data.channels[0].feedback && this.enabled[0])
+		else if(!data.channels[0].enabled && this.enabled[0])
 		{
 			disableButton(el);
-			this.enabled[0] = data.channels[0].feedback;
+			this.enabled[0] = data.channels[0].enabled;
 		}
 
 		el = this.map.get("btn1");
-		if(data.channels[1].feedback && !this.enabled[1])
+		if(data.channels[1].enabled && !this.enabled[1])
 		{
 			enableButton(el);
-			this.enabled[1] = data.channels[1].feedback;
+			this.enabled[1] = data.channels[1].enabled;
 		}
-		else if(!data.channels[1].feedback && this.enabled[1])
+		else if(!data.channels[1].enabled && this.enabled[1])
 		{
 			disableButton(el);
-			this.enabled[1] = data.channels[1].feedback;
+			this.enabled[1] = data.channels[1].enabled;
 		}
 
 		el = this.map.get("btn2");
-		if(data.channels[2].feedback && !this.enabled[2])
+		if(data.channels[2].enabled && !this.enabled[2])
 		{
 			enableButton(el);
-			this.enabled[2] = data.channels[2].feedback;
+			this.enabled[2] = data.channels[2].enabled;
 		}
-		else if(!data.channels[2].feedback && this.enabled[2])
+		else if(!data.channels[2].enabled && this.enabled[2])
 		{
 			disableButton(el);
-			this.enabled[2] = data.channels[2].feedback;
+			this.enabled[2] = data.channels[2].enabled;
 		}
 
 		el = this.map.get("btn3");
-		if(data.channels[3].feedback && !this.enabled[3])
+		if(data.channels[3].enabled && !this.enabled[3])
 		{
 			enableButton(el);
-			this.enabled[3] = data.channels[3].feedback;
+			this.enabled[3] = data.channels[3].enabled;
 		}
-		else if(!data.channels[3].feedback && this.enabled[3])
+		else if(!data.channels[3].enabled && this.enabled[3])
 		{
 			disableButton(el);
-			this.enabled[3] = data.channels[3].feedback;
+			this.enabled[3] = data.channels[3].enabled;
 		}
 	}
 

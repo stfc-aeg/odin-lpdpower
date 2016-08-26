@@ -2,56 +2,60 @@ from quad import Quad
 from DataTree import DataTree
 import logging
 
-#Data tree to represent one channel on a quad
+
 class ChannelData(object):
-	def __init__(self, quad, channel):
-		self.quad = quad
-		self.channel = channel
+    """Data tree to represent one channel on a quad."""
 
-		self.dataTree = DataTree({
-			"voltage" : self.getVoltage,
-			"current" : self.getCurrent,
-			"fusevoltage" : self.getFuse,
-			"feedback" : self.isEnabled,
-			"enable" : self.quad.isEnabled(channel)
-			})
+    def __init__(self, quad, channel):
+        self.quad = quad
+        self.channel = channel
 
-		self.dataTree.addCallback("enable/", self.setChannel)
+        self.dataTree = DataTree({
+            "voltage": self.getVoltage,
+            "current": self.getCurrent,
+            "fusevoltage": self.getFuse,
+            "enabled": self.getEnable,
+            "enable": False,  # Command
+            })
 
-	def getVoltage(self):
-		return self.quad.getChannelVoltage(self.channel)
+        self.dataTree.addCallback("enable/", self.setEnable)
 
-	def getFuse(self):
-		return self.quad.getFuseVoltage(self.channel)
+    def getVoltage(self):
+        return self.quad.getChannelVoltage(self.channel)
 
-	def getCurrent(self):
-		return self.quad.getChannelCurrent(self.channel)
+    def getFuse(self):
+        return self.quad.getFuseVoltage(self.channel)
 
-	def isEnabled(self):
-		return self.quad.isEnabled(self.channel)
+    def getCurrent(self):
+        return self.quad.getChannelCurrent(self.channel)
 
-	def setChannel(self, path, val):
-		self.quad.setChannel(self.channel, val)
+    def getEnable(self):
+        return self.quad.getEnable(self.channel)
 
-#Data tree to represent an entire quad
+    def setEnable(self, path, val):
+        self.quad.setEnable(self.channel, val)
+
+
 class QuadData(object):
-	def __init__(self, *args, **kwargs):
-		if len(args) and isinstance(args[0], Quad):
-			self.quad = args[0]
-		else:
-			self.quad = Quad(*args, **kwargs)
+    """Data tree to represent an entire quad."""
 
-		self.channels = [ChannelData(self.quad, i) for i in range(4)]
+    def __init__(self, *args, **kwargs):
+        if len(args) and isinstance(args[0], Quad):
+            self.quad = args[0]
+        else:
+            self.quad = Quad(*args, **kwargs)
 
-		self.dataTree = DataTree({
-			"channels" : [
-				self.channels[0].dataTree,
-				self.channels[1].dataTree,
-				self.channels[2].dataTree,
-				self.channels[3].dataTree
-				],
-			"supply" : self.getSupplyVoltage,
-			})
+        self.channels = [ChannelData(self.quad, i) for i in range(4)]
 
-	def getSupplyVoltage(self):
-		return self.quad.getSupplyVoltage()
+        self.dataTree = DataTree({
+            "channels": [
+                self.channels[0].dataTree,
+                self.channels[1].dataTree,
+                self.channels[2].dataTree,
+                self.channels[3].dataTree
+                ],
+            "supply": self.getSupplyVoltage,
+            })
+
+    def getSupplyVoltage(self):
+        return self.quad.getSupplyVoltage()
