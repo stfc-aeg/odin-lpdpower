@@ -122,6 +122,9 @@ class PSCU(I2CContainer):
         GPIO.add_event_detect("P9_11", GPIO.RISING)
         GPIO.add_event_detect("P9_12", GPIO.RISING)
 
+        # Internal flag tracking state of quads 'enable all' command
+        self.__allEnabled = False
+
         self.deferred_executor = DeferredExecutor()
 
     def handle_deferred(self):
@@ -220,6 +223,9 @@ class PSCU(I2CContainer):
     def getArmed(self):
         return self.__armed
 
+    def getAllEnabled(self):
+        return self.__allEnabled
+
     def getHealth(self):
         return self.__healthy
 
@@ -263,24 +269,26 @@ class PSCU(I2CContainer):
     def enableAll(self, enable):
         logging.debug("Called enableAll with value {}".format(enable))
 
-        # Loop over all quads in system
-        for quad_idx in range(len(self.quad)):
-
-            # Loop over all channels in the quad
-            for channel in range(Quad.NUM_CHANNELS):
-                # If turning on, add channel to deferred executor queue to sequence power up,
-                # otherwise turn off immediately, having first cleared any pending turn-on commands
-                # from the queue.
-                if enable:
+        if enable:
+            # Loop over all quads and channels in system, adding enable command to deferred
+            # executor queue
+            for quad_idx in range(len(self.quad)):
+                for channel in range(Quad.NUM_CHANNELS):
                     self.deferred_executor.enqueue(self.quadEnableTrace, 1.0, quad_idx, channel)
-                else:
-                    num_enables_pending = self.deferred_executor.pending()
-                    if num_enables_pending > 0:
-                        logging.debug("Clearing {} pending quad enable commands from queue".format(
-                            num_enables_pending
-                        ))
-                        self.deferred_executor.clear()
+            self.__allEnabled = True
+        else:
+            # Clear any pending turn-on command from the queue first, then turn off all channels
+            # immediately.
+            num_enables_pending = self.deferred_executor.pending()
+            if num_enables_pending > 0:
+                logging.debug("Clearing {} pending quad enable commands from queue".format(
+                    num_enables_pending
+                ))
+                self.deferred_executor.clear()
+            for quad_idx in range(len(self.quad)):
+                for channel in range(Quad.NUM_CHANNELS):
                     self.quad[quad_idx].setChannel(channel, False)
+            self.__allEnabled = False
 
     def setArmed(self, value):
         pin = 0 if value else 1
@@ -391,3 +399,8 @@ class PSCU(I2CContainer):
 
         buff = self.mcpMisc[3].input_pins([0, 1, 2, 3, 4])
         self.__latchedOutputs = [bool(i) for i in buff]
+
+        # Update internal allEnabled state based on current armed state since being disarmed
+        # automatically turns off all quad outputs
+        if not self.__armed:
+            self.__allEnabled = False

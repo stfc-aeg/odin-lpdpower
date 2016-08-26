@@ -58,7 +58,7 @@ function generateQuad(id)
 			<td><span id="q${id}-f1"></span>V</td>
 			<td><span id="q${id}-f2"></span>V</td>
 			<td><span id="q${id}-f3"></span>V</td>
-		</tr> 
+		</tr>
 
 		<tr>
 			<th scope="row">Current</th>
@@ -91,7 +91,7 @@ class Quad
 		for (var i = 0; i < elements.length; ++i)
 		{
 			var start = 2 + id.toString().length;
-			var key = elements[i].id.substr(start, 
+			var key = elements[i].id.substr(start,
 						elements[i].id.length - start);
 			this.map.set(key, elements[i]);
 		}
@@ -130,7 +130,7 @@ class Quad
 			disableButton(el);
 			this.enabled[0] = data.channels[0].feedback;
 		}
-		
+
 		el = this.map.get("btn1");
 		if(data.channels[1].feedback && !this.enabled[1])
 		{
@@ -208,7 +208,7 @@ function generateTempSensors(count)
 	for(id = 0; id < count; ++id)
 	{
 		ret += `
-		<tr> 
+		<tr>
 			<th class="text-center">Temp ${id+1}</th>
 			<td><span id="tmp${id}-tmp"></span>°C</td>
 			<td><span id="tmp${id}-set"></span>°C</td>
@@ -230,12 +230,12 @@ class TempSensor
 	{
 		this.map = new Map();
 		this.active = true;
-	
+
 		var elements = document.querySelectorAll(`[id^='tmp${id}-']`);
 		for (var i = 0; i < elements.length; ++i)
 		{
 			var start = 4 + id.toString().length;
-			var key = elements[i].id.substr(start, 
+			var key = elements[i].id.substr(start,
 						elements[i].id.length - start);
 			this.map.set(key, elements[i]);
 		}
@@ -278,7 +278,7 @@ function generateHumiditySensors(count)
 	for(id = 0; id < count; ++id)
 	{
 		ret += `
-		<tr> 
+		<tr>
 			<th class="text-center">Humid ${id+1}</th>
 			<td><span id="h${id}-h"></span>%</td>
 			<td><span id="h${id}-set"></span>%</td>
@@ -300,12 +300,12 @@ class HumiditySensor
 	{
 		this.map = new Map();
 		this.active = true;
-		
+
 		var elements = document.querySelectorAll(`[id^='h${id}-']`);
 		for (var i = 0; i < elements.length; ++i)
 		{
 			var start = 2 + id.toString().length;
-			var key = elements[i].id.substr(start, 
+			var key = elements[i].id.substr(start,
 						elements[i].id.length - start);
 			this.map.set(key, elements[i]);
 		}
@@ -347,7 +347,7 @@ function generatePumpSensors(count)
 	for(id = 0; id < count; ++id)
 	{
 		ret += `
-		<tr> 
+		<tr>
 			<th class="text-center">Pump ${id+1}</th>
 			<td><span id="p${id}-flow">0</span>l/min</td>
 			<td><span id="p${id}-set">0</span>l/min</td>
@@ -367,12 +367,12 @@ class PumpSensor
 	constructor(id)
 	{
 		this.map = new Map();
-		
+
 		var elements = document.querySelectorAll(`[id^='p${id}-']`);
 		for (var i = 0; i < elements.length; ++i)
 		{
 			var start = 2 + id.toString().length;
-			var key = elements[i].id.substr(start, 
+			var key = elements[i].id.substr(start,
 						elements[i].id.length - start);
 			this.map.set(key, elements[i]);
 		}
@@ -406,14 +406,14 @@ function generateFanSensors(count)
 			<th class="text-center" style="width:10%;">Tripped</th>
 		</tr>
 	</thead>
-	  
+
 	<tbody>
 	`;
 
 	for(id = 0; id < count; ++id)
 	{
 		ret += `
-		<tr> 
+		<tr>
 			<th class="text-center">Fan ${id+1}</th>
 			<td><span id="f${id}-speed">0</span>Hz</td>
 			<td><span id="f${id}-set">0</span>Hz</td>
@@ -443,12 +443,12 @@ class FanSensor
 	{
 		this.map = new Map();
 		this.target = 0.0;
-		
+
 		var elements = document.querySelectorAll(`[id^='f${id}-']`);
 		for (var i = 0; i < elements.length; ++i)
 		{
 			var start = 2 + id.toString().length;
-			var key = elements[i].id.substr(start, 
+			var key = elements[i].id.substr(start,
 						elements[i].id.length - start);
 			this.map.set(key, elements[i]);
 		}
@@ -488,6 +488,7 @@ var pump_sensor;
 var fan_sensor;
 
 var armed = true;
+var enabled = true;
 
 var global_elems = new Map();
 $(document).ready(function()
@@ -507,13 +508,13 @@ $(document).ready(function()
 	for(var i = 0; i < elems.length; ++i)
 		global_elems.set(elems[i].id, elems[i]);
 
-        var latched_elems = document.querySelectorAll("[id$='-latched']");
-        for(var i = 0; i < latched_elems.length; i++) 
-            global_elems.set(latched_elems[i].id, latched_elems[i]);
+    var latched_elems = document.querySelectorAll("[id$='-latched']");
+    for(var i = 0; i < latched_elems.length; i++)
+        global_elems.set(latched_elems[i].id, latched_elems[i]);
 
 	global_elems.set("overall-status", document.querySelector("#overall-status"));
 	global_elems.set("trace-status", document.querySelector("#trace-status"));
-        global_elems.set("trace-latched", document.querySelector("#trace-latched"));
+    global_elems.set("trace-latched", document.querySelector("#trace-latched"));
 	global_elems.set("enable", document.querySelector("#overall-enable"));
 	global_elems.set("arm", document.querySelector("#overall-arm"));
 
@@ -555,11 +556,11 @@ function updateAll()
 		global_elems.get("trace-status").style.backgroundColor = response.trace.overall ? colorOk : colorFail;
 
 	        // Handler latched states
-                global_elems.get("tmp-latched").style.backgroundColor = response.temperature.latched ? colorOk: colorFail;
-                global_elems.get("trace-latched").style.backgroundColor = response.trace.latched ? colorOk: colorFail;
-                global_elems.get("h-latched").style.backgroundColor = response.humidity.latched ? colorOk: colorFail;
-                global_elems.get("f-latched").style.backgroundColor = response.fan.latched ? colorOk: colorFail;
-                global_elems.get("p-latched").style.backgroundColor = response.pump.latched ? colorOk: colorFail;
+        global_elems.get("tmp-latched").style.backgroundColor = response.temperature.latched ? colorOk: colorFail;
+        global_elems.get("trace-latched").style.backgroundColor = response.trace.latched ? colorOk: colorFail;
+        global_elems.get("h-latched").style.backgroundColor = response.humidity.latched ? colorOk: colorFail;
+        global_elems.get("f-latched").style.backgroundColor = response.fan.latched ? colorOk: colorFail;
+        global_elems.get("p-latched").style.backgroundColor = response.pump.latched ? colorOk: colorFail;
 
 		if(response.isarmed && !armed)
 		{
@@ -577,6 +578,23 @@ function updateAll()
 			el.innerHTML = "Arm Interlock";
 			armed = false;
 		}
+
+        if (response.allenabled && !enabled)
+        {
+            var el = global_elems.get("enable");
+            el.classList.add(buttonOn);
+            el.classList.remove(buttonOff);
+            el.innerHTML = "Disable Quads";
+            enabled = true;
+        }
+        else if (!response.allenabled && enabled)
+        {
+            var el = global_elems.get("enable");
+            el.classList.add(buttonOff);
+            el.classList.remove(buttonOn);
+            el.innerHTML = "Enable Quads";
+            enabled = false;
+        }
 	});
 }
 
@@ -622,7 +640,7 @@ function enableQuads()
 		{method: 'PUT',
 		contentType: 'application/json',
 		processData: false,
-		data: JSON.stringify({enableall: true})});
+		data: JSON.stringify({enableall: global_elems.get("enable").classList.contains(buttonOff)})});
 }
 
 function updateSpeed(fid)
@@ -642,4 +660,3 @@ function updateSpeed(fid)
 		processData: false,
 		data: JSON.stringify({target: value})});
 }
-

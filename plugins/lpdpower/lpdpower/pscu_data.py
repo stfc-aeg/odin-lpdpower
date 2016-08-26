@@ -124,7 +124,8 @@ class PSCUData(object):
             "overall": self.pscu.getHealth,
             "arm": True,  # Output
             "isarmed": self.pscu.getArmed,
-            "enableall": False  # Output
+            "enableall": True,  # Output
+            "allenabled": self.pscu.getAllEnabled,
         })
 
         self.dataTree.addCallback("enableall/", self.enableAll)
