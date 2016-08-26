@@ -66,3 +66,7 @@ class DeferredExecutor(object):
                 next_command.execute()
                 self.execution_queue.pop(0)
                 self.last_executed = now
+
+    def clear(self):
+        """Clear any pending commands off the execution queue."""
+        del self.execution_queue[:]

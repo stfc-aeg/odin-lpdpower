@@ -68,3 +68,13 @@ class TestDeferredExecutor():
 
         assert_equal(self.command.call_count, num_commands)
         assert_equal(self.command.call_args_list, cmd_calls)
+
+    def test_executor_clear(self):
+
+        num_commands = 10
+        for i in range(num_commands):
+            self.deferred_executor.enqueue(self.command, 1.0)
+
+        assert_equal(self.deferred_executor.pending(), num_commands)
+        self.deferred_executor.clear()
+        assert_equal(self.deferred_executor.pending(), 0)
