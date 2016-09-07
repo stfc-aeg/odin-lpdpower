@@ -201,7 +201,7 @@ class LcdDisplay(object):
         content += 'Quad: {} Chans: {}/{} \r'.format(quad + 1, *[chan+1 for chan in quad_chans])
 
         for quad_chan in quad_chans:
-            quad_enable = ('ON ' if self.pscu.quad[quad].isEnabled(quad_chan) else 'OFF')
+            quad_enable = ('ON ' if self.pscu.quad[quad].getEnable(quad_chan) else 'OFF')
             quad_volts = self.pscu.quad[quad].getChannelVoltage(quad_chan)
             quad_fuse = 'OK'
             quad_current = self.pscu.quad[quad].getChannelCurrent(quad_chan)
