@@ -2,6 +2,28 @@ class ParameterTreeError(Exception):
     pass
 
 
+class ParameterAccessor(object):
+
+    def __init__(self, path, getter=None, setter=None):
+        self.path = path[:-1]
+        self._get = getter
+        self._set = setter
+
+    def get(self):
+
+        if callable(self._get):
+            return self._get()
+        else:
+            return self._get
+
+    def set(self, value):
+
+        if callable(self._set):
+            return self._set(value)
+        else:
+            raise ParameterTreeError("Parameter {} is read-only".format(self.path))
+
+
 class ParameterTree(object):
 
     def __init__(self, tree):
@@ -18,8 +40,13 @@ class ParameterTree(object):
                 self.addCallback(path + c[0], c[1])
             return subtree.__tree
 
-        # Convert list to enumerated dict ; TODO - remove this?
-        if isinstance(subtree, list):
+        # Convert 2-tuple of one or more callables into a read-write accessor pair
+        if isinstance(subtree, tuple):
+            if callable(subtree[0]) or callable(subtree[1]):
+                subtree = ParameterAccessor(path, subtree[0], subtree[1])
+
+        # Convert list or non-callable tuple to enumerated dict ; TODO - remove this?
+        if isinstance(subtree, list) or isinstance(subtree, tuple):
             subtree = {str(i): subtree[i] for i in range(len(subtree))}
 
         # Recursively check child elements
@@ -37,12 +64,8 @@ class ParameterTree(object):
 
         # If this is a leaf nodes, check if the leaf is a r/w tuple and substitute the
         # read element of that tuple into the node
-        if isinstance(node, tuple):
-            node = node[0]
-
-        # If the node is callable, call the function
-        if callable(node):
-            return node()
+        if isinstance(node, ParameterAccessor):
+            return node.get()
 
         return node
 
@@ -81,9 +104,8 @@ class ParameterTree(object):
                 raise ParameterTreeError('Invalid path: {}{}'.format(cur_path, str(e)[1:-1]))
 
         # Override value
-        if isinstance(data_tree, tuple):
-            if len(data_tree) > 1 and callable(data_tree[1]):
-                data_tree[1](new_data)
+        if isinstance(data_tree, ParameterAccessor):
+            data_tree.set(new_data)
         else:
             # Validate type of new node matches existing
             if type(data_tree) is not type(new_data):

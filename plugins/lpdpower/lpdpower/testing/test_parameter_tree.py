@@ -48,7 +48,7 @@ class TestParameterTree():
 
         cls.complex_tree = ParameterTree({
             'intParam': cls.int_value,
-            'callableIntParam': lambda: cls.int_value,
+            'callableRoParam': (lambda: cls.int_value, None),
             'listParam': cls.list_values,
             'branch': cls.complex_tree_branch,
         })
@@ -125,12 +125,12 @@ class TestParameterTree():
 
         complex_vals = self.complex_tree.getData('')
         assert_equals(complex_vals['intParam'], self.int_value)
-        assert_equals(complex_vals['callableIntParam'], self.int_value)
+        assert_equals(complex_vals['callableRoParam'], self.int_value)
 
     def test_complex_tree_callable_readonly(self):
 
-        with assert_raises_regexp(ParameterTreeError, "Cannot set value of read only path"):
-            self.complex_tree.setData('callableIntParam', 1234)
+        with assert_raises_regexp(ParameterTreeError, 'Parameter callableRoParam is read-only'):
+            self.complex_tree.setData('callableRoParam', 1234)
 
     def test_complex_tree_set_invalid_path(self):
 
@@ -142,7 +142,7 @@ class TestParameterTree():
 
         complex_vals = self.complex_tree.getData('')
         complex_vals_copy = deepcopy(complex_vals)
-        del complex_vals_copy['callableIntParam']
+        del complex_vals_copy['callableRoParam']
 
         self.complex_tree.setData('', complex_vals_copy)
         complex_vals2 = self.complex_tree.getData('')
@@ -162,42 +162,62 @@ class TestRwParameterTree():
 
         cls.int_rw_param = 4576
         cls.int_ro_param = 255374
-        cls.int_ro_value = 9876
+        cls.int_rw_value = 9876
+        cls.int_wo_param = 0
 
         cls.rw_callable_tree = ParameterTree({
-            'intRwParam': (cls.intRwParamGet, cls.intRwParamSet),
-            'intRoParam': (cls.intRoParamGet, None),
-            'intRoValue': cls.int_ro_value,
+            'intCallableRwParam': (cls.intCallableRwParamGet, cls.intCallableRwParamSet),
+            'intCallableRoParam': (cls.intCallableRoParamGet, None),
+            'intCallableWoParam': (None, cls.intCallableWoParamSet),
+            'intCallableRwValue': (cls.int_rw_value, cls.intCallableRoParamSet),
+
         })
 
-
     @classmethod
-    def intRwParamSet(cls, value):
+    def intCallableRwParamSet(cls, value):
         cls.int_rw_param = value
 
     @classmethod
-    def intRwParamGet(cls):
+    def intCallableRwParamGet(cls):
         return cls.int_rw_param
 
     @classmethod
-    def intRoParamGet(cls):
+    def intCallableRoParamGet(cls):
         return cls.int_ro_param
+
+    @classmethod
+    def intCallableWoParamSet(cls, value):
+        cls.int_wo_param = value
+
+    def intCallableRoParamSet(cls, value):
+        pass
 
     def test_rw_tree_simple_get_values(self):
 
-        dt_rw_int_param = self.rw_callable_tree.getData('intRwParam')
-        assert_equal(dt_rw_int_param['intRwParam'], self.int_rw_param)
+        dt_rw_int_param = self.rw_callable_tree.getData('intCallableRwParam')
+        assert_equal(dt_rw_int_param['intCallableRwParam'], self.int_rw_param)
 
-        dt_ro_int_param = self.rw_callable_tree.getData('intRoParam')
-        assert_equal(dt_ro_int_param['intRoParam'], self.int_ro_param)
+        dt_ro_int_param = self.rw_callable_tree.getData('intCallableRoParam')
+        assert_equal(dt_ro_int_param['intCallableRoParam'], self.int_ro_param)
 
-        dt_ro_int_value = self.rw_callable_tree.getData('intRoValue')
-        assert_equal(dt_ro_int_value['intRoValue'], self.int_ro_value)
+        dt_rw_int_value = self.rw_callable_tree.getData('intCallableRwValue')
+        assert_equal(dt_rw_int_value['intCallableRwValue'], self.int_rw_value)
 
     def test_rw_tree_simple_set_value(self):
 
         new_int_value = 91210
-        self.rw_callable_tree.setData('intRwParam', new_int_value)
+        self.rw_callable_tree.setData('intCallableRwParam', new_int_value)
 
-        dt_rw_int_param = self.rw_callable_tree.getData('intRwParam')
-        assert_equal(dt_rw_int_param['intRwParam'], new_int_value)
+        dt_rw_int_param = self.rw_callable_tree.getData('intCallableRwParam')
+        assert_equal(dt_rw_int_param['intCallableRwParam'], new_int_value)
+
+    def test_rw_tree_set_ro_param(self):
+
+        with assert_raises_regexp(ParameterTreeError, 'Parameter intCallableRoParam is read-only'):
+            self.rw_callable_tree.setData('intCallableRoParam', 0)
+
+    def test_rw_callable_tree_set_wo_param(self):
+
+        new_value = 1234
+        self.rw_callable_tree.setData('intCallableWoParam', new_value)
+        assert_equal(self.int_wo_param, new_value)
