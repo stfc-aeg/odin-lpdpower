@@ -42,8 +42,9 @@ class ParameterTree(object):
 
         # Convert 2-tuple of one or more callables into a read-write accessor pair
         if isinstance(subtree, tuple):
-            if callable(subtree[0]) or callable(subtree[1]):
-                subtree = ParameterAccessor(path, subtree[0], subtree[1])
+            if len(subtree) > 1:
+                if callable(subtree[0]) or callable(subtree[1]):
+                    subtree = ParameterAccessor(path, subtree[0], subtree[1])
 
         # Convert list or non-callable tuple to enumerated dict ; TODO - remove this?
         if isinstance(subtree, list) or isinstance(subtree, tuple):
@@ -69,7 +70,7 @@ class ParameterTree(object):
 
         return node
 
-    def getData(self, path):
+    def get(self, path):
         levels = path.split('/')
 
         subtree = self.__tree
@@ -122,7 +123,7 @@ class ParameterTree(object):
         return data_tree
 
 
-    def setData(self, path, data):
+    def set(self, path, data):
 
         # Expand out any lists/tuples
         data = self.__recursiveTreeCheck(data)
