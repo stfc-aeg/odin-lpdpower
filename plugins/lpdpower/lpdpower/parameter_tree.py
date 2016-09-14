@@ -18,8 +18,8 @@ class ParameterTree(object):
                 self.addCallback(path + c[0], c[1])
             return subtree.__tree
 
-        # Convert lists/tuples to dict
-        if isinstance(subtree, list) or isinstance(subtree, tuple):
+        # Convert list to enumerated dict ; TODO - remove this?
+        if isinstance(subtree, list):
             subtree = {str(i): subtree[i] for i in range(len(subtree))}
 
         # Recursively check child elements
@@ -30,12 +30,20 @@ class ParameterTree(object):
         return subtree
 
     def __recursivePopulateTree(self, node):
+
+        # If this is a branch nodes recurse down the tree
         if isinstance(node, dict):
             return {k: self.__recursivePopulateTree(v) for k, v in node.iteritems()}
 
-        # Leaf nodes
+        # If this is a leaf nodes, check if the leaf is a r/w tuple and substitute the
+        # read element of that tuple into the node
+        if isinstance(node, tuple):
+            node = node[0]
+
+        # If the node is callable, call the function
         if callable(node):
             return node()
+
         return node
 
     def getData(self, path):
@@ -58,30 +66,39 @@ class ParameterTree(object):
     # Replaces values in data_tree with values from new_data
     def __recursiveMergeTree(self, data_tree, new_data, cur_path):
 
-        # Functions are read only
-        if callable(data_tree):
-            raise ParameterTreeError(
-                "Cannot set value of read only path {}".format(cur_path[:-1]))
+        # # Functions are read only
+        # if callable(data_tree):
+        #     raise ParameterTreeError(
+        #         "Cannot set value of read only path {}".format(cur_path[:-1]))
+
+        # Recurse down tree if this is a banch node
+        if isinstance(data_tree, dict):
+            try:
+                data_tree.update({k: self.__recursiveMergeTree(
+                    data_tree[k], v, cur_path + k + '/') for k, v in new_data.iteritems()})
+                return data_tree
+            except KeyError as e:
+                raise ParameterTreeError('Invalid path: {}{}'.format(cur_path, str(e)[1:-1]))
 
         # Override value
-        if not isinstance(data_tree, dict):
+        if isinstance(data_tree, tuple):
+            if len(data_tree) > 1 and callable(data_tree[1]):
+                data_tree[1](new_data)
+        else:
             # Validate type of new node matches existing
             if type(data_tree) is not type(new_data):
                 raise ParameterTreeError('Type mismatch updating {}: got {} expected {}'.format(
                     cur_path[:-1], type(new_data).__name__, type(data_tree).__name__
                 ))
-            # Check for callbacks
-            for c in self.__callbacks:
-                if cur_path.startswith(c[0]):
-                    c[1](cur_path, new_data)
-            return new_data
+            data_tree = new_data
 
-        try:
-            data_tree.update({k: self.__recursiveMergeTree(
-                data_tree[k], v, cur_path + k + '/') for k, v in new_data.iteritems()})
-            return data_tree
-        except KeyError as e:
-            raise ParameterTreeError('Invalid path: {}{}'.format(cur_path, str(e)[1:-1]))
+        # Check for callbacks
+        for c in self.__callbacks:
+            if cur_path.startswith(c[0]):
+                c[1](cur_path, new_data)
+
+        return data_tree
+
 
     def setData(self, path, data):
 

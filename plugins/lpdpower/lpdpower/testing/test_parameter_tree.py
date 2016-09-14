@@ -154,3 +154,50 @@ class TestParameterTree():
 
         with assert_raises_regexp(ParameterTreeError, 'Type mismatch updating intParam'):
             self.complex_tree.setData('intParam', param_data)
+
+class TestRwParameterTree():
+
+    @classmethod
+    def setup_class(cls):
+
+        cls.int_rw_param = 4576
+        cls.int_ro_param = 255374
+        cls.int_ro_value = 9876
+
+        cls.rw_callable_tree = ParameterTree({
+            'intRwParam': (cls.intRwParamGet, cls.intRwParamSet),
+            'intRoParam': (cls.intRoParamGet, None),
+            'intRoValue': cls.int_ro_value,
+        })
+
+
+    @classmethod
+    def intRwParamSet(cls, value):
+        cls.int_rw_param = value
+
+    @classmethod
+    def intRwParamGet(cls):
+        return cls.int_rw_param
+
+    @classmethod
+    def intRoParamGet(cls):
+        return cls.int_ro_param
+
+    def test_rw_tree_simple_get_values(self):
+
+        dt_rw_int_param = self.rw_callable_tree.getData('intRwParam')
+        assert_equal(dt_rw_int_param['intRwParam'], self.int_rw_param)
+
+        dt_ro_int_param = self.rw_callable_tree.getData('intRoParam')
+        assert_equal(dt_ro_int_param['intRoParam'], self.int_ro_param)
+
+        dt_ro_int_value = self.rw_callable_tree.getData('intRoValue')
+        assert_equal(dt_ro_int_value['intRoValue'], self.int_ro_value)
+
+    def test_rw_tree_simple_set_value(self):
+
+        new_int_value = 91210
+        self.rw_callable_tree.setData('intRwParam', new_int_value)
+
+        dt_rw_int_param = self.rw_callable_tree.getData('intRwParam')
+        assert_equal(dt_rw_int_param['intRwParam'], new_int_value)
