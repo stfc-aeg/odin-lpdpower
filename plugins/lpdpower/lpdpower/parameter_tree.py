@@ -1,18 +1,18 @@
-class DataTreeError(Exception):
+class ParameterTreeError(Exception):
     pass
 
 
-class DataTree(object):
+class ParameterTree(object):
 
     def __init__(self, tree):
         self.__callbacks = []
         self.__tree = self.__recursiveTreeCheck(tree)
 
-    # Expand out lists / child DataTrees
+    # Expand out lists / child ParameterTrees
     def __recursiveTreeCheck(self, subtree, path=''):
 
-        # Expand out child DataTree
-        if isinstance(subtree, DataTree):
+        # Expand out child ParameterTree
+        if isinstance(subtree, ParameterTree):
             # Merge callbacks
             for c in subtree.__callbacks:
                 self.addCallback(path + c[0], c[1])
@@ -51,7 +51,7 @@ class DataTree(object):
             if isinstance(subtree, dict) and l in subtree:
                 subtree = subtree[l]
             else:
-                raise DataTreeError("The path %s is invalid" % path)
+                raise ParameterTreeError("The path %s is invalid" % path)
 
         return self.__recursivePopulateTree({levels[-1]: subtree})
 
@@ -60,14 +60,14 @@ class DataTree(object):
 
         # Functions are read only
         if callable(data_tree):
-            raise DataTreeError(
+            raise ParameterTreeError(
                 "Cannot set value of read only path {}".format(cur_path[:-1]))
 
         # Override value
         if not isinstance(data_tree, dict):
             # Validate type of new node matches existing
             if type(data_tree) is not type(new_data):
-                raise DataTreeError('Type mismatch updating {}: got {} expected {}'.format(
+                raise ParameterTreeError('Type mismatch updating {}: got {} expected {}'.format(
                     cur_path[:-1], type(new_data).__name__, type(data_tree).__name__
                 ))
             # Check for callbacks
@@ -81,7 +81,7 @@ class DataTree(object):
                 data_tree[k], v, cur_path + k + '/') for k, v in new_data.iteritems()})
             return data_tree
         except KeyError as e:
-            raise DataTreeError('Invalid path: {}{}'.format(cur_path, str(e)[1:-1]))
+            raise ParameterTreeError('Invalid path: {}{}'.format(cur_path, str(e)[1:-1]))
 
     def setData(self, path, data):
 
@@ -100,7 +100,7 @@ class DataTree(object):
             if isinstance(merge_point, dict) and l in merge_point:
                 merge_point = merge_point[l]
             else:
-                raise DataTreeError("Invalid path: {}".format(path))
+                raise ParameterTreeError("Invalid path: {}".format(path))
 
         # Add trailing / to paths where necessary
         if len(path) and path[-1] != '/':

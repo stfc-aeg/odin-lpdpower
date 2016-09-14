@@ -1,15 +1,15 @@
-""" Test DataTree class from lpdpower.
+""" Test ParameterTree class from lpdpower.
 
 Tim Nicholls, STFC Application Engingeering
 """
 
 from copy import deepcopy
 from nose.tools import *
-from lpdpower.DataTree import DataTree, DataTreeError
+from lpdpower.parameter_tree import ParameterTree, ParameterTreeError
 
-class TestDataTree():
+class TestParameterTree():
 
-    """Test the DataTree class.
+    """Test the ParameterTree class.
     """
 
     @classmethod
@@ -28,7 +28,7 @@ class TestDataTree():
             'strParam':  cls.str_value,
         }
 
-        cls.simple_tree = DataTree(cls.simple_dict)
+        cls.simple_tree = ParameterTree(cls.simple_dict)
 
         # Set up nested dict of parameters for a more complex tree
         cls.nested_dict = cls.simple_dict.copy()
@@ -36,17 +36,17 @@ class TestDataTree():
             'branchIntParam': 4567,
             'branchStrParam': 'theBranch',
         }
-        cls.nested_tree = DataTree(cls.nested_dict)
+        cls.nested_tree = ParameterTree(cls.nested_dict)
 
         cls.callback_tree = deepcopy(cls.nested_tree)
         cls.callback_tree.addCallback('branch/', cls.branch_callback)
 
         cls.branch_callback_count = 0
 
-        cls.complex_tree_branch = DataTree(deepcopy(cls.nested_dict))
+        cls.complex_tree_branch = ParameterTree(deepcopy(cls.nested_dict))
         cls.complex_tree_branch.addCallback('', cls.branch_callback)
 
-        cls.complex_tree = DataTree({
+        cls.complex_tree = ParameterTree({
             'intParam': cls.int_value,
             'callableIntParam': lambda: cls.int_value,
             'listParam': cls.list_values,
@@ -60,7 +60,7 @@ class TestDataTree():
         #     cls.branch_callback_count, path, value))
 
     def setup(self):
-        TestDataTree.branch_callback_count = 0
+        TestParameterTree.branch_callback_count = 0
         pass
 
     def test_simple_tree_returns_dict(self):
@@ -84,7 +84,7 @@ class TestDataTree():
 
     def test_simple_tree_missing_value(self):
 
-        with assert_raises_regexp(DataTreeError, 'The path missing is invalid'):
+        with assert_raises_regexp(ParameterTreeError, 'The path missing is invalid'):
             self.simple_tree.getData('missing')
 
     def test_nested_tree_returns_nested_dict(self):
@@ -118,7 +118,7 @@ class TestDataTree():
         branch_data = deepcopy(self.nested_dict['branch'])
         branch_data['extraParam'] = 'oops'
 
-        with assert_raises_regexp(DataTreeError, 'Invalid path'):
+        with assert_raises_regexp(ParameterTreeError, 'Invalid path'):
             self.callback_tree.setData('branch', branch_data)
 
     def test_complex_tree_calls_leaf_nodes(self):
@@ -129,13 +129,13 @@ class TestDataTree():
 
     def test_complex_tree_callable_readonly(self):
 
-        with assert_raises_regexp(DataTreeError, "Cannot set value of read only path"):
+        with assert_raises_regexp(ParameterTreeError, "Cannot set value of read only path"):
             self.complex_tree.setData('callableIntParam', 1234)
 
     def test_complex_tree_set_invalid_path(self):
 
         invalid_path = 'invalidPath/toNothing'
-        with assert_raises_regexp(DataTreeError, 'Invalid path: {}'.format(invalid_path)):
+        with assert_raises_regexp(ParameterTreeError, 'Invalid path: {}'.format(invalid_path)):
             self.complex_tree.setData(invalid_path, 0)
 
     def test_complex_tree_set_top_level(self):
@@ -152,5 +152,5 @@ class TestDataTree():
 
         param_data = {'intParam': 9876}
 
-        with assert_raises_regexp(DataTreeError, 'Type mismatch updating intParam'):
+        with assert_raises_regexp(ParameterTreeError, 'Type mismatch updating intParam'):
             self.complex_tree.setData('intParam', param_data)
