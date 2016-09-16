@@ -50,7 +50,7 @@ class QuadData(object):
             self.quad = kwargs['quad']
         else:
             self.quad = Quad(*args, **kwargs)
-            
+
         self.channels = [ChannelData(self.quad, i) for i in range(4)]
 
         self.param_tree = ParameterTree({
@@ -60,7 +60,7 @@ class QuadData(object):
                 self.channels[2].param_tree,
                 self.channels[3].param_tree
                 ],
-            "supply": self.getSupplyVoltage,
+            "supply": (self.getSupplyVoltage, None),
             })
 
     def getSupplyVoltage(self):
