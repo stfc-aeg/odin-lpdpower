@@ -82,7 +82,7 @@ class PSCUData(object):
         else:
             self.pscu = PSCU(*args, **kwargs)
 
-        self.quadData = [QuadData(q) for q in self.pscu.quad]
+        self.quadData = [QuadData(quad=q) for q in self.pscu.quad]
         self.tempData = [TempData(self.pscu, i) for i in range(11)]
         self.humidityData = [HumidityData(self.pscu, i) for i in range(2)]
 

@@ -41,11 +41,16 @@ class QuadData(object):
     """Data tree to represent an entire quad."""
 
     def __init__(self, *args, **kwargs):
-        if len(args) and isinstance(args[0], Quad):
-            self.quad = args[0]
+        # if len(args) and isinstance(args[0], Quad):
+        #     self.quad = args[0]
+        # else:
+        #     self.quad = Quad(*args, **kwargs)
+
+        if 'quad' in kwargs:
+            self.quad = kwargs['quad']
         else:
             self.quad = Quad(*args, **kwargs)
-
+            
         self.channels = [ChannelData(self.quad, i) for i in range(4)]
 
         self.param_tree = ParameterTree({

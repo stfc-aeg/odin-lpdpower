@@ -12,8 +12,6 @@ else:                         # pragma: no cover
 from nose.tools import *
 
 sys.modules['lpdpower.quad'] = Mock()
-sys.modules['lpdqwer.quad.Quad'] = Mock()
-Quad = Mock
 from lpdpower.quad_data import ChannelData, QuadData
 
 class TestChannelData():
@@ -49,8 +47,13 @@ class TestQuadData():
 
     @classmethod
     def setup_class(cls):
-        cls.quad = Quad()
-        cls.quad_data = QuadData(cls.quad)
+        cls.quad = Mock()
+        cls.quad_data = QuadData(quad=cls.quad)
+
+    def test_quad_data_no_quad_arg(self):
+
+        qd = QuadData()
+        assert(qd.quad is not None)
 
     def test_quad_supply_voltage_get(self):
         self.quad_data.param_tree.get('supply')
