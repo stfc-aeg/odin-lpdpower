@@ -305,7 +305,7 @@ class PSCU(I2CContainer):
         self.mcpMisc[0].output(pin, MCP23008.HIGH)
         self.mcpMisc[0].output(pin, MCP23008.LOW)
 
-    def setFanSpeed(self, value):
+    def setFanTarget(self, value):
         self.__fanTarget = value
         self.fanSpd.setOutput01(1.0 - (value / 100.0))
 
