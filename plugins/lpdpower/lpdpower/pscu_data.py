@@ -123,9 +123,9 @@ class PSCUData(object):
                  "latched": (self.pscu.getTraceLatched,  None),
                         },
             "overall": (self.pscu.getHealth,  None),
-            "arm": (True, self.setArmed),
+            "arm": (True, self.pscu.setArmed),
             "isarmed": (self.pscu.getArmed,  None),
-            "enableall": (True,  self.enableAll),
+            "enableall": (True,  self.pscu.enableAll),
             "allenabled": (self.pscu.getAllEnabled, None),
             "enableInterval": (self.pscu.getEnableInterval, None),
         })
@@ -151,14 +151,6 @@ class PSCUData(object):
             self.param_tree.set(path, data)
         except ParameterTreeError as e:
             raise PSCUDataError(e)
-
-#    def enableAll(self, path, value):
-    def enableAll(self, value):
-        self.pscu.enableAll(value)
-
-    #def setArmed(self, path, value):
-    def setArmed(self, value):
-        self.pscu.setArmed(value)
 
     def getQuadTraces(self):
         return {str(q) : self.pscu.getQuadTrace(q) for q in range(4)}
