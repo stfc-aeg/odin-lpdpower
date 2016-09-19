@@ -36,7 +36,7 @@ class LPDPowerAdapter(ApiAdapter):
     @response_types('application/json')
     def get(self, path, request):
         try:
-            response = self.pscuData.getData(path)
+            response = self.pscuData.get(path)
             status_code = 200
         except PSCUDataError as e:
             response = {'error': str(e)}
@@ -48,8 +48,8 @@ class LPDPowerAdapter(ApiAdapter):
     def put(self, path, request):
         try:
             data = json_decode(request.body)
-            self.pscuData.setData(path, data)
-            response = self.pscuData.getData(path)
+            self.pscuData.set(path, data)
+            response = self.pscuData.get(path)
             status_code = 200
         except PSCUDataError as e:
             response = {'error': str(e)}
