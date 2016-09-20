@@ -4,6 +4,9 @@ from functools import partial
 import logging
 import time
 
+class LcdDisplayError(Exception):
+    pass
+
 class LcdDisplay(object):
 
     GREEN = UsbLcd.GREEN
@@ -13,7 +16,10 @@ class LcdDisplay(object):
 
         self.pscu = pscu
 
-        self.lcd = UsbLcd(serial_dev, baud, rows, cols)
+        try:
+            self.lcd = UsbLcd(serial_dev, baud, rows, cols)
+        except Exception as e:
+            raise LcdDisplayError("Failed to initialise LCD: {}".format(e))
 
         self.lcd.clear()
 

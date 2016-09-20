@@ -128,6 +128,7 @@ class PSCUData(object):
             "enableall": (True,  self.pscu.enableAll),
             "allenabled": (self.pscu.getAllEnabled, None),
             "enableInterval": (self.pscu.getEnableInterval, None),
+            "displayError": (self.pscu.getDisplayError, None),
         })
 
     def get(self, path):

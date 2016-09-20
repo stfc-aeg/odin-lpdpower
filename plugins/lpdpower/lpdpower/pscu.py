@@ -4,7 +4,7 @@ from ad7998 import AD7998
 from ad5321 import AD5321
 from mcp23008 import MCP23008
 from quad import Quad
-from lcd_display import LcdDisplay
+from lcd_display import LcdDisplay, LcdDisplayError
 from deferred_executor import DeferredExecutor
 
 import Adafruit_BBIO.GPIO as GPIO
@@ -119,7 +119,12 @@ class PSCU(I2CContainer):
         self.__latchedOutputs = [0, 0, 0, 0, 0]  # Tmp, F, P, T, H
 
         # LCD Display
-        self.lcd = LcdDisplay(self, "/dev/ttyACM0", 57600, rows=4, cols=20)
+        try:
+            self.lcd = LcdDisplay(self, "/dev/ttyACM0", 57600, rows=4, cols=20)
+            self.lcd_display_error = False
+        except LcdDisplayError as e:
+            logging.warning(e)
+            self.lcd_display_error = True
 
         GPIO.setup("P9_11", GPIO.IN)
         GPIO.setup("P9_12", GPIO.IN)
@@ -308,8 +313,16 @@ class PSCU(I2CContainer):
     def setFanTarget(self, value):
         self.__fanTarget = value
         self.fanSpd.setOutput01(1.0 - (value / 100.0))
+        
+    def getDisplayError(self):
+        return self.lcd_display_error
 
     def updateLCD(self):
+        
+        # Do nothing if display was not initlialised OK
+        if self.lcd_display_error:
+            return
+        
         # Get input
         if GPIO.event_detected("P9_11"):
             self.lcd.previous_page()
