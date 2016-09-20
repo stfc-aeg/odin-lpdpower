@@ -1,149 +1,157 @@
+import logging
+
 from quad_data import QuadData
-from DataTree import DataTree
+from parameter_tree import ParameterTree, ParameterTreeError
 from pscu import PSCU
-from quad import Quad
-from tca9548 import TCA9548
 
-#Dummy class
-#class PSCU(object):
-#	def __init__(self):
-#		self.tca = TCA9548(0x70)
-#		quad = self.tca.attachDevice(5, Quad)
-#		self.quads = [quad] * 4
 
-#Data container for an individual temp sensor
 class TempData(object):
-	def __init__(self, pscu, number):
-		self.dataTree = DataTree({
-			"setpoint" : self.getSetPoint,
-			"temperature" : self.getTemp,
-			"trace" : self.getTrace,
-			"tripped" : self.getTripped,
-			"disabled" : self.getDisabled
-		})
+    """Data container for an individual temperature sensor."""
 
-		self.pscu = pscu
-		self.number = number
+    def __init__(self, pscu, number):
+        self.param_tree = ParameterTree({
+            "setpoint": (self.getSetPoint, None),
+            "temperature": (self.getTemp, None),
+            "trace": (self.getTrace, None),
+            "tripped": (self.getTripped, None),
+            "disabled": (self.getDisabled, None),
+        })
 
-	def getSetPoint(self):
-		return self.pscu.getTempSetPoint(self.number)
+        self.pscu = pscu
+        self.number = number
 
-	def getTemp(self):
-		return self.pscu.getTemperature(self.number)
+    def getSetPoint(self):
+        return self.pscu.getTempSetPoint(self.number)
 
-	def getTrace(self):
-		return self.pscu.getTempTrace(self.number)
+    def getTemp(self):
+        return self.pscu.getTemperature(self.number)
 
-	def getTripped(self):
-		return self.pscu.getTempTripped(self.number)
+    def getTrace(self):
+        return self.pscu.getTempTrace(self.number)
 
-	def getDisabled(self):
-		return self.pscu.getTempDisabled(self.number)
+    def getTripped(self):
+        return self.pscu.getTempTripped(self.number)
 
-#Data container for an individual humidity sensor
+    def getDisabled(self):
+        return self.pscu.getTempDisabled(self.number)
+
+
 class HumidityData(object):
-	def __init__(self, pscu, number):
-		self.dataTree = DataTree({
-			"humidity" : self.getHumidity,
-			"setpoint" : self.getSetPoint,
-			"tripped" : self.getTripped,
-			"trace" : self.getTrace,
-			"disabled" : self.getDisabled,
-		})
+    """Data container for an individual humidity sensor."""
 
-		self.pscu = pscu
-		self.number = number
+    def __init__(self, pscu, number):
+        self.param_tree = ParameterTree({
+            "humidity": (self.getHumidity, None),
+            "setpoint": (self.getSetPoint, None),
+            "tripped": (self.getTripped, None),
+            "trace": (self.getTrace, None),
+            "disabled": (self.getDisabled, None),
+        })
 
-	def getHumidity(self):
-		return self.pscu.getHumidity(self.number)
+        self.pscu = pscu
+        self.number = number
 
-	def getSetPoint(self):
-                return self.pscu.getHSetPoint(self.number)
+    def getHumidity(self):
+        return self.pscu.getHumidity(self.number)
 
-	def getTripped(self):
-                return self.pscu.getHTripped(self.number)
+    def getSetPoint(self):
+        return self.pscu.getHSetPoint(self.number)
 
-	def getTrace(self):
-                return self.pscu.getHTrace(self.number)
+    def getTripped(self):
+        return self.pscu.getHTripped(self.number)
 
-	def getDisabled(self):
-		return self.pscu.getHDisabled(self.number)
+    def getTrace(self):
+        return self.pscu.getHTrace(self.number)
 
-#Data container for entire PSCU & Quads
+    def getDisabled(self):
+        return self.pscu.getHDisabled(self.number)
+        
+
+class PSCUDataError(Exception):
+    """Simple exception container to wrap lower-level exceptions."""
+
+    pass
+
+
 class PSCUData(object):
-	def __init__(self, *args, **kwargs):
-		if len(args) and isinstance(args[0], PSCU):
-			self.pscu = args[0]
-		else:
-			self.pscu = PSCU(*args, **kwargs)
+    """Data container for entire PSCU & Quads."""
 
-		self.quadData = [QuadData(q) for q in self.pscu.quad]
-		self.tempData = [TempData(self.pscu, i) for i in range(11)]
-		self.humidityData = [HumidityData(self.pscu, i) for i in range(2)]
+    def __init__(self, *args, **kwargs):
+        if len(args) and isinstance(args[0], PSCU):
+            self.pscu = args[0]
+        else:
+            self.pscu = PSCU(*args, **kwargs)
 
-		self.dataTree = DataTree({
-			"quad" : {
-				"quads" : [q.dataTree for q in self.quadData],
-				"trace" : [self.traceQ0, self.traceQ1, self.traceQ2, self.traceQ3]
-			},
-			"temperature" : {
-				"sensors" : [t.dataTree for t in self.tempData],
-				"overall" : self.pscu.getTempOutput,
-				"latched" : self.pscu.getTempLatched,
-			},
-			"humidity" : {
-				"sensors" : [h.dataTree for h in self.humidityData],
-				"overall" : self.pscu.getHumidityOutput,
-				"latched" : self.pscu.getHumidityLatched,
-			},
-			"fan" : {
-				"target" : 0,
-				"currentspeed" : self.pscu.getFanSpeed,
-				"setpoint" : self.pscu.getFanSetPoint,
-				"potentiometer" : self.pscu.getFanPot,
-				"tripped" : self.pscu.getFanTripped,
-				"overall" : self.pscu.getFanOutput,
-				"latched" : self.pscu.getFanLatched,
-			},
-			"pump" : {
-				"flow" : self.pscu.getPumpFlow,	
-				"setpoint" : self.pscu.getPumpSetPoint,
-				"tripped" : self.pscu.getPumpTripped,
-				"overall" : self.pscu.getPumpOutput,
-				"latched" : self.pscu.getPumpLatched,
-			},
-			"trace" : {
-				 "overall" : self.pscu.getTraceOutput,
-				 "latched" : self.pscu.getTraceLatched,
+        self.quadData = [QuadData(quad=q) for q in self.pscu.quad]
+        
+        self.tempData = [TempData(self.pscu, i) for i in range(11)]
+        self.humidityData = [HumidityData(self.pscu, i) for i in range(2)]
+
+        self.param_tree = ParameterTree({
+            "quad": {
+                "quads": [q.param_tree for q in self.quadData],
+                'trace': (self.getQuadTraces, None),
+            },
+            "temperature": {
+                "sensors": [t.param_tree for t in self.tempData],
+                "overall": (self.pscu.getTempOutput,  None),
+                "latched": (self.pscu.getTempLatched,  None),
+            },
+            "humidity": {
+                "sensors": [h.param_tree for h in self.humidityData],
+                "overall": (self.pscu.getHumidityOutput, None),
+                "latched": (self.pscu.getHumidityLatched, None),
+            },
+            "fan": {
+                "target": (self.pscu.getFanTarget, self.pscu.setFanTarget),
+                "currentspeed": (self.pscu.getFanSpeed, None),
+                "setpoint": (self.pscu.getFanSetPoint, None),
+                "potentiometer": (self.pscu.getFanPot, None),
+                "tripped": (self.pscu.getFanTripped, None),
+                "overall": (self.pscu.getFanOutput, None),
+                "latched": (self.pscu.getFanLatched, None),
+            },
+            "pump": {
+                "flow": (self.pscu.getPumpFlow, None),
+                "setpoint": (self.pscu.getPumpSetPoint, None),
+                "tripped": (self.pscu.getPumpTripped, None),
+                "overall": (self.pscu.getPumpOutput, None),
+                "latched": (self.pscu.getPumpLatched, None),
+            },
+            "trace": {
+                 "overall": (self.pscu.getTraceOutput, None),
+                 "latched": (self.pscu.getTraceLatched,  None),
                         },
-			"overall": self.pscu.getHealth,
-			"arm" : True, #Output
-			"isarmed" : self.pscu.getArmed,
-			"enableall" : False #Output
-		})
+            "overall": (self.pscu.getHealth,  None),
+            "arm": (True, self.pscu.setArmed),
+            "isarmed": (self.pscu.getArmed,  None),
+            "enableall": (True,  self.pscu.enableAll),
+            "allenabled": (self.pscu.getAllEnabled, None),
+            "enableInterval": (self.pscu.getEnableInterval, None),
+        })
 
-		self.dataTree.addCallback("enableall/", self.enableAll)
-		self.dataTree.addCallback("arm/", self.setArmed)
-		self.dataTree.addCallback("fan/target/", self.fanTarget)
+    def get(self, path):
+        """Get parameters from the underlying parameter tree.
 
-	def enableAll(self, path, value):
-		self.pscu.enableAll()
+        This method simply wraps underlying ParameterTree method so that an exceptions can be
+        re-raised with an appropriate PSCUDataError.
+        """
+        try:
+            return self.param_tree.get(path)
+        except ParameterTreeError as e:
+            raise PSCUDataError(e)
 
-	def setArmed(self, path, value):
-		self.pscu.setArmed(value)
+    def set(self, path, data):
+        """Set parameters in underlying parameter tree.
 
-	def fanTarget(self, path, value):
-		self.pscu.setFanSpeed(value)
+        This method simply wraps underlying ParameterTree method so that an exceptions can be
+        re-raised with an appropriate PSCUDataError.
+        """
+        try:
+            self.param_tree.set(path, data)
+        except ParameterTreeError as e:
+            raise PSCUDataError(e)
 
-	def traceQ0(self):
-		return self.pscu.getQuadTrace(0)
-
-	def traceQ1(self):
-                return self.pscu.getQuadTrace(1)
-
-	def traceQ2(self):
-                return self.pscu.getQuadTrace(2)
-
-	def traceQ3(self):
-                return self.pscu.getQuadTrace(3)
-
+    def getQuadTraces(self):
+        return {str(q) : self.pscu.getQuadTrace(q) for q in range(4)}
+         
