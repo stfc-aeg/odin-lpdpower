@@ -1,3 +1,4 @@
+from i2c_device import I2CDevice
 from i2c_container import I2CContainer
 from tca9548 import TCA9548
 from ad7998 import AD7998
@@ -20,6 +21,8 @@ class PSCU(I2CContainer):
     DEFAULT_QUAD_ENABLE_INTERVAL = 1.0
 
     def __init__(self, quad_enable_interval=DEFAULT_QUAD_ENABLE_INTERVAL):
+        
+        I2CDevice.disable_exceptions()
 
         self.quad_enable_interval = quad_enable_interval
 

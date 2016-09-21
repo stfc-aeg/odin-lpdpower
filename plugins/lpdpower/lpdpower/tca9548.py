@@ -19,8 +19,8 @@ class TCA9548(I2CDevice):
 			raise I2CExpection("Device %s was not properly detached from the TCA" % device)
 
 		#Call own callback (for chained TCAs)
-		if self.preAccess != None:
-			self.preAccess(self) 
+		if self.pre_access != None:
+			self.pre_access(self) 
 
 		#Skip if already enabled
 		if self.__attachedDevices[device] == self.__enabledLine:
@@ -41,13 +41,13 @@ class TCA9548(I2CDevice):
 			raise I2CException("The device %s must be a type or an instance of I2CDevice" % device)
 
 		self.__attachedDevices[device] = line
-		device.preAccess = self.__deviceCallback
+		device.pre_access = self.__deviceCallback
 		return device
 
 	def removeDevice(self, device):
 		if device in self.__attachedDevices:
 			self.__attachedDevices.pop(device)
-			device.preAccess = None
+			device.pre_access = None
 		else:
 			#Device is not attached to this TCA
 			raise I2CException("The device %s is not attached to this TCA" % device)
