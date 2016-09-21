@@ -1,4 +1,4 @@
-from I2CDevice import I2CDevice, I2CException
+from i2c_device import I2CDevice, I2CException
 from I2CContainer import I2CContainer
 import sys
 

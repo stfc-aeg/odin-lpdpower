@@ -1,4 +1,4 @@
-from I2CDevice import I2CDevice
+from i2c_device import I2CDevice, I2CException
 
 class AD7998(I2CDevice):
 	def __init__(self, address = 0x20, **kwargs):
