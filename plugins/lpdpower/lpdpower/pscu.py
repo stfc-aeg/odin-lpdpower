@@ -1,4 +1,4 @@
-from I2CContainer import I2CContainer
+from i2c_container import I2CContainer
 from tca9548 import TCA9548
 from ad7998 import AD7998
 from ad5321 import AD5321

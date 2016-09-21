@@ -1,5 +1,5 @@
 from i2c_device import I2CDevice, I2CException
-from I2CContainer import I2CContainer
+from i2c_container import I2CContainer
 import sys
 
 #Handles enabling/disabling I2C devices connected to a TCA9548
