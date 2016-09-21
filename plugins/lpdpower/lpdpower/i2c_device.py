@@ -12,7 +12,7 @@ class I2CDevice(Adafruit_I2C):
 
     def write8(self, *args):
         if not self.preAccess == None: self.preAccess(self)
-         ret = Adafruit_I2C.write8(self, *args)
+        ret = Adafruit_I2C.write8(self, *args)
         return ret
 
     def write16(self, *args):
