@@ -40,6 +40,8 @@ class LcdDisplay(object):
 
         self.registered_pages.append(self.trace_page)
 
+        self.registered_pages.append(self.quad_supply_page)
+        
         for quad in range(4):
             for chan in range(2):
                 self.registered_pages.append(partial(self.quad_page, quad, chan*2))
@@ -197,6 +199,19 @@ class LcdDisplay(object):
         )
 
         return content
+    
+    def quad_supply_page(self):
+        
+        content = self.page_header()
+        
+        content += 'Quad supplies\r'
+        
+        quad_supply_volts = [self.pscu.quad[quad].getSupplyVoltage() for quad in range(4)]
+        
+        content += '1: {:4.1f}V 2:{:4.1f}V\r'.format(quad_supply_volts[0], quad_supply_volts[1])
+        content += '3: {:4.1f}V 4:{:4.1f}V\r'.format(quad_supply_volts[2], quad_supply_volts[3])
+        
+        return content
 
     def quad_page(self, quad, start_chan):
 
@@ -204,16 +219,28 @@ class LcdDisplay(object):
 
         quad_chans = [start_chan, start_chan+1]                                                                                                                     
 
+        quad_supply_volts = self.pscu.quad[quad].getSupplyVoltage()
+        
         content += 'Quad: {} Chans: {}/{} \r'.format(quad + 1, *[chan+1 for chan in quad_chans])
 
         for quad_chan in quad_chans:
             quad_enable = ('ON ' if self.pscu.quad[quad].getEnable(quad_chan) else 'OFF')
             quad_volts = self.pscu.quad[quad].getChannelVoltage(quad_chan)
-            quad_fuse = 'OK'
+            quad_fuse_volts = self.pscu.quad[quad].getFuseVoltage(quad_chan)
             quad_current = self.pscu.quad[quad].getChannelCurrent(quad_chan)
 
-            content += '{}:{} {:4.1f}V {:4.1f}A {}'.format(
-                quad_chan+1, quad_enable, quad_volts, quad_current, quad_fuse)
+            fuse_ok = True
+            if quad_supply_volts > 24.0:
+                fuse_delta_volts = abs(quad_fuse_volts - quad_supply_volts)
+                if fuse_delta_volts > 2.0:
+                    fuse_ok = False
+            
+            if fuse_ok:          
+                content += '{}:{} {:4.1f}V {:4.1f}A OK'.format(
+                    quad_chan+1, quad_enable, quad_volts, quad_current)
+            else:
+                content += '{}:Fuse blow? ({:4.1f}V)'.format(
+                    quad_chan+1, quad_fuse_volts)
 
         return content
 
