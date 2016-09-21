@@ -1,5 +1,5 @@
 import sys
-from I2CDevice import I2CDevice
+from i2c_device import I2CDevice, I2CException
 
 class AD5321(I2CDevice):
 	def __init__(self, address = 0xc, **kwargs):

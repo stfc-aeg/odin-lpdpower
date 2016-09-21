@@ -1,4 +1,4 @@
-from I2CDevice import I2CDevice
+from i2c_device import I2CDevice, I2CException
 import time
 
 class LM92(I2CDevice):

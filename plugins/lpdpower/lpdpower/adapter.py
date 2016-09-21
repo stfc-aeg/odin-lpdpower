@@ -9,18 +9,10 @@ import sys
 import logging
 
 
-class NullDevice():
-
-    def write(self, s):
-        pass
-
-
 class LPDPowerAdapter(ApiAdapter):
 
     def __init__(self, **kwargs):
         super(LPDPowerAdapter, self).__init__(**kwargs)
-
-        sys.stdout = NullDevice()  # Prevent I2C spam if devices aren't connected
 
         # Retrieve adapter options from config file
         self.update_interval = float(self.options.get('update_interval', 0.05))
