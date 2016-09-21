@@ -94,11 +94,13 @@ class Quad(I2CContainer):
     def pollAllSensors(self):
         """Poll all sensor channels into buffer variables."""
 
+        enable_pins = range(4, 4 + self.NUM_CHANNELS)
+        self.__channelEnable = self.mcp.input_pins(enable_pins)
+
         for channel in range(self.NUM_CHANNELS):
             self.__channelVoltage[channel] = self.adcPower.readInput01(channel) * 5 * 16
             self.__channelCurrent[channel] = self.adcPower.readInput01(channel + 4) * 5 * 4
             self.__fuseVoltage[channel] = self.adcFuse.readInput01(channel) * 5 * 16
-            self.__channelEnable[channel] = self.mcp.input(channel + 4) == 1
 
         self.__supplyVoltage = self.adcFuse.readInput01(4) * 5 * 16
 
