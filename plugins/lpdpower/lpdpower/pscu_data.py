@@ -124,10 +124,8 @@ class PSCUData(object):
             "position": (self.pscu.getPosition, None),
             "overall": (self.pscu.getHealth,  None),
             "latched": (self.getAllLatched, None),
-            "arm": (True, self.pscu.setArmed),
-            "isarmed": (self.pscu.getArmed,  None),
-            "enableall": (True,  self.pscu.enableAll),
-            "allenabled": (self.pscu.getAllEnabled, None),
+            "armed": (self.pscu.getArmed, self.pscu.setArmed),
+            "allEnabled": (self.pscu.getAllEnabled, self.pscu.enableAll),
             "enableInterval": (self.pscu.getEnableInterval, None),
             "displayError": (self.pscu.getDisplayError, None),
         })
