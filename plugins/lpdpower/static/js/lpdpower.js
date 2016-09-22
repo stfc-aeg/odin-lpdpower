@@ -3,6 +3,7 @@ const buttonOn = "btn-success";
 const buttonOff = "btn-danger";
 const colorOk = "#5cb85c";
 const colorFail = "#d9534f";
+const colorUnknown = '#555555';
 
 function round1dp(flt)
 {
@@ -10,27 +11,21 @@ function round1dp(flt)
     return flt.toFixed(1);
 }
 
-function enableButton(el)
-{
-	el.classList.remove(buttonOff);
-	el.classList.add(buttonOn);
-	el.innerHTML = "Disable";
-}
-
-function disableButton(el)
-{
-	el.classList.remove(buttonOn);
-	el.classList.add(buttonOff);
-	el.innerHTML = "Enable";
-}
-
 function generateQuad(id)
 {
 	return `
 <div class="caption">
-	<h3>Quad ${id+1}:</h3>
-	<p>Supply Voltage: <span id="q${id}-sv"></span>V</p>
-	<p class="error" id="q${id}-trace">Quad ${id+1} was not detected!</p>
+	<div class="container-fluid">
+		<div class="row"><h4>Quad ${id+1}:</h4></div>
+		<div class="row">
+			<div class="col-xs-5">Supply:</div>
+			<div id="q${id}-sv" class="col-xs-5">&nbsp;</div>
+		</div>
+		<div class="row">
+			<div class="col-xs-5">Trace:</div>
+			<div id="q${id}-trace"  class="col-xs-5 status vertical-align">&nbsp;</div>
+		</div>
+	</div>
 </div>
 <table class="table table-striped">
 	<thead>
@@ -101,7 +96,7 @@ class Quad
 	{
 		//Update all the values in the table
 		//Channel voltages
-    	        this.map.get("sv").innerHTML = round1dp(data.supply);
+    	this.map.get("sv").innerHTML = round1dp(data.supply) + 'V';
 		this.map.get("v0").innerHTML = round1dp(data.channels[0].voltage);
 		this.map.get("v1").innerHTML = round1dp(data.channels[1].voltage);
 		this.map.get("v2").innerHTML = round1dp(data.channels[2].voltage);
@@ -119,65 +114,18 @@ class Quad
 		this.map.get("a2").innerHTML = round1dp(data.channels[2].current);
 		this.map.get("a3").innerHTML = round1dp(data.channels[3].current);
 
-		var el = this.map.get("btn0");
-		if(data.channels[0].enabled && !this.enabled[0])
+		for (var chan = 0; chan < 4; chan++)
 		{
-			enableButton(el);
-			this.enabled[0] = data.channels[0].enabled;
-		}
-		else if(!data.channels[0].enabled && this.enabled[0])
-		{
-			disableButton(el);
-			this.enabled[0] = data.channels[0].enabled;
+			var elem_name = "btn" + chan.toString();
+			var el = this.map.get(elem_name);
+			update_button_state(el, data.channels[chan].enabled, 'Disable', 'Enable')
 		}
 
-		el = this.map.get("btn1");
-		if(data.channels[1].enabled && !this.enabled[1])
-		{
-			enableButton(el);
-			this.enabled[1] = data.channels[1].enabled;
-		}
-		else if(!data.channels[1].enabled && this.enabled[1])
-		{
-			disableButton(el);
-			this.enabled[1] = data.channels[1].enabled;
-		}
-
-		el = this.map.get("btn2");
-		if(data.channels[2].enabled && !this.enabled[2])
-		{
-			enableButton(el);
-			this.enabled[2] = data.channels[2].enabled;
-		}
-		else if(!data.channels[2].enabled && this.enabled[2])
-		{
-			disableButton(el);
-			this.enabled[2] = data.channels[2].enabled;
-		}
-
-		el = this.map.get("btn3");
-		if(data.channels[3].enabled && !this.enabled[3])
-		{
-			enableButton(el);
-			this.enabled[3] = data.channels[3].enabled;
-		}
-		else if(!data.channels[3].enabled && this.enabled[3])
-		{
-			disableButton(el);
-			this.enabled[3] = data.channels[3].enabled;
-		}
 	}
 
 	updateTrace(value)
 	{
-		if(this.trace != value)
-		{
-			this.trace = value;
-			if(value)
-				this.map.get("trace").classList.add("hidden");
-			else
-				this.map.get("trace").classList.remove("hidden");
-		}
+		update_status_box(this.map.get('trace'), value, 'OK', 'Error')
 	}
 }
 
@@ -185,9 +133,17 @@ function generateTempSensors(count)
 {
 	var ret = `
 <div class="caption">
-	<h3>Temperature:</h3>
-	<div class="status" id="tmp-health">Status</div>
-	<div class="status" id="tmp-latched">Latched</div>
+	<div class="container-fluid">
+		<div class="row"><h4>Temperature:</h4></div>
+		<div class="row caption-row">
+			<div class="col-xs-5">Status:</div>
+			<div id="tmp-health" class="col-xs-5 status vertical-align">&nbsp;</div>
+		</div>
+		<div class="row caption-row">
+			<div class="col-xs-5">Latched:</div>
+			<div id="tmp-latched"  class="col-xs-5 status vertical-align">&nbsp;</div>
+		</div>	
+	</div>
 </div>
 <table class="table table-striped">
 
@@ -214,7 +170,7 @@ function generateTempSensors(count)
 			<td><span id="tmp${id}-set"></span>°C</td>
 			<td><div id="tmp${id}-trace" class="status" ></div></td>
 			<td><div id="tmp${id}-enable" class="status" ></div></td>
-		        <td><div id="tmp${id}-trip" class="status"></div></td>
+		    <td><div id="tmp${id}-trip" class="status"></div></td>
 		</tr>
 		`;
 	}
@@ -255,9 +211,17 @@ function generateHumiditySensors(count)
 {
 	var ret = `
 <div class="caption">
-	<h3>Humidity:</h3>
-	<div class="status" id="h-health">Status</div>
-	<div class="status" id="h-latched">Latched</div>
+	<div class="container-fluid">
+		<div class="row"><h4>Humidity:</h4></div>
+		<div class="row caption-row">
+			<div class="col-xs-5">Status:</div>
+			<div id="h-health" class="col-xs-5 status vertical-align">&nbsp;</div>
+		</div>
+		<div class="row caption-row">
+			<div class="col-xs-5">Latched:</div>
+			<div id="h-latched"  class="col-xs-5 status vertical-align">&nbsp;</div>
+		</div>	
+	</div>
 </div>
 <table class="table table-striped">
 
@@ -325,9 +289,17 @@ function generatePumpSensors(count)
 {
 	var ret = `
 <div class="caption">
-	<h3>Pump:</h3>
-	<div class="status" id="p-health">Status</div>
-	<div class="status" id="p-latched">Latched</div>
+	<div class="container-fluid">
+		<div class="row"><h4>Pump:</h4></div>
+		<div class="row caption-row">
+			<div class="col-xs-5">Status:</div>
+			<div id="p-health" class="col-xs-5 status vertical-align">&nbsp;</div>
+		</div>
+		<div class="row caption-row">
+			<div class="col-xs-5">Latched:</div>
+			<div id="p-latched"  class="col-xs-5 status vertical-align">&nbsp;</div>
+		</div>	
+	</div>
 </div>
 <table class="table table-striped">
 
@@ -390,18 +362,26 @@ function generateFanSensors(count)
 {
 	var ret = `
 <div class="caption">
-	<h3>Fan:</h3>
-	<div class="status" id="f-health">Status</div>
-	<div class="status" id="f-latched">Latched</div>
+	<div class="container-fluid">
+	<div class="row"><h4>Fan:</h4></div>
+	<div class="row caption-row">
+		<div class="col-xs-5">Status:</div>
+		<div id="f-health" class="col-xs-5 status vertical-align">&nbsp;</div>
+	</div>
+	<div class="row caption-row">
+		<div class="col-xs-5">Latched:</div>
+		<div id="f-latched"  class="col-xs-5 status vertical-align">&nbsp;</div>
+	</div>	
+</div>
 </div>
 <table class="table table-striped">
 
 	<thead>
 		<tr>
 			<th class="text-center" style="width:20%;">Sensor</th>
-			<th class="text-center" style="width:14%;">Current Speed</th>
-			<th class="text-center" style="width:13%;">Set Point</th>
-			<th class="text-center" style="width:14%;">Potentiometer</th>
+			<th class="text-center" style="width:20%;">Current Speed</th>
+			<th class="text-center" style="width:20%;">Set Point</th>
+			<!-- <th class="text-center" style="width:14%;">Potentiometer</th> -->
 			<th class="text-center" style="width:30%;">Target Speed</th>
 			<th class="text-center" style="width:10%;">Tripped</th>
 		</tr>
@@ -417,7 +397,7 @@ function generateFanSensors(count)
 			<th class="text-center">Fan ${id+1}</th>
 			<td><span id="f${id}-speed">0</span>Hz</td>
 			<td><span id="f${id}-set">0</span>Hz</td>
-			<td><span id="f${id}-pot">0</span>%</td>
+			<!-- <td><span id="f${id}-pot">0</span>%</td> -->
 			<td>
 				<div class="input-group">
 					<input class="form-control" type="text" id="f${id}-target" aria-label="Target fan speed (Hz)">
@@ -458,8 +438,8 @@ class FanSensor
 	{
 		this.map.get("trip").style.backgroundColor = data.tripped ? colorFail : colorOk;
 		this.map.get("speed").innerHTML = round1dp(data.currentspeed);
-		this.map.get("pot").innerHTML = round1dp(data.potentiometer);
-    		this.map.get("set").innerHTML = round1dp(data.setpoint);
+		//this.map.get("pot").innerHTML = round1dp(data.potentiometer);
+    	this.map.get("set").innerHTML = round1dp(data.setpoint);
 
 		if(data.target != this.target)
 		{
@@ -487,9 +467,6 @@ var humidity_sensors = [];
 var pump_sensor;
 var fan_sensor;
 
-var armed = true;
-var enabled = true;
-
 var global_elems = new Map();
 $(document).ready(function()
 {
@@ -513,14 +490,30 @@ $(document).ready(function()
         global_elems.set(latched_elems[i].id, latched_elems[i]);
 
 	global_elems.set("overall-status", document.querySelector("#overall-status"));
+	global_elems.set("overall-latched", document.querySelector("#overall-latched"));
+	global_elems.set("overall-armed", document.querySelector("#overall-armed"));	
 	global_elems.set("trace-status", document.querySelector("#trace-status"));
     global_elems.set("trace-latched", document.querySelector("#trace-latched"));
-	global_elems.set("enable", document.querySelector("#overall-enable"));
-	global_elems.set("arm", document.querySelector("#overall-arm"));
+    global_elems.set("position", document.querySelector("#position"));
+	global_elems.set("arm", document.querySelector("#button-arm"));
+	global_elems.set("enable", document.querySelector("#button-enable"));
 
 	//Start update function
 	setInterval(updateAll, 200);
 });
+
+function update_status_box(el, value, text_true, text_false) 
+{
+	el.style.backgroundColor = value ? colorOk : colorFail;
+	el.innerHTML = value ? text_true : text_false;
+}
+
+function update_button_state(el, value, text_true, text_false)
+{
+	el.classList.add(value ? buttonOn : buttonOff);
+	el.classList.remove(value ? buttonOff: buttonOn);
+	el.innerHTML = value ? text_true : text_false;
+}
 
 function updateAll()
 {
@@ -547,54 +540,31 @@ function updateAll()
 		//Handle fan sensor
 		fan_sensor.update(response.fan);
 
-		//Handle overall health
-		global_elems.get("tmp-health").style.backgroundColor = response.temperature.overall ? colorOk : colorFail;
-		global_elems.get("h-health").style.backgroundColor = response.humidity.overall ? colorOk : colorFail;
-		global_elems.get("p-health").style.backgroundColor = response.pump.overall ? colorOk : colorFail;
-		global_elems.get("f-health").style.backgroundColor = response.fan.overall ? colorOk : colorFail;
-		global_elems.get("overall-status").style.backgroundColor = response.overall ? colorOk : colorFail;
-		global_elems.get("trace-status").style.backgroundColor = response.trace.overall ? colorOk : colorFail;
+		//Handle overall status
 
-	        // Handler latched states
-        global_elems.get("tmp-latched").style.backgroundColor = response.temperature.latched ? colorOk: colorFail;
-        global_elems.get("trace-latched").style.backgroundColor = response.trace.latched ? colorOk: colorFail;
-        global_elems.get("h-latched").style.backgroundColor = response.humidity.latched ? colorOk: colorFail;
-        global_elems.get("f-latched").style.backgroundColor = response.fan.latched ? colorOk: colorFail;
-        global_elems.get("p-latched").style.backgroundColor = response.pump.latched ? colorOk: colorFail;
+		update_status_box(global_elems.get("overall-status"), response.overall, 'Healthy', 'Error')
+		update_status_box(global_elems.get("overall-latched"), response.latched, 'No', 'Yes')
+		update_status_box(global_elems.get("overall-armed"), response.isarmed, 'Yes', 'No')
+		update_status_box(global_elems.get("trace-status"), response.trace.overall, 'OK', 'Error')
+		update_status_box(global_elems.get("trace-latched"), response.trace.latched, 'No', 'Yes')
+		global_elems.get("position").innerHTML = round1dp(response.position).toString() + '%'
+		
+		// Handle health states
+		update_status_box(global_elems.get("tmp-health"), response.temperature.overall, 'Healthy', 'Error');
+		update_status_box(global_elems.get("h-health"), response.humidity.overall, 'Healthy', 'Error');
+		update_status_box(global_elems.get("p-health"), response.pump.overall, 'Healthy', 'Error');
+		update_status_box(global_elems.get("f-health"), response.fan.overall, 'Healthy', 'Error');
+		
+	    // Handle latched states
+		update_status_box(global_elems.get("tmp-latched"), response.temperature.latched, 'No', 'Yes')
+		update_status_box(global_elems.get("h-latched"), response.humidity.latched, 'No', 'Yes')
+		update_status_box(global_elems.get("p-latched"), response.pump.latched, 'No', 'Yes')
+		update_status_box(global_elems.get("f-latched"), response.fan.latched, 'No', 'Yes')
 
-		if(response.isarmed && !armed)
-		{
-			var el = global_elems.get("arm");
-			el.classList.add(buttonOn);
-			el.classList.remove(buttonOff);
-			el.innerHTML = "Disarm Interlock";
-			armed = true;
-		}
-		else if(!response.isarmed && armed)
-		{
-			var el = global_elems.get("arm");
-			el.classList.add(buttonOff);
-			el.classList.remove(buttonOn);
-			el.innerHTML = "Arm Interlock";
-			armed = false;
-		}
-
-        if (response.allenabled && !enabled)
-        {
-            var el = global_elems.get("enable");
-            el.classList.add(buttonOn);
-            el.classList.remove(buttonOff);
-            el.innerHTML = "Disable Quads";
-            enabled = true;
-        }
-        else if (!response.allenabled && enabled)
-        {
-            var el = global_elems.get("enable");
-            el.classList.add(buttonOff);
-            el.classList.remove(buttonOn);
-            el.innerHTML = "Enable Quads";
-            enabled = false;
-        }
+        // Handle button states
+        update_button_state(global_elems.get("arm"), response.isarmed, 'Disarm Interlock', 'Arm Interlock');
+        update_button_state(global_elems.get("enable"), response.allenabled, 'Disable Quads', 'Enable Quads');
+       
 	});
 }
 

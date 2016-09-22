@@ -109,8 +109,10 @@ class PSCU(I2CContainer):
         self.__fanSpeed = 0
         self.__fanTarget = 100
         self.__fanSetPoint = 0
-        self.__fanPot = 0
         self.__fanTrip = False
+        
+        # Position
+        self.__position = 0
 
         # Quad traces
         self.__qTraces = [0] * self.numQuads
@@ -217,9 +219,6 @@ class PSCU(I2CContainer):
     def getFanSetPoint(self):
         return self.__fanSetPoint
 
-    def getFanPot(self):
-        return self.__fanPot
-
     def getFanTarget(self):
         return self.__fanTarget
 
@@ -231,6 +230,9 @@ class PSCU(I2CContainer):
             raise I2CException("There is no quad %s" % q)
 
         return self.__qTraces[q]
+
+    def getPosition(self):
+        return self.__position
 
     def getArmed(self):
         return self.__armed
@@ -396,7 +398,7 @@ class PSCU(I2CContainer):
         self.__hValues[0] = self.adcMisc[1].readInput01(1) * 100 * 5 / 3.9
         self.__hValues[1] = self.adcMisc[1].readInput01(2) * 100 * 5 / 3.9
         self.__pumpFlow = self.adcMisc[1].readInput01(3) * 5 / 4.32 * 35
-        self.__fanPot = self.adcMisc[1].readInput01(4) * 100
+        self.__position = self.adcMisc[1].readInput01(4) * 100
 
         self.__fanSetPoint = self.adcMisc[0].readInput01(0) * 5 / 4.5 * 50
         self.__hSetPoints[0] = self.adcMisc[0].readInput01(1) * 100 * 5 / 3.9
