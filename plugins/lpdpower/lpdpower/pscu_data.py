@@ -106,7 +106,6 @@ class PSCUData(object):
                 "target": (self.pscu.getFanTarget, self.pscu.setFanTarget),
                 "currentspeed": (self.pscu.getFanSpeed, None),
                 "setpoint": (self.pscu.getFanSetPoint, None),
-                "potentiometer": (self.pscu.getFanPot, None),
                 "tripped": (self.pscu.getFanTripped, None),
                 "overall": (self.pscu.getFanOutput, None),
                 "latched": (self.pscu.getFanLatched, None),
@@ -121,8 +120,10 @@ class PSCUData(object):
             "trace": {
                  "overall": (self.pscu.getTraceOutput, None),
                  "latched": (self.pscu.getTraceLatched,  None),
-                        },
+            },
+            "position": (self.pscu.getPosition, None),
             "overall": (self.pscu.getHealth,  None),
+            "latched": (self.getAllLatched, None),
             "arm": (True, self.pscu.setArmed),
             "isarmed": (self.pscu.getArmed,  None),
             "enableall": (True,  self.pscu.enableAll),
@@ -153,6 +154,10 @@ class PSCUData(object):
         except ParameterTreeError as e:
             raise PSCUDataError(e)
 
+    def getAllLatched(self):
+        
+        return all(self.pscu.getAllLatched())
+    
     def getQuadTraces(self):
         return {str(q) : self.pscu.getQuadTrace(q) for q in range(4)}
          
