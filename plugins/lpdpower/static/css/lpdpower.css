@@ -12,83 +12,69 @@
 	width: 250px;
 }
 
-#lpdpower {
-	margin-top: 50px;
+.caption-row {
+	padding-top: 2px;
+	padding-bottom: 2px;
+}
+
+.logo {
+	padding: 10px;
+	height: 50px;
+	top: 0px;
+	margin-top: -15px;
 }
 
 .status {
-	height: 20px;
-	width: 80%;
-	margin: 0 10%;
+	height: 25px;
 	border-radius: 3px;
 	color: #ffffff;
+	text-align: center;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
-.error {
-	color: red;
-	font-weight: 700;
+.vertical-align {
+	display: flex;
+	align-items: center;
 }
 
-#overall-box
-{
+.sidebar-nav-fixed {
+	padding: 9px 9px;
 	position: fixed;
 	left: 0px;
-	top: 20%;
+	top: 55px;
 	width: 220px;
-	height: 380px;
 	background-color: #f9f9f9;
 }
 
-#overall-title
-{
-	position:absolute;
-	left:20px;
-	top:20px;
+.sidebar-row {
+	padding-top: 5px;
+	padding-bottom: 5px;
 }
 
-#overall-status
+.sidebar-title
 {
-	position: absolute;
-	top: 80px;
-}
-
-#trace-label
-{
-	position:absolute;
-	left: 20px;
-	top: 120px;
-}
-
-#trace-status
-{
-	position: absolute;
-	margin: 0;
-	left: 70px;
-	top: 120px;
-	width: 60px;
 	text-align: center;
-	color: #ffffff;
 }
 
-#trace-latched
-{
-	position: absolute;
-	margin: 0;
-	top: 120px;
-	left: 140px;
-	width: 60px;
-	text-align: center;
-	color: #ffffff;
+.sidebar-centered {
+    float: none;
+    margin: 0 auto;
 }
 
-#overall-box > table
-{
-	position: absolute;
-	top: 250px;
-	width: 100%;
+.action-btn {
+	width: 70%; /* 150px; */
 }
 
-#overall-box > table button
-{
-	margin: 10px 0;
+.row-fluid > .span-fixed-sidebar {
+	margin-left: 250px;
 }
+
+.pscu-data {
+	margin-left: 230px;
+    padding: 40px 0px;
+    text-align: center;
+}
+
+
