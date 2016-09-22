@@ -544,7 +544,7 @@ function updateAll()
 
 		update_status_box(global_elems.get("overall-status"), response.overall, 'Healthy', 'Error')
 		update_status_box(global_elems.get("overall-latched"), response.latched, 'No', 'Yes')
-		update_status_box(global_elems.get("overall-armed"), response.isarmed, 'Yes', 'No')
+		update_status_box(global_elems.get("overall-armed"), response.armed, 'Yes', 'No')
 		update_status_box(global_elems.get("trace-status"), response.trace.overall, 'OK', 'Error')
 		update_status_box(global_elems.get("trace-latched"), response.trace.latched, 'No', 'Yes')
 		global_elems.get("position").innerHTML = round1dp(response.position).toString() + '%'
@@ -562,8 +562,8 @@ function updateAll()
 		update_status_box(global_elems.get("f-latched"), response.fan.latched, 'No', 'Yes')
 
         // Handle button states
-        update_button_state(global_elems.get("arm"), response.isarmed, 'Disarm Interlock', 'Arm Interlock');
-        update_button_state(global_elems.get("enable"), response.allenabled, 'Disable Quads', 'Enable Quads');
+        update_button_state(global_elems.get("arm"), response.armed, 'Disarm Interlock', 'Arm Interlock');
+        update_button_state(global_elems.get("enable"), response.allEnabled, 'Disable Quads', 'Enable Quads');
        
 	});
 }
@@ -601,7 +601,7 @@ function armInterlock()
 		{method: 'PUT',
 		contentType: 'application/json',
 		processData: false,
-		data: JSON.stringify({arm: global_elems.get("arm").classList.contains(buttonOff)})});
+		data: JSON.stringify({armed: global_elems.get("arm").classList.contains(buttonOff)})});
 }
 
 function enableQuads()
@@ -610,7 +610,7 @@ function enableQuads()
 		{method: 'PUT',
 		contentType: 'application/json',
 		processData: false,
-		data: JSON.stringify({enableall: global_elems.get("enable").classList.contains(buttonOff)})});
+		data: JSON.stringify({allEnabled: global_elems.get("enable").classList.contains(buttonOff)})});
 }
 
 function updateSpeed(fid)
