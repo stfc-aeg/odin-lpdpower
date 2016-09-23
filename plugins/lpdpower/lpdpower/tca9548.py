@@ -13,10 +13,9 @@ from i2c_container import I2CContainer
 
 
 class TCA9548(I2CDevice):
-
     """TCA9548 class.
 
-    This class implements support for the ICA9548 I2V device, allowing other
+    This class implements support for the ICA9548 I2C device, allowing other
     instances of I2CDevice or I2CContainer classes to be attached to TCA instance,
     allowing the appropriate output bus to be selected transparently for each access.
     """
@@ -46,7 +45,6 @@ class TCA9548(I2CDevice):
 
         :param device: the device for which the callback is being called.
         """
-
         # Check the device is attached, otherwise raise an exception
         if device not in self._attached_devices:
             raise I2CException('Device %s was not properly detached from the TCA' % device)
