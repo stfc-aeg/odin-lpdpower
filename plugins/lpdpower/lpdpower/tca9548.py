@@ -49,7 +49,7 @@ class TCA9548(I2CDevice):
 
         # Check the device is attached, otherwise raise an exception
         if device not in self._attached_devices:
-            raise I2CException("Device %s was not properly detached from the TCA" % device)
+            raise I2CException('Device %s was not properly detached from the TCA' % device)
 
         # Call own callback (for chained TCAs)
         if self.pre_access is not None:
@@ -86,7 +86,8 @@ class TCA9548(I2CDevice):
 
         # Raise an exception if the device is not and I2CDevice or I2CContainer instance
         if not isinstance(device, I2CDevice) and not isinstance(device, I2CContainer):
-            raise I2CException("Device %s must be a type or an instance of I2CDevice" % device)
+            raise I2CException(
+                'Device %s must be a type or an instance of I2CDevice or I2CContainer' % device)
 
         # Add device to attached devices and set its pre-access callback
         self._attached_devices[device] = channel
@@ -102,7 +103,7 @@ class TCA9548(I2CDevice):
         :param device: Device to remove from the TCA.
         """
         if device not in self._attached_devices:
-            raise I2CException("Device %s is not attached to this TCA" % device)
+            raise I2CException('Device %s is not attached to this TCA' % device)
 
         self._attached_devices.pop(device)
         device.pre_access = None
