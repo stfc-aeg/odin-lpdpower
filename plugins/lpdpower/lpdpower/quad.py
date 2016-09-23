@@ -106,7 +106,7 @@ class Quad(I2CContainer):
 
 if __name__ == "__main__":
     tca = TCA9548(0x70)
-    quad = tca.attachDevice(0, Quad)
+    quad = tca.attach_device(0, Quad)
 
     quad.setEnables({0: True, 1: True, 2: True, 3: True})
     for chan in range(4):

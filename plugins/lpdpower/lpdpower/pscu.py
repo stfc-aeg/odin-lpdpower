@@ -32,56 +32,56 @@ class PSCU(I2CContainer):
         self.numQuads = 4
         self.quad = []
         for i in range(self.numQuads):
-            self.quad.append(self.tca.attachDevice(i, Quad))
+            self.quad.append(self.tca.attach_device(i, Quad))
 
         # Attach bus 4 devices
         # Temperature monitor AD7998s
         self.adcTempMon = []
-        self.adcTempMon.append(self.tca.attachDevice(4, AD7998, 0x21))
-        self.adcTempMon.append(self.tca.attachDevice(4, AD7998, 0x22))
-        self.adcTempMon.append(self.tca.attachDevice(4, AD7998, 0x23))
+        self.adcTempMon.append(self.tca.attach_device(4, AD7998, 0x21))
+        self.adcTempMon.append(self.tca.attach_device(4, AD7998, 0x22))
+        self.adcTempMon.append(self.tca.attach_device(4, AD7998, 0x23))
 
         # Temperature monitor MCP23008s
         self.mcpTempMon = []
-        self.mcpTempMon.append(self.tca.attachDevice(4, MCP23008, 0x24))
+        self.mcpTempMon.append(self.tca.attach_device(4, MCP23008, 0x24))
         for i in range(8):
             self.mcpTempMon[0].setup(i, MCP23008.IN if i < 7 else MCP23008.IN)
 
-        self.mcpTempMon.append(self.tca.attachDevice(4, MCP23008, 0x25))
+        self.mcpTempMon.append(self.tca.attach_device(4, MCP23008, 0x25))
         for i in range(8):
             self.mcpTempMon[1].setup(i, MCP23008.IN)
 
-        self.mcpTempMon.append(self.tca.attachDevice(4, MCP23008, 0x26))
+        self.mcpTempMon.append(self.tca.attach_device(4, MCP23008, 0x26))
         for i in range(8):
             self.mcpTempMon[2].setup(i, MCP23008.IN)
 
-        self.mcpTempMon.append(self.tca.attachDevice(4, MCP23008, 0x27))
+        self.mcpTempMon.append(self.tca.attach_device(4, MCP23008, 0x27))
         for i in range(8):
             self.mcpTempMon[3].setup(i, MCP23008.IN)
 
         # Attach bus 5 devices
         # Misc AD7998s
         self.adcMisc = []
-        self.adcMisc.append(self.tca.attachDevice(5, AD7998, 0x21))
-        self.adcMisc.append(self.tca.attachDevice(5, AD7998, 0x22))
+        self.adcMisc.append(self.tca.attach_device(5, AD7998, 0x21))
+        self.adcMisc.append(self.tca.attach_device(5, AD7998, 0x22))
 
         # Misc MCP23008s
         self.mcpMisc = []
-        self.mcpMisc.append(self.tca.attachDevice(5, MCP23008, 0x24))
+        self.mcpMisc.append(self.tca.attach_device(5, MCP23008, 0x24))
         for i in range(8):
             self.mcpMisc[0].setup(i, MCP23008.OUT if i < 2 else MCP23008.IN)
-        self.mcpMisc.append(self.tca.attachDevice(5, MCP23008, 0x25))
+        self.mcpMisc.append(self.tca.attach_device(5, MCP23008, 0x25))
         for i in range(8):
             self.mcpMisc[1].setup(i, MCP23008.IN)
-        self.mcpMisc.append(self.tca.attachDevice(5, MCP23008, 0x26))
+        self.mcpMisc.append(self.tca.attach_device(5, MCP23008, 0x26))
         for i in range(8):
             self.mcpMisc[2].setup(i, MCP23008.IN)
-        self.mcpMisc.append(self.tca.attachDevice(5, MCP23008, 0x27))
+        self.mcpMisc.append(self.tca.attach_device(5, MCP23008, 0x27))
         for i in range(8):
             self.mcpMisc[3].setup(i, MCP23008.IN)
 
         # Fan speed AD5321
-        self.fanSpd = self.tca.attachDevice(5, AD5321, 0x0c)
+        self.fanSpd = self.tca.attach_device(5, AD5321, 0x0c)
 
         # Buffers for all I2C sensors
         # Temperature
