@@ -31,30 +31,30 @@ def call_pre_access(func):
 class I2CDevice(object):
 
     """I2CDevice class.
-    
+
     This class implements the I2C device access interface, providing read and write
-    access primitives for a range of byte and word-level operations. A pre_access 
+    access primitives for a range of byte and word-level operations. A pre_access
     attribute allows an external callback to be executed on each access to, e.g. allow
     a bus multiplexer to be controlled transparently.
     """
-    
+
     _enable_exceptions = False
-    
+
     @classmethod
     def enable_exceptions(cls):
         """Enable I2CDevice exceptions."""
         logging.debug("Enabling I2CDevice exceptions")
         cls._enable_exceptions = True
-    
+
     @classmethod
     def disable_exceptions(cls):
         """Disable I2CDevice exceptions."""
         logging.debug("Disabling I2CDevice exceptions")
         cls._enable_exceptions = False
-        
+
     def __init__(self, address, busnum=-1, debug=False):
         """Initialise the I2CDevice object.
-        
+
         :param address: address of device on I2C bus
         :param busnum: number of the I2C bus on the host device
         :param debug: enable debug access logging
@@ -66,23 +66,23 @@ class I2CDevice(object):
 
     def handle_error(self, access_name, register, error):
         """Handle exception condition for I2CDevice.
-        
+
         If exceptions are enabled, raise an exception based on the passed arguments,
         otherwise, log an message if debugging is turned on and return an error value.
         """
-        
+
         err_msg = 'I2C {} error from device {:#x} register {:#x}: {}'.format(
              access_name, self.address, register, error
         )
-        
+
         if self._enable_exceptions:
             raise I2CException(err_msg)
-        
+
         if self.debug:
             logging.debug(err_msg)
-            
+
         return -1
-            
+
     @call_pre_access
     def write8(self, reg, value):
         """"Write an 8-bit value to the specified register/address."""
@@ -92,18 +92,18 @@ class I2CDevice(object):
                 logging.debug("I2C: Wrote 0x%02X to register 0x%02X" % (value, reg))
         except IOError as err:
             return self.handle_error('write8', reg, err)
-  
+
     @call_pre_access
     def write16(self, reg, value):
         """Write a 16-bit value to the specified register/address pair."""
         try:
             self.bus.write_word_data(self.address, reg, value)
             if self.debug:
-                logging.debug("I2C: Wrote 0x%02X to register pair 0x%02X,0x%02X" % 
+                logging.debug("I2C: Wrote 0x%02X to register pair 0x%02X,0x%02X" %
                               (value, reg, reg+1))
         except IOError as err:
             return self.handle_error('write16', value, err)
-      
+
     @call_pre_access
     def writeList(self, reg, list):
         """Write an array of bytes using I2C format."""
@@ -114,20 +114,20 @@ class I2CDevice(object):
                 logging.debug(list)
         except IOError as err:
             return self.handle_error('writeList', reg, err)
-  
+
     @call_pre_access
     def readList(self, reg, length):
         """Read a list of bytes from the I2C device."""
         try:
             results = self.bus.read_i2c_block_data(self.address, reg, length)
             if self.debug:
-                logging.debug("I2C: Device 0x%02X returned the following from reg 0x%02X" % 
+                logging.debug("I2C: Device 0x%02X returned the following from reg 0x%02X" %
                               (self.address, reg))
                 logging.debug(results)
             return results
         except IOError as err:
             return self.handle_error('readList', reg, err)
-  
+
     @call_pre_access
     def readU8(self, reg):
         """Read an unsigned byte from the I2C device."""
@@ -139,7 +139,7 @@ class I2CDevice(object):
             return result
         except IOError as err:
             return self.handle_error('readU8', reg, err)
-  
+
     @call_pre_access
     def readS8(self, reg):
         """Read a signed byte from the I2C device."""
@@ -152,14 +152,14 @@ class I2CDevice(object):
             return result
         except IOError as err:
             return self.handle_error('readS8', reg, err)
-  
+
     @call_pre_access
     def readU16(self, reg):
         """Read an unsigned 16-bit value from the I2C device."""
         try:
             result = self.bus.read_word_data(self.address,reg)
             if (self.debug):
-                logging.debug("I2C: Device 0x%02X returned 0x%04X from reg 0x%02X" % 
+                logging.debug("I2C: Device 0x%02X returned 0x%04X from reg 0x%02X" %
                               (self.address, result & 0xFFFF, reg))
             return result
         except IOError as err:
@@ -171,7 +171,7 @@ class I2CDevice(object):
         try:
             result = self.bus.read_word_data(self.address,reg)
             if (self.debug):
-                logging.debug("I2C: Device 0x%02X returned 0x%04X from reg 0x%02X" % 
+                logging.debug("I2C: Device 0x%02X returned 0x%04X from reg 0x%02X" %
                               (self.address, result & 0xFFFF, reg))
             return result
         except IOError as err:
