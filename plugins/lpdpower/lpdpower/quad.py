@@ -16,7 +16,7 @@ class Quad(I2CContainer):
         I2CContainer.__init__(self)
 
         # Set up internal I2C devices
-        self.mcp = self.attachDevice(MCP23008, 0x20)
+        self.mcp = self.attach_device(MCP23008, 0x20)
 
         for i in range(self.NUM_CHANNELS):
             self.mcp.setup(i, MCP23008.OUT)
@@ -25,8 +25,8 @@ class Quad(I2CContainer):
         for i in range(self.NUM_CHANNELS, self.NUM_CHANNELS*2):
             self.mcp.setup(i, MCP23008.IN)
 
-        self.adcPower = self.attachDevice(AD7998, 0x22)
-        self.adcFuse = self.attachDevice(AD7998, 0x21)
+        self.adcPower = self.attach_device(AD7998, 0x22)
+        self.adcFuse = self.attach_device(AD7998, 0x21)
 
         # Create internal buffers for all sensor channels
         self.__channelVoltage = [0.0] * self.NUM_CHANNELS
