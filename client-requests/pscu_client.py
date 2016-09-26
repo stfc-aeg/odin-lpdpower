@@ -1,10 +1,10 @@
 import requests, sys, time, json, pprint
 
-class PSCUAccess(object):
+class PSCUClient(object):
     ''' Provide access to PSCU's i2c devices '''
     def __init__(self, bDebugMsgs=False):
         self.bDebug = bDebugMsgs
-        self.url = 'http://beagle03.aeg.lan:8888/api/0.1/lpdpower/'
+        self.url = 'http://beagle04.aeg.lan:8888/api/0.1/lpdpower/'
 	self.response = requests.get(self.url)
         self.dict     = self.response.json()
         # Headers don't change
@@ -15,26 +15,21 @@ class PSCUAccess(object):
     
     def getArm(self):
         self.dict     = requests.get(self.url).json()
-        return self.dict['arm']
-
-    def getIsarmed(self):
-        self.dict     = requests.get(self.url).json()
-        return self.dict['isarmed']
+        return self.dict['armed']
 
     def getEnableall(self):
         self.dict     = requests.get(self.url).json()
-        return self.dict['enableall']
+        return self.dict['allEnabled']
 
     def getOverall(self):
         self.dict     = requests.get(self.url).json()
         return self.dict['overall']
 
     def setArm(self, bToggle):
-        payload = {"arm": bToggle}
+        payload = {"armed": bToggle}
         rep = requests.put(self.url, data=json.dumps(payload), headers=self.headers)
         if rep.status_code != 200:
             print "Error: %d Couldn't updated key 'arm'!" % rep.status_code
-
      
     def setQuadChannel(self, quad, channel, bEnable):
         ''' Set 'enable' key value to True/False in a specific Quad's Channel '''
@@ -73,52 +68,56 @@ class PSCUAccess(object):
 
     def testFanSpeeds(self):
         # Manually set target speed at 40%
-        print "Changing fan speed to 40%; Monitor speed decrease for 5 seconds.."
-        fanPath = 'http://beagle03.aeg.lan:8888/api/0.1/lpdpower/fan'
+        theDelay = 3
+        print "Changing fan speed to 40%; Monitor speed decrease for {} seconds..".format(theDelay)
+        fanPath = self.url + 'fan' #'http://beagle03.aeg.lan:8888/api/0.1/lpdpower/fan'
         thePSCU.setKey(fanPath, 'target', 40)
-        for index in range(5):
+        for index in range(theDelay):
             dFan = thePSCU.getKey(fanPath, 'fan')
             print "\rCurrent Speed is:   {0:2.1f}Hz (Target: {1}%)".format(dFan['currentspeed'], dFan['target']),
             sys.stdout.flush()
             time.sleep(1)
 
         # Manually set target speed at 80%
-        print "\nChanging fan speed to 80%; Watch speed increase for 5 seconds.."
+        print "\nChanging fan speed to 80%; Watch speed increase for {} seconds..".format(theDelay)
         thePSCU.setKey(fanPath, 'target', 80)
-        for index in range(5):
+        for index in range(theDelay):
             dFan = thePSCU.getKey(fanPath, 'fan')
             print "\rCurrent Speed is:   {0:2.1f}Hz (Target: {1}%)".format(dFan['currentspeed'], dFan['target']),
             sys.stdout.flush()
             time.sleep(1)
         print ""
 
-
 if __name__ == "__main__":
 
-    thePSCU = PSCUAccess()
+    thePSCU = PSCUClient()
 
     # Toggle arm - Switch off if armed, Switch on if not
     bArmStatus = thePSCU.getArm()
-    print "Arm is set to: {}, while the system is: {}".format(bArmStatus, ("Armed" if thePSCU.getIsarmed() == True else "Not Armed"))
+    print "Arm is set to: {}, while the system is: {}".format(bArmStatus, ("Armed" if thePSCU.getArm() == True else "Not Armed"))
     bToggle = (True if bArmStatus == False else False)
 
     # Toggle arm, pause before checking 'arm'
     thePSCU.setArm(bToggle)    
     time.sleep(0.2)
     bArmStatus = thePSCU.getArm()
-    print "Setting arm to: {}, Now system is: {}".format(bArmStatus, ("Armed" if thePSCU.getIsarmed() == True else "Not Armed"))
+    print "Setting arm to: {}, Now system is: {}".format(bArmStatus, ("Armed" if thePSCU.getArm() == True else "Not Armed"))
 
     # Enable/Disabled a quad channel:
     (bEnable, quad, channel) = (True, 0, 1)
-    print "Quad {}, channel {} after change:".format(quad, channel)
-    print "[key 'enable' type changes..]"
+    print "Quad {}, channel {} before change:".format(quad, channel)
+    print "[key 'enabled' type changes if system armed]"
     pp = pprint.PrettyPrinter(indent=2)
-    pp.pprint(requests.get('http://beagle03.aeg.lan:8888/api/0.1/lpdpower/quad/quads/0/channels/3').json())
-    
-    thePSCU.setQuadChannel(quad, channel, bEnable)
-    print "Quad {}, channel {} after change:".format(quad, channel)
-    pp.pprint(requests.get('http://beagle03.aeg.lan:8888/api/0.1/lpdpower/quad/quads/0/channels/3').json())
+    pp.pprint(requests.get(thePSCU.url+'quad/quads/0/channels/1').json())
 
+    bEnabledDisabled = thePSCU.getKey(thePSCU.url+'quad/quads/0/channels/1/enabled', 'enabled')
     
+    # Toggle channel, wait 0.1 seconds before checking
+    thePSCU.setQuadChannel(quad, channel, bEnabledDisabled)
+    time.sleep(0.1)
+    
+    print "Quad {}, channel {} after change:".format(quad, channel)
+    pp.pprint(requests.get(thePSCU.url+'quad/quads/0/channels/1').json())
+
     # Test that we can change the fan speed
     thePSCU.testFanSpeeds()
