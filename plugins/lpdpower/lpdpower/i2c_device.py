@@ -39,6 +39,8 @@ class I2CDevice(object):
     """
 
     _enable_exceptions = False
+    
+    ERROR = -1
 
     @classmethod
     def enable_exceptions(cls):
@@ -81,7 +83,7 @@ class I2CDevice(object):
         if self.debug:
             logging.debug(err_msg)
 
-        return -1
+        return I2CDevice.ERROR
 
     @call_pre_access
     def write8(self, reg, value):
