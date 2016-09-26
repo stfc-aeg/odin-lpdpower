@@ -2,12 +2,11 @@
 
 ''' Display all device information in as similar a fashion as the webpage, as possible '''
 
-from pscu_access import PSCUAccess
-thePSCU = PSCUAccess()
+from pscu_client import PSCUClient
 
 if __name__ == "__main__":
 
-    thePSCU = PSCUAccess()
+    thePSCU = PSCUClient()
 
     print "________________________________________________________________"
     print "Replicating \"Overall Health\", i.e. left-hand side of the webpage"
@@ -16,7 +15,7 @@ if __name__ == "__main__":
     print "Trace Status:   {}, Latched: {}".format(thePSCU.getKey(thePSCU.url+'trace/overall', 'overall'),
                                                 thePSCU.getKey(thePSCU.url+'trace/latched', 'latched'))
     print "key enableall:  {}".format(thePSCU.getEnableall())
-    print "key isarmed:    {}".format(thePSCU.getIsarmed())
+    print "key arm:    {}".format(thePSCU.getArm())
 
     print "________________________________________________________________"
     
@@ -33,12 +32,13 @@ if __name__ == "__main__":
             quads[str(quad)]['channels'][str(channel)]
             chCurrent     = quads[str(quad)]['channels'][str(channel)]['current']
             chEnable      = quads[str(quad)]['channels'][str(channel)]['enable']
-            chFeedback    = quads[str(quad)]['channels'][str(channel)]['feedback']
+            #chFeedback    = quads[str(quad)]['channels'][str(channel)]['feedback']
             chFuseVoltage = quads[str(quad)]['channels'][str(channel)]['fusevoltage']
             chVoltage     = quads[str(quad)]['channels'][str(channel)]['voltage']
             print "Channel{}:  ".format(channel),
             print "{0:.3f}A  ".format(chCurrent),
-            print "Enable: {}  Fdbck: {}  Fuse: {}  ".format(chEnable,chFeedback, chFuseVoltage),
+            print "Enable: {}  Fdbck: {}  Fuse: {}  ".format(chEnable,None,#chFeedback, 
+                                                             chFuseVoltage),
             print "Volt: {0:.3}V".format(chVoltage)
 
     print "________________________________________________________________"
@@ -90,7 +90,7 @@ if __name__ == "__main__":
     chFan = thePSCU.getKey(thePSCU.url + 'fan', 'fan')
     print "Fan1 Status: {}  Latched: {}  ".format(chFan['overall'], chFan['latched'])
     print "{0:>2.1f}Hz  Setpoint {1:>2.1f}Hz  ".format(chFan['currentspeed'], chFan['setpoint']),
-    print "Potentiometer: {0:>2.1f}%  ".format(chFan['potentiometer']),
+    #print "Potentiometer: {0:>2.1f}%  ".format(chFan['potentiometer']),
     print "Tripped: {}      (target: {})".format(chFan['tripped'], chFan['target'])
     
     print "________________________________________________________________"
