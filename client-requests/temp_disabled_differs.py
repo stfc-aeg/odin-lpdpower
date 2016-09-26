@@ -2,8 +2,8 @@
 
 ''' Demonstrate how temperature sensor data type is either int/bool for dictionary key 'disabled' '''
 
-from pscu_access import PSCUAccess
-thePSCU = PSCUAccess()
+from pscu_client import PSCUClient
+thePSCU = PSCUClient()
 
 # Access temperature sensor info
 temps = thePSCU.dict['temperature']['sensors']
