@@ -87,9 +87,9 @@ class Quad(I2CContainer):
         if not len(data):
             return
 
-        self.mcp.disableOutputs()
+        self.mcp.disable_outputs()
         self.mcp.output_pins(data)
-        self.mcp.disableOutputs()
+        self.mcp.disable_outputs()
 
     def pollAllSensors(self):
         """Poll all sensor channels into buffer variables."""
