@@ -98,11 +98,11 @@ class Quad(I2CContainer):
         self.__channelEnable = self.mcp.input_pins(enable_pins)
 
         for channel in range(self.NUM_CHANNELS):
-            self.__channelVoltage[channel] = self.adcPower.readInput01(channel) * 5 * 16
-            self.__channelCurrent[channel] = self.adcPower.readInput01(channel + 4) * 5 * 4
-            self.__fuseVoltage[channel] = self.adcFuse.readInput01(channel) * 5 * 16
+            self.__channelVoltage[channel] = self.adcPower.read_input_scaled(channel) * 5 * 16
+            self.__channelCurrent[channel] = self.adcPower.read_input_scaled(channel + 4) * 5 * 4
+            self.__fuseVoltage[channel] = self.adcFuse.read_input_scaled(channel) * 5 * 16
 
-        self.__supplyVoltage = self.adcFuse.readInput01(4) * 5 * 16
+        self.__supplyVoltage = self.adcFuse.read_input_scaled(4) * 5 * 16
 
 if __name__ == "__main__":
     tca = TCA9548(0x70)

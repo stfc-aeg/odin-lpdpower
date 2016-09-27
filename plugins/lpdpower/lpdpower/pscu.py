@@ -353,23 +353,23 @@ class PSCU(I2CContainer):
 
         # Temperature ADCs
         for i in range(8):
-            adc_input_fs = self.adcTempMon[0].readInput01(i)
+            adc_input_fs = self.adcTempMon[0].read_input_scaled(i)
             set_point = self.convert_ad7998_temp(adc_input_fs)
             #logging.debug("pollAllSensors %d %f %f %f " %( i, adc_input_fs, adc_input_fs*4095, set_point))
-            # self.convert_ad7998_temp(self.adcTempMon[0].readInput01(i))
+            # self.convert_ad7998_temp(self.adcTempMon[0].read_input_scaled(i))
             self.__tempSetPoints[i] = set_point
 
         for i in range(8):
             self.__tempValues[i] = self.convert_ad7998_temp(
-                self.adcTempMon[1].readInput01(i))
+                self.adcTempMon[1].read_input_scaled(i))
 
         for i in range(3):
             self.__tempValues[
-                i + 8] = self.convert_ad7998_temp(self.adcTempMon[2].readInput01(i))
+                i + 8] = self.convert_ad7998_temp(self.adcTempMon[2].read_input_scaled(i))
 
         for i in range(4, 7):
             self.__tempSetPoints[
-                i + 4] = self.convert_ad7998_temp(self.adcTempMon[2].readInput01(i))
+                i + 4] = self.convert_ad7998_temp(self.adcTempMon[2].read_input_scaled(i))
 
         # Temperature MCPs
         buff = self.mcpTempMon[0].input_pins([0, 1, 2, 3, 4, 5, 7])
@@ -394,16 +394,16 @@ class PSCU(I2CContainer):
             self.__tempTraces[i + 5] = bool(buff[i])
 
         #Misc. ADCs
-        self.__fanSpeed = self.adcMisc[1].readInput01(0) * 5 / 4.5 * 50
-        self.__hValues[0] = self.adcMisc[1].readInput01(1) * 100 * 5 / 3.9
-        self.__hValues[1] = self.adcMisc[1].readInput01(2) * 100 * 5 / 3.9
-        self.__pumpFlow = self.adcMisc[1].readInput01(3) * 5 / 4.32 * 35
-        self.__position = self.adcMisc[1].readInput01(4) * 100
+        self.__fanSpeed = self.adcMisc[1].read_input_scaled(0) * 5 / 4.5 * 50
+        self.__hValues[0] = self.adcMisc[1].read_input_scaled(1) * 100 * 5 / 3.9
+        self.__hValues[1] = self.adcMisc[1].read_input_scaled(2) * 100 * 5 / 3.9
+        self.__pumpFlow = self.adcMisc[1].read_input_scaled(3) * 5 / 4.32 * 35
+        self.__position = self.adcMisc[1].read_input_scaled(4) * 100
 
-        self.__fanSetPoint = self.adcMisc[0].readInput01(0) * 5 / 4.5 * 50
-        self.__hSetPoints[0] = self.adcMisc[0].readInput01(1) * 100 * 5 / 3.9
-        self.__hSetPoints[1] = self.adcMisc[0].readInput01(2) * 100 * 5 / 3.9
-        self.__pumpSetPoint = self.adcMisc[0].readInput01(3) * 5 / 4.32 * 35
+        self.__fanSetPoint = self.adcMisc[0].read_input_scaled(0) * 5 / 4.5 * 50
+        self.__hSetPoints[0] = self.adcMisc[0].read_input_scaled(1) * 100 * 5 / 3.9
+        self.__hSetPoints[1] = self.adcMisc[0].read_input_scaled(2) * 100 * 5 / 3.9
+        self.__pumpSetPoint = self.adcMisc[0].read_input_scaled(3) * 5 / 4.32 * 35
 
         #Misc. MCPs
         buff = self.mcpMisc[0].input_pins([2, 3, 4, 5, 6, 7])
