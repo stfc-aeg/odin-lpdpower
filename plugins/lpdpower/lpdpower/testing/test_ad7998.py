@@ -24,8 +24,6 @@ class TestAD7998():
         cls.address = 0x20
         cls.ad7998 = AD7998(cls.address)
         
-        print cls.ad7998.bus.mock_calls
-        
     def set_read_return_value(self, value):
         
         self.ad7998.bus.read_word_data.return_value = value
