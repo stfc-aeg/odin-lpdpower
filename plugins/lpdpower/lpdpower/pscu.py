@@ -317,7 +317,7 @@ class PSCU(I2CContainer):
 
     def setFanTarget(self, value):
         self.__fanTarget = value
-        self.fanSpd.set_output(1.0 - (value / 100.0))
+        self.fanSpd.set_output_scaled(1.0 - (value / 100.0))
         
     def getDisplayError(self):
         return self.lcd_display_error

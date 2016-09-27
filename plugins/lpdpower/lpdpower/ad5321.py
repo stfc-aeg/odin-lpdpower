@@ -1,6 +1,6 @@
 """AD5321 - device access class for the AD5321 12-bit I2C DAC.
 
-This class implements supported for the AD5321 I2C DAC device, providing simple
+This class implements support for the AD5321 I2C DAC device, providing simple
 methods to set the output value (as a fraction of full-scale) and to read the
 scaled setting back.
 
@@ -26,7 +26,7 @@ class AD5321(I2CDevice):
         # Initialise the I2CDevice superclass instance
         I2CDevice.__init__(self, address, **kwargs)
 
-    def set_output(self, value):
+    def set_output_scaled(self, value):
         """Set the output voltage of the DAC.
 
         This method sets the output voltage of the DAC, specified as a fraction of the
@@ -50,7 +50,7 @@ class AD5321(I2CDevice):
         # Write values to device
         self.write8(msb, lsb)
 
-    def read_value(self):
+    def read_value_scaled(self):
         """Read the current output value set in the device.
 
         The method reads the current value set in the device, returning the value
