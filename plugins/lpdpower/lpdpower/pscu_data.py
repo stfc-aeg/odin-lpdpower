@@ -77,11 +77,15 @@ class PSCUData(object):
     """Data container for entire PSCU & Quads."""
 
     def __init__(self, *args, **kwargs):
-        if len(args) and isinstance(args[0], PSCU):
-            self.pscu = args[0]
+#         if len(args) and isinstance(args[0], PSCU):
+#             self.pscu = args[0]
+#         else:
+#             self.pscu = PSCU(*args, **kwargs)
+        if 'pscu' in kwargs:
+            self.pscu = kwargs['pscu']
         else:
             self.pscu = PSCU(*args, **kwargs)
-
+        
         self.quadData = [QuadData(quad=q) for q in self.pscu.quad]
         
         self.tempData = [TempData(self.pscu, i) for i in range(11)]
@@ -157,5 +161,5 @@ class PSCUData(object):
         return all(self.pscu.getAllLatched())
     
     def getQuadTraces(self):
-        return {str(q) : self.pscu.getQuadTrace(q) for q in range(4)}
+        return {str(q) : self.pscu.getQuadTrace(q) for q in range(self.pscu.numQuads)}
          
