@@ -31,14 +31,13 @@ if __name__ == "__main__":
         for channel in range(len( channels)):
             quads[str(quad)]['channels'][str(channel)]
             chCurrent     = quads[str(quad)]['channels'][str(channel)]['current']
-            chEnable      = quads[str(quad)]['channels'][str(channel)]['enable']
+            chEnabled      = quads[str(quad)]['channels'][str(channel)]['enabled']
             #chFeedback    = quads[str(quad)]['channels'][str(channel)]['feedback']
             chFuseVoltage = quads[str(quad)]['channels'][str(channel)]['fusevoltage']
             chVoltage     = quads[str(quad)]['channels'][str(channel)]['voltage']
             print "Channel{}:  ".format(channel),
             print "{0:.3f}A  ".format(chCurrent),
-            print "Enable: {}  Fdbck: {}  Fuse: {}  ".format(chEnable,None,#chFeedback, 
-                                                             chFuseVoltage),
+            print "Enabled: {}  Fuse: {}  ".format(chEnabled, chFuseVoltage),
             print "Volt: {0:.3}V".format(chVoltage)
 
     print "________________________________________________________________"
