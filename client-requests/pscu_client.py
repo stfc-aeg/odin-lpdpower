@@ -2,10 +2,14 @@ import requests, sys, time, json, pprint
 
 class PSCUClient(object):
     ''' Provide access to PSCU's i2c devices '''
-    def __init__(self, bDebugMsgs=False):
+    def __init__(self, address='beagle04.aeg.lan', port=8888, bDebugMsgs=False):
         self.bDebug = bDebugMsgs
-        self.url = 'http://beagle04.aeg.lan:8888/api/0.1/lpdpower/'
-	self.response = requests.get(self.url)
+        if not isinstance(address, basestring):
+            address = str(address)
+        if not isinstance(port, basestring):
+            port = str(port)
+        self.url      = 'http://{}:{}/api/0.1/lpdpower/'.format(address, port)
+        self.response = requests.get(self.url)
         self.dict     = self.response.json()
         # Headers don't change
         self.headers = {'Content-Type' : 'application/json'}
