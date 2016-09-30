@@ -94,7 +94,7 @@ class PSCUClient(object):
 
 if __name__ == "__main__":
 
-    thePSCU = PSCUClient()
+    thePSCU = PSCUClient(address='beagle04.aeg.lan', port=8888)
 
     # Toggle arm - Switch off if armed, Switch on if not
     bArmStatus = thePSCU.getArm()
