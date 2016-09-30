@@ -11,15 +11,18 @@ else:                         # pragma: no cover
 
 from nose.tools import *
 
-sys.modules['lpdpower.pscu'] = Mock()
-sys.modules['lpdpower.quad'] = Mock()
+sys.modules['smbus'] = Mock()
+sys.modules['serial'] = Mock()
+sys.modules['Adafruit_BBIO'] = Mock()
+sys.modules['Adafruit_BBIO.GPIO'] = Mock()
 from lpdpower.pscu_data import TempData, HumidityData, PSCUData, PSCUDataError
 from lpdpower.parameter_tree import ParameterAccessor
 
 class TestTempData():
     
     @classmethod
-    def setup_class(cls):
+    @patch('lpdpower.i2c_device.smbus.SMBus')
+    def setup_class(cls, mock_bus):
         cls.pscu = Mock()
         cls.number = 1
         cls.temp_data = TempData(cls.pscu, cls.number)

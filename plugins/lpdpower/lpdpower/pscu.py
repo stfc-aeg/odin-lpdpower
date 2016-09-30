@@ -281,7 +281,7 @@ class PSCU(I2CContainer):
 
     def quadEnableTrace(self, quad_idx, channel):
         logging.debug("Enabling quad {} channel {} output".format(quad_idx, channel))
-        self.quad[quad_idx].setEnable(channel, True)
+        self.quad[quad_idx].set_enable(channel, True)
 
     def enableAll(self, enable):
         logging.debug("Called enableAll with value {}".format(enable))
@@ -306,7 +306,7 @@ class PSCU(I2CContainer):
                 self.deferred_executor.clear()
             for quad_idx in range(len(self.quad)):
                 for channel in range(Quad.NUM_CHANNELS):
-                    self.quad[quad_idx].setEnable(channel, False)
+                    self.quad[quad_idx].set_enable(channel, False)
             self.__allEnabled = False
 
     def setArmed(self, value):
@@ -349,13 +349,13 @@ class PSCU(I2CContainer):
 
         return temp_val
 
-    def pollAllSensors(self):
+    def poll_all_sensors(self):
 
         # Temperature ADCs
         for i in range(8):
             adc_input_fs = self.adcTempMon[0].read_input_scaled(i)
             set_point = self.convert_ad7998_temp(adc_input_fs)
-            #logging.debug("pollAllSensors %d %f %f %f " %( i, adc_input_fs, adc_input_fs*4095, set_point))
+            #logging.debug("poll_all_sensors %d %f %f %f " %( i, adc_input_fs, adc_input_fs*4095, set_point))
             # self.convert_ad7998_temp(self.adcTempMon[0].read_input_scaled(i))
             self.__tempSetPoints[i] = set_point
 
@@ -434,4 +434,4 @@ class PSCU(I2CContainer):
 
         # Poll sensors for all quads also
         for quad in self.quad:
-            quad.pollAllSensors()
+            quad.poll_all_sensors()

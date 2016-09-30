@@ -14,27 +14,27 @@ class ChannelData(object):
             "voltage": (self.getVoltage, None),
             "current": (self.getCurrent, None),
             "fusevoltage": (self.getFuse, None),
-            "enabled": (self.getEnable, None),
-            "enable": (False,  self.setEnable),
+            "enabled": (self.get_enable, None),
+            "enable": (False,  self.set_enable),
             })
 
-        #self.param_tree.addCallback("enable/", self.setEnable)
+        #self.param_tree.addCallback("enable/", self.set_enable)
 
     def getVoltage(self):
-        return self.quad.getChannelVoltage(self.channel)
+        return self.quad.get_channel_voltage(self.channel)
 
     def getFuse(self):
-        return self.quad.getFuseVoltage(self.channel)
+        return self.quad.get_fuse_voltage(self.channel)
 
     def getCurrent(self):
-        return self.quad.getChannelCurrent(self.channel)
+        return self.quad.get_channel_current(self.channel)
 
-    def getEnable(self):
-        return self.quad.getEnable(self.channel)
+    def get_enable(self):
+        return self.quad.get_enable(self.channel)
 
-    # def setEnable(self, path, val):
-    def setEnable(self, val):
-        self.quad.setEnable(self.channel, val)
+    # def set_enable(self, path, val):
+    def set_enable(self, val):
+        self.quad.set_enable(self.channel, val)
 
 
 class QuadData(object):
@@ -60,8 +60,8 @@ class QuadData(object):
                 self.channels[2].param_tree,
                 self.channels[3].param_tree
                 ],
-            "supply": (self.getSupplyVoltage, None),
+            "supply": (self.get_supply_voltage, None),
             })
 
-    def getSupplyVoltage(self):
-        return self.quad.getSupplyVoltage()
+    def get_supply_voltage(self):
+        return self.quad.get_supply_voltage()

@@ -5,55 +5,62 @@ Tim Nicholls, STFC Application Engineering Group
 
 import sys
 if sys.version_info[0] == 3:  # pragma: no cover
-    from unittest.mock import Mock, call
+    from unittest.mock import Mock, patch, call
 else:                         # pragma: no cover
-    from mock import Mock, call
+    from mock import Mock, patch, call
 
 from nose.tools import *
 
-sys.modules['lpdpower.quad'] = Mock()
+sys.modules['smbus'] = Mock()
+from lpdpower.quad import Quad
 from lpdpower.quad_data import ChannelData, QuadData
 
 class TestChannelData():
 
     @classmethod
-    def setup_class(cls):
-        cls.quad = Mock()
+    @patch('lpdpower.i2c_device.smbus.SMBus')
+    def setup_class(cls, mock_bus):
+        cls.quad = Quad()
         cls.channel = 1
         cls.channel_data = ChannelData(cls.quad, cls.channel)
 
     def test_channel_voltage_get(self):
-        self.channel_data.param_tree.get('voltage')
-        self.quad.getChannelVoltage.assert_called_with(self.channel)
+        response = self.channel_data.param_tree.get('voltage')
+        assert_equal(type(response['voltage']), float)
 
     def test_channel_current_get(self):
-        self.channel_data.param_tree.get('current')
-        self.quad.getChannelCurrent.assert_called_with(self.channel)
+        response = self.channel_data.param_tree.get('current')
+        assert_equal(type(response['current']), float)
 
     def test_channel_fuse_get(self):
-        self.channel_data.param_tree.get('fusevoltage')
-        self.quad.getFuseVoltage.assert_called_with(self.channel)
+        response = self.channel_data.param_tree.get('fusevoltage')
+        assert_equal(type(response['fusevoltage']), float)
 
     def test_channel_enable_get(self):
-        self.channel_data.param_tree.get('enabled')
-        self.quad.getEnable.assert_called_with(self.channel)
+        response = self.channel_data.param_tree.get('enabled')
+        assert_equal(type(response['enabled']), bool)
 
     def test_channel_enable_set(self):
         enable = True
+        # Force underlying Quad enable value so test can validate call tree
+        self.quad._Quad__channelEnable[self.channel] = enable       
         self.channel_data.param_tree.set('enable', enable)
-        self.quad.setEnable.assert_called_with(self.channel, enable)
+        response = self.channel_data.param_tree.get('enabled')
+        assert_equal(response['enabled'], enable)
 
 class TestQuadData():
 
     @classmethod
-    def setup_class(cls):
-        cls.quad = Mock()
+    @patch('lpdpower.i2c_device.smbus.SMBus')
+    def setup_class(cls, mock_bus):
+        cls.quad = Quad()
         cls.quad_data = QuadData(quad=cls.quad)
 
-    def test_quad_data_no_quad_arg(self):
+    @patch('lpdpower.i2c_device.smbus.SMBus')
+    def test_quad_data_no_quad_arg(self, mock_bus):
         qd = QuadData()
         assert(qd.quad is not None)
 
     def test_quad_supply_voltage_get(self):
-        self.quad_data.param_tree.get('supply')
-        self.quad.getSupplyVoltage.assert_called_with()
+        response = self.quad_data.param_tree.get('supply')
+        assert_equal(type(response['supply']), float)

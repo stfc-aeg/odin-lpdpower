@@ -206,7 +206,7 @@ class LcdDisplay(object):
         
         content += 'Quad supplies\r'
         
-        quad_supply_volts = [self.pscu.quad[quad].getSupplyVoltage() for quad in range(4)]
+        quad_supply_volts = [self.pscu.quad[quad].get_supply_voltage() for quad in range(4)]
         
         content += '1: {:4.1f}V 2:{:4.1f}V\r'.format(quad_supply_volts[0], quad_supply_volts[1])
         content += '3: {:4.1f}V 4:{:4.1f}V\r'.format(quad_supply_volts[2], quad_supply_volts[3])
@@ -219,15 +219,15 @@ class LcdDisplay(object):
 
         quad_chans = [start_chan, start_chan+1]                                                                                                                     
 
-        quad_supply_volts = self.pscu.quad[quad].getSupplyVoltage()
+        quad_supply_volts = self.pscu.quad[quad].get_supply_voltage()
         
         content += 'Quad: {} Chans: {}/{} \r'.format(quad + 1, *[chan+1 for chan in quad_chans])
 
         for quad_chan in quad_chans:
-            quad_enable = ('ON ' if self.pscu.quad[quad].getEnable(quad_chan) else 'OFF')
-            quad_volts = self.pscu.quad[quad].getChannelVoltage(quad_chan)
-            quad_fuse_volts = self.pscu.quad[quad].getFuseVoltage(quad_chan)
-            quad_current = self.pscu.quad[quad].getChannelCurrent(quad_chan)
+            quad_enable = ('ON ' if self.pscu.quad[quad].get_enable(quad_chan) else 'OFF')
+            quad_volts = self.pscu.quad[quad].get_channel_voltage(quad_chan)
+            quad_fuse_volts = self.pscu.quad[quad].get_fuse_voltage(quad_chan)
+            quad_current = self.pscu.quad[quad].get_channel_current(quad_chan)
 
             fuse_ok = True
             if quad_supply_volts > 24.0:

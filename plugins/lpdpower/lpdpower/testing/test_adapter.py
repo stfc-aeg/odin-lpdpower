@@ -12,8 +12,10 @@ else:                         # pragma: no cover
 import json
 from nose.tools import *
 
-sys.modules['lpdpower.pscu'] = Mock()
-sys.modules['lpdpower.quad'] = Mock()
+sys.modules['smbus'] = Mock()
+sys.modules['serial'] = Mock()
+sys.modules['Adafruit_BBIO'] = Mock()
+sys.modules['Adafruit_BBIO.GPIO'] = Mock()
 from lpdpower.adapter import LPDPowerAdapter
 
 class TestLPDPowerAdapter():

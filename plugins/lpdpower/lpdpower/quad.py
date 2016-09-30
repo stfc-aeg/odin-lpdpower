@@ -1,30 +1,46 @@
+"""Quad - device class for the LPD Quad power supply box.
+
+This class implements support tor the I2C control and monitoring functionality of the
+LPD Quad power supply box. This allows all elements of the device to be accessed via
+the I2C bus.
+
+James Hogge, STFC Application Engineering Group.
+"""
 from i2c_device import I2CException
 from i2c_container import I2CContainer
-from tca9548 import TCA9548
 from mcp23008 import MCP23008
 from ad7998 import AD7998
 
-import time
-import logging
-
 
 class Quad(I2CContainer):
+    """Quad class.
 
+    This class implements support for the LPD Quad power supply box.
+    """
+
+    # Number of output channels on the Quad box
     NUM_CHANNELS = 4
 
     def __init__(self):
+        """Initialise the Quad device.
+
+        This method initialises the Quad device, setting up the internal
+        I2C devices into the appropriate modes and creating internal buffer variables
+        for all sensor channels.
+        """
         I2CContainer.__init__(self)
 
-        # Set up internal I2C devices
+        # Set up MCP GPIO device - first 4 channels are output enables, second 4 channels
+        # are enable status inputs
         self.mcp = self.attach_device(MCP23008, 0x20)
 
         for i in range(self.NUM_CHANNELS):
             self.mcp.setup(i, MCP23008.OUT)
-            # self.mcp.pullup(i, True)
 
         for i in range(self.NUM_CHANNELS, self.NUM_CHANNELS*2):
             self.mcp.setup(i, MCP23008.IN)
 
+        # Attach ADC devices for monitoring
         self.adcPower = self.attach_device(AD7998, 0x22)
         self.adcFuse = self.attach_device(AD7998, 0x21)
 
@@ -35,43 +51,88 @@ class Quad(I2CContainer):
         self.__channelEnable = [False] * self.NUM_CHANNELS
         self.__supplyVoltage = 0.0
 
-    def getChannelVoltage(self, channel):
+    def get_channel_voltage(self, channel):
+        """Get output channel voltage.
+
+        This method returns the current voltage on the specified output channel.
+
+        :param channel: channel to get value for
+        :return channel output voltage in volts
+        """
         if channel > 3 or channel < 0:
             raise I2CException(
                 "%s is not a channel on the Quad. Must be between 0 & 3" % channel)
 
         return self.__channelVoltage[channel]
 
-    def getChannelCurrent(self, channel):
+    def get_channel_current(self, channel):
+        """Get output channel current.
+
+        This method returns the current current on the specified output channel.
+
+        :param channel: channel to get value for
+        :return channel output current in amps
+        """
         if channel > 3 or channel < 0:
             raise I2CException(
                 "%s is not a channel on the Quad. Must be between 0 & 3" % channel)
 
         return self.__channelCurrent[channel]
 
-    # Gets the voltage after the fuse should be more or less equal to 48V
-    def getFuseVoltage(self, channel):
+    def get_fuse_voltage(self, channel):
+        """Get output channel fuse voltage.
+
+        This method returns the current voltage before the fuse on the specified channel.
+
+        :param channel: channel to get value for
+        :return channel output fuse voltage in volts
+        """
         if channel > 3 or channel < 0:
             raise I2CException("%s is not a channel on the Quad. Must be between 0 & 3" % channel)
 
         return self.__fuseVoltage[channel]
 
-    # Checks whether a channel is enabled
-    def getEnable(self, channel):
+    def get_enable(self, channel):
+        """Get output channel enable.
+
+        This method returns the enable status for the specified channel.
+
+        :param channel: channel to get value for
+        :return channel enable status as bool
+        """
         if channel > 3 or channel < 0:
             raise I2CException("%s is not a channel on the Quad. Must be between 0 & 3" % channel)
 
         return self.__channelEnable[channel]
 
-    def getSupplyVoltage(self):
+    def get_supply_voltage(self):
+        """Get the Quad box supply voltage.
+
+        This method returns the Quad supply voltage.
+
+        :return supply voltage in volts
+        """
         return self.__supplyVoltage
 
-    # Sets an individual channel on or off
-    def setEnable(self, channel, enabled):
-        self.setEnables({channel: enabled})
+    def set_enable(self, channel, enabled):
+        """Set the output enable for a given channel.
+
+        This method sets the ouput enable for given channel to the specified state.
+
+        :param channel: channel to set enable for
+        :param enabled: bool enabled value for the channel
+        """
+        self.set_enables({channel: enabled})
 
     # Sets multiple channels on or off
-    def setEnables(self, channels):
+    def set_enables(self, channels):
+        """Set the output enable for multiple channels.
+
+        This method sets the output enable state of multiple channels specified in a
+        dict of channel: enabled pairs, e.g. {0: True, 1: False, ...}.
+
+        :param channels: dict of channel enables to set
+        """
         data = {}
 
         for channel in channels:
@@ -80,36 +141,35 @@ class Quad(I2CContainer):
                     "%s is not a channel on the Quad. Must be between 0 & 3" % channel)
 
             # If the channel is not currently in the desired state (on/off)
-            if self.getEnable(channel) != channels[channel]:
+            if self.get_enable(channel) != channels[channel]:
                 data[channel] = True
 
         # No channels to toggle
         if not len(data):
             return
 
+        # Toggle the output enable of the Quad to set the appropriate enable state.
+        # A 0-1-0 transition is required by the control circuit to enable a channel.
         self.mcp.disable_outputs()
         self.mcp.output_pins(data)
         self.mcp.disable_outputs()
 
-    def pollAllSensors(self):
-        """Poll all sensor channels into buffer variables."""
+    def poll_all_sensors(self):
+        """Poll all sensor channels into buffer variables.
 
+        This method polls all sensor channels into the internal buffer variables. This mechanism
+        allows the polling rate to be controlled independently of any get_xxx calls being made
+        by client software.
+        """
+        # Read and udpate the output enable states
         enable_pins = range(4, 4 + self.NUM_CHANNELS)
         self.__channelEnable = self.mcp.input_pins(enable_pins)
 
+        # For each channel read an dupate the voltage and current values
         for channel in range(self.NUM_CHANNELS):
             self.__channelVoltage[channel] = self.adcPower.read_input_scaled(channel) * 5 * 16
             self.__channelCurrent[channel] = self.adcPower.read_input_scaled(channel + 4) * 5 * 4
             self.__fuseVoltage[channel] = self.adcFuse.read_input_scaled(channel) * 5 * 16
 
+        # Read and update the supply voltage
         self.__supplyVoltage = self.adcFuse.read_input_scaled(4) * 5 * 16
-
-if __name__ == "__main__":
-    tca = TCA9548(0x70)
-    quad = tca.attach_device(0, Quad)
-
-    quad.setEnables({0: True, 1: True, 2: True, 3: True})
-    for chan in range(4):
-        enabled = quad.getEnable(chan)
-
-    # quad.printTest()
