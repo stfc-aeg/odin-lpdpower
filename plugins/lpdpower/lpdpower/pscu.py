@@ -1,4 +1,4 @@
-from i2c_device import I2CDevice
+from i2c_device import I2CDevice, I2CException
 from i2c_container import I2CContainer
 from tca9548 import TCA9548
 from ad7998 import AD7998
@@ -21,7 +21,7 @@ class PSCU(I2CContainer):
     DEFAULT_QUAD_ENABLE_INTERVAL = 1.0
 
     def __init__(self, quad_enable_interval=DEFAULT_QUAD_ENABLE_INTERVAL):
-        
+
         I2CDevice.disable_exceptions()
 
         self.quad_enable_interval = quad_enable_interval
@@ -86,42 +86,42 @@ class PSCU(I2CContainer):
         # Buffers for all I2C sensors
         # Temperature
         self.numTemperatures = 11
-        self.__tempValues = [0] * self.numTemperatures
-        self.__tempSetPoints = [0] * self.numTemperatures
-        self.__tempTrips = [0] * self.numTemperatures
-        self.__tempTraces = [0] * self.numTemperatures
+        self.__tempValues = [0.0] * self.numTemperatures
+        self.__tempSetPoints = [0.0] * self.numTemperatures
+        self.__tempTrips = [False] * self.numTemperatures
+        self.__tempTraces = [False] * self.numTemperatures
         self.__tempDisabled = [False] * self.numTemperatures
 
         # Humidity
         self.numHumidities = 2
-        self.__hValues = [0] * self.numHumidities
-        self.__hSetPoints = [0] * self.numHumidities
-        self.__hTrips = [0] * self.numHumidities
-        self.__hTraces = [0] * self.numHumidities
+        self.__hValues = [0.0] * self.numHumidities
+        self.__hSetPoints = [0.0] * self.numHumidities
+        self.__hTrips = [False] * self.numHumidities
+        self.__hTraces = [False] * self.numHumidities
         self.__hDisabled = [False] * self.numHumidities
 
         # Pump
-        self.__pumpFlow = 0
-        self.__pumpSetPoint = 0
+        self.__pumpFlow = 0.0
+        self.__pumpSetPoint = 0.0
         self.__pumpTrip = False
 
         # Fan
-        self.__fanSpeed = 0
-        self.__fanTarget = 100
-        self.__fanSetPoint = 0
+        self.__fanSpeed = 0.0
+        self.__fanTarget = 100.0
+        self.__fanSetPoint = 0.0
         self.__fanTrip = False
-        
+
         # Position
-        self.__position = 0
+        self.__position = 0.0
 
         # Quad traces
-        self.__qTraces = [0] * self.numQuads
+        self.__qTraces = [False] * self.numQuads
 
         # Overall
         self.__armed = False
         self.__healthy = False
-        self.__sensorOutputs = [0, 0, 0, 0, 0]  # Tmp, F, P, H, T
-        self.__latchedOutputs = [0, 0, 0, 0, 0]  # Tmp, F, P, T, H
+        self.__sensorOutputs = [False] * 5  # Tmp, F, P, H, T
+        self.__latchedOutputs = [False] * 5  # Tmp, F, P, T, H
 
         # LCD Display
         try:
@@ -146,61 +146,61 @@ class PSCU(I2CContainer):
 
     def getTemperature(self, sensor):
         if sensor > 10 or sensor < 0:
-            raise I2CException("There is not sensor %s" % sensor)
+            raise I2CException('Illegal sensor index {} specified'.format(sensor))
 
         return self.__tempValues[sensor]
 
     def getTempSetPoint(self, sensor):
         if sensor > 10 or sensor < 0:
-            raise I2CException("There is not sensor %s" % sensor)
+            raise I2CException('Illegal sensor index {} specified'.format(sensor))
 
         return self.__tempSetPoints[sensor]
 
     def getTempTripped(self, sensor):
         if sensor > 10 or sensor < 0:
-            raise I2CException("There is not sensor %s" % sensor)
+            raise I2CException('Illegal sensor index {} specified'.format(sensor))
 
         return self.__tempTrips[sensor]
 
     def getTempTrace(self, sensor):
         if sensor > 10 or sensor < 0:
-            raise I2CException("There is not sensor %s" % sensor)
+            raise I2CException('Illegal sensor index {} specified'.format(sensor))
 
         return self.__tempTraces[sensor]
 
     def getTempDisabled(self, sensor):
         if sensor > 10 or sensor < 0:
-            raise I2CException("There is not sensor %s" % sensor)
+            raise I2CException('Illegal sensor index {} specified'.format(sensor))
 
         return self.__tempDisabled[sensor]
 
     def getHumidity(self, sensor):
         if sensor > 1 or sensor < 0:
-            raise I2CException("There is not sensor %s" % sensor)
+            raise I2CException('Illegal sensor index {} specified'.format(sensor))
 
         return self.__hValues[sensor]
 
     def getHSetPoint(self, sensor):
         if sensor > 1 or sensor < 0:
-            raise I2CException("There is not sensor %s" % sensor)
+            raise I2CException('Illegal sensor index {} specified'.format(sensor))
 
         return self.__hSetPoints[sensor]
 
     def getHTripped(self, sensor):
         if sensor > 1 or sensor < 0:
-            raise I2CException("There is not sensor %s" % sensor)
+            raise I2CException('Illegal sensor index {} specified'.format(sensor))
 
         return self.__hTrips[sensor]
 
     def getHTrace(self, sensor):
         if sensor > 1 or sensor < 0:
-            raise I2CException("There is not sensor %s" % sensor)
+            raise I2CException('Illegal sensor index {} specified'.format(sensor))
 
         return self.__hTraces[sensor]
 
     def getHDisabled(self, sensor):
         if sensor > 1 or sensor < 0:
-            raise I2CException("There is not sensor %s" % sensor)
+            raise I2CException('Illegal sensor index {} specified'.format(sensor))
 
         return self.__hDisabled[sensor]
 
@@ -225,11 +225,11 @@ class PSCU(I2CContainer):
     def getFanTripped(self):
         return self.__fanTrip
 
-    def getQuadTrace(self, q):
-        if q > 3 or q < 0:
-            raise I2CException("There is no quad %s" % q)
+    def getQuadTrace(self, quad_idx):
+        if quad_idx > 3 or quad_idx < 0:
+            raise I2CException("Illegal quad index {} specified".format(quad_idx))
 
-        return self.__qTraces[q]
+        return self.__qTraces[quad_idx]
 
     def getPosition(self):
         return self.__position
@@ -279,7 +279,14 @@ class PSCU(I2CContainer):
     def getEnableInterval(self):
         return self.quad_enable_interval
 
-    def quadEnableTrace(self, quad_idx, channel):
+    def quad_enable_channel(self, quad_idx, channel):
+
+        if quad_idx > 3 or quad_idx < 0:
+            raise I2CException("Illegal quad index {} specified".format(quad_idx))
+
+        if channel >= Quad.NUM_CHANNELS or channel < 0:
+            raise I2CException("Illegal channel index {} specified".format(channel))
+
         logging.debug("Enabling quad {} channel {} output".format(quad_idx, channel))
         self.quad[quad_idx].set_enable(channel, True)
 
@@ -292,7 +299,7 @@ class PSCU(I2CContainer):
             for quad_idx in range(len(self.quad)):
                 for channel in range(Quad.NUM_CHANNELS):
                     self.deferred_executor.enqueue(
-                        self.quadEnableTrace, self.quad_enable_interval, quad_idx, channel
+                        self.quad_enable_channel, self.quad_enable_interval, quad_idx, channel
                     )
             self.__allEnabled = True
         else:
@@ -318,16 +325,16 @@ class PSCU(I2CContainer):
     def setFanTarget(self, value):
         self.__fanTarget = value
         self.fanSpd.set_output_scaled(1.0 - (value / 100.0))
-        
+
     def getDisplayError(self):
         return self.lcd_display_error
 
     def updateLCD(self):
-        
+
         # Do nothing if display was not initlialised OK
         if self.lcd_display_error:
             return
-        
+
         # Get input
         if GPIO.event_detected("P9_11"):
             self.lcd.previous_page()
