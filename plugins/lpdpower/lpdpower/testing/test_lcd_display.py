@@ -24,12 +24,12 @@ class TestLcdDisplay():
         cls.pscu.numQuads = 4
         cls.pscu.numTemperatures = 11
         cls.pscu.numHumidities = 2
-        cls.pscu.getAllLatched.return_value = [True]*4
-        cls.pscu.getTemperature.return_value = 20.0
-        cls.pscu.getHumidity.return_value = 56.7
-        cls.pscu.getFanSpeed.return_value = 45.0
-        cls.pscu.getFanTarget.return_value = 90
-        cls.pscu.getPumpFlow.return_value = 4.2
+        cls.pscu.get_all_latched.return_value = [True]*4
+        cls.pscu.get_temperature.return_value = 20.0
+        cls.pscu.get_humidity.return_value = 56.7
+        cls.pscu.get_fan_speed.return_value = 45.0
+        cls.pscu.get_fan_target.return_value = 90
+        cls.pscu.get_pump_flow.return_value = 4.2
         cls.pscu.quad = [Mock()]*4
         for q in range(cls.pscu.numQuads):
             cls.pscu.quad[q].get_supply_voltage.return_value = 48.1
@@ -123,7 +123,7 @@ class TestLcdDisplay():
 
         for page in range(self.display.num_temp_pages):
             content = self.display.temperature_page(page)
-            for call in ['getTemperature', 'getTempLatched', 'getTempOutput', 'getTempTripped']:
+            for call in ['get_temperature', 'get_temp_latched', 'get_temp_output', 'get_temp_tripped']:
                 assert_true(getattr(self.pscu, call).called)
             assert_equal(type(content), str)
             assert_true(len(content) > 0)
@@ -132,7 +132,7 @@ class TestLcdDisplay():
     def test_humidity_page(self):
 
         content = self.display.humidity_page()
-        for call in ['getHumidity', 'getHumidityLatched', 'getHumidityOutput', 'getHTripped']:
+        for call in ['get_humidity', 'get_humidity_latched', 'get_humidity_output', 'get_humidity_tripped']:
             assert_true(getattr(self.pscu, call).called)
         assert_equal(type(content), str)
         assert_true(len(content) > 0)
@@ -141,7 +141,7 @@ class TestLcdDisplay():
     def test_fan_page(self):
 
         content = self.display.fan_page()
-        for call in ['getFanSpeed', 'getFanTarget', 'getFanLatched']:
+        for call in ['get_fan_speed', 'get_fan_target', 'get_fan_latched']:
             assert_true(getattr(self.pscu, call).called)
         assert_true
         assert_equal(type(content), str)
@@ -152,7 +152,7 @@ class TestLcdDisplay():
     def test_pump_page(self):
 
         content = self.display.pump_page()
-        for call in ['getPumpFlow', 'getPumpOutput', 'getPumpLatched']:
+        for call in ['get_pump_flow', 'get_pump_output', 'get_pump_latched']:
             assert_true(getattr(self.pscu, call).called)
         assert_equal(type(content), str)
         assert_true(len(content) > 0)
@@ -163,7 +163,7 @@ class TestLcdDisplay():
 
         content = self.display.trace_page()
         for call in [
-            'getTraceOutput', 'getTraceLatched', 'getTempTrace', 'getHTrace', 'getQuadTrace'
+            'getTraceOutput', 'getTraceLatched', 'get_temp_trace', 'get_humidity_trace', 'get_quad_trace'
         ]:
             assert_true(getattr(self.pscu, call).called)
         assert_equal(type(content), str)

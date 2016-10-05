@@ -53,6 +53,6 @@ class LPDPowerAdapter(ApiAdapter):
 
     def update_loop(self):
         self.pscuData.pscu.handle_deferred()
-        self.pscuData.pscu.updateLCD()
+        self.pscuData.pscu.update_lcd()
         self.pscuData.pscu.poll_all_sensors()
         IOLoop.instance().call_later(self.update_interval, self.update_loop)

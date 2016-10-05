@@ -157,9 +157,9 @@ class LcdDisplay(object):
 
         :return: rendered page as a string
         """
-        healthy = self.pscu.getHealth()
-        all_latched = all(self.pscu.getAllLatched())
-        armed = self.pscu.getArmed()
+        healthy = self.pscu.get_health()
+        all_latched = all(self.pscu.get_all_latched())
+        armed = self.pscu.get_armed()
 
         content = self.page_header()
         content += 'System  : {}\r'.format('Healthy' if healthy else 'ERROR')
@@ -203,14 +203,14 @@ class LcdDisplay(object):
         start_chan = page * self.temps_per_page
         end_chan = start_chan + self.temps_per_page
 
-        state_str = self.format_state_str(self.pscu.getTempOutput(), self.pscu.getTempLatched())
+        state_str = self.format_state_str(self.pscu.get_temp_output(), self.pscu.get_temp_latched())
 
         content += 'Temp {}/{}: {}\r'.format(page+1, self.num_temp_pages, state_str)
 
         for chan in range(start_chan, end_chan):
             if chan < num_temp_vals:
-                chan_temp = self.pscu.getTemperature(chan)
-                chan_trip = '*' if self.pscu.getTempTripped(chan) else ' '
+                chan_temp = self.pscu.get_temperature(chan)
+                chan_trip = '*' if self.pscu.get_temp_tripped(chan) else ' '
                 temp_disp = '{:2d}:{:4.1f}C{} '.format(chan+1, chan_temp, chan_trip)
             else:
                 temp_disp = '\r'
@@ -229,13 +229,13 @@ class LcdDisplay(object):
         content = self.page_header()
 
         state_str = self.format_state_str(
-            self.pscu.getHumidityOutput(), self.pscu.getHumidityLatched())
+            self.pscu.get_humidity_output(), self.pscu.get_humidity_latched())
 
         content += 'Humidity: {}\r'.format(state_str)
 
         for chan in range(self.pscu.numHumidities):
-            chan_humid = self.pscu.getHumidity(chan)
-            chan_trip = '*' if self.pscu.getHTripped(chan) else ' '
+            chan_humid = self.pscu.get_humidity(chan)
+            chan_trip = '*' if self.pscu.get_humidity_tripped(chan) else ' '
             content += '{}:{:4.1f}%{} '.format(chan+1, chan_humid, chan_trip)
 
         content += '\r\r'
@@ -251,11 +251,11 @@ class LcdDisplay(object):
         """
         content = self.page_header()
 
-        state_str = self.format_state_str(self.pscu.getFanOutput(), self.pscu.getFanLatched())
+        state_str = self.format_state_str(self.pscu.get_fan_output(), self.pscu.get_fan_latched())
 
         content += 'Fan: {}\r'.format(state_str)
-        content += 'Target:  {:3d}%\r'.format(self.pscu.getFanTarget())
-        content += 'Speed : {:4.1f}Hz\r'.format(self.pscu.getFanSpeed())
+        content += 'Target:  {:3d}%\r'.format(self.pscu.get_fan_target())
+        content += 'Speed : {:4.1f}Hz\r'.format(self.pscu.get_fan_speed())
         content += time.strftime(self.time_format)
 
         return content
@@ -269,10 +269,10 @@ class LcdDisplay(object):
         """
         content = self.page_header()
 
-        state_str = self.format_state_str(self.pscu.getPumpOutput(), self.pscu.getPumpLatched())
+        state_str = self.format_state_str(self.pscu.get_pump_output(), self.pscu.get_pump_latched())
 
         content += 'Pump: {}\r'.format(state_str)
-        content += 'Flow: {:.1f}l/min\r'.format(self.pscu.getPumpFlow())
+        content += 'Flow: {:.1f}l/min\r'.format(self.pscu.get_pump_flow())
         content += '\r'
 
         return content
@@ -300,9 +300,9 @@ class LcdDisplay(object):
 
         state_str = self.format_state_str(self.pscu.getTraceOutput(), self.pscu.getTraceLatched())
 
-        temp_traces = [self.pscu.getTempTrace(chan) for chan in range(self.pscu.numTemperatures)]
-        humidity_traces = [self.pscu.getHTrace(chan) for chan in range(self.pscu.numHumidities)]
-        quad_traces = [self.pscu.getQuadTrace(chan) for chan in range(self.pscu.numQuads)]
+        temp_traces = [self.pscu.get_temp_trace(chan) for chan in range(self.pscu.numTemperatures)]
+        humidity_traces = [self.pscu.get_humidity_trace(chan) for chan in range(self.pscu.numHumidities)]
+        quad_traces = [self.pscu.get_quad_trace(chan) for chan in range(self.pscu.numQuads)]
 
         content += 'Trace: {}\r'.format(state_str)
         content += 'Temp: {}\r'.format(self.format_trace_str(temp_traces))

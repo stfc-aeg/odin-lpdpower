@@ -21,19 +21,19 @@ class TempData(object):
         self.number = number
 
     def getSetPoint(self):
-        return self.pscu.getTempSetPoint(self.number)
+        return self.pscu.get_temp_set_point(self.number)
 
     def getTemp(self):
-        return self.pscu.getTemperature(self.number)
+        return self.pscu.get_temperature(self.number)
 
     def getTrace(self):
-        return self.pscu.getTempTrace(self.number)
+        return self.pscu.get_temp_trace(self.number)
 
     def getTripped(self):
-        return self.pscu.getTempTripped(self.number)
+        return self.pscu.get_temp_tripped(self.number)
 
     def getDisabled(self):
-        return self.pscu.getTempDisabled(self.number)
+        return self.pscu.get_temp_disabled(self.number)
 
 
 class HumidityData(object):
@@ -41,7 +41,7 @@ class HumidityData(object):
 
     def __init__(self, pscu, number):
         self.param_tree = ParameterTree({
-            "humidity": (self.getHumidity, None),
+            "humidity": (self.get_humidity, None),
             "setpoint": (self.getSetPoint, None),
             "tripped": (self.getTripped, None),
             "trace": (self.getTrace, None),
@@ -51,20 +51,20 @@ class HumidityData(object):
         self.pscu = pscu
         self.number = number
 
-    def getHumidity(self):
-        return self.pscu.getHumidity(self.number)
+    def get_humidity(self):
+        return self.pscu.get_humidity(self.number)
 
     def getSetPoint(self):
-        return self.pscu.getHSetPoint(self.number)
+        return self.pscu.get_humidity_set_point(self.number)
 
     def getTripped(self):
-        return self.pscu.getHTripped(self.number)
+        return self.pscu.get_humidity_tripped(self.number)
 
     def getTrace(self):
-        return self.pscu.getHTrace(self.number)
+        return self.pscu.get_humidity_trace(self.number)
 
     def getDisabled(self):
-        return self.pscu.getHDisabled(self.number)
+        return self.pscu.get_humidity_disabled(self.number)
         
 
 class PSCUDataError(Exception):
@@ -98,40 +98,40 @@ class PSCUData(object):
             },
             "temperature": {
                 "sensors": [t.param_tree for t in self.tempData],
-                "overall": (self.pscu.getTempOutput,  None),
-                "latched": (self.pscu.getTempLatched,  None),
+                "overall": (self.pscu.get_temp_output,  None),
+                "latched": (self.pscu.get_temp_latched,  None),
             },
             "humidity": {
                 "sensors": [h.param_tree for h in self.humidityData],
-                "overall": (self.pscu.getHumidityOutput, None),
-                "latched": (self.pscu.getHumidityLatched, None),
+                "overall": (self.pscu.get_humidity_output, None),
+                "latched": (self.pscu.get_humidity_latched, None),
             },
             "fan": {
-                "target": (self.pscu.getFanTarget, self.pscu.setFanTarget),
-                "currentspeed": (self.pscu.getFanSpeed, None),
-                "setpoint": (self.pscu.getFanSetPoint, None),
-                "tripped": (self.pscu.getFanTripped, None),
-                "overall": (self.pscu.getFanOutput, None),
-                "latched": (self.pscu.getFanLatched, None),
+                "target": (self.pscu.get_fan_target, self.pscu.set_fan_target),
+                "currentspeed": (self.pscu.get_fan_speed, None),
+                "setpoint": (self.pscu.get_fan_set_point, None),
+                "tripped": (self.pscu.get_fan_tripped, None),
+                "overall": (self.pscu.get_fan_output, None),
+                "latched": (self.pscu.get_fan_latched, None),
             },
             "pump": {
-                "flow": (self.pscu.getPumpFlow, None),
-                "setpoint": (self.pscu.getPumpSetPoint, None),
-                "tripped": (self.pscu.getPumpTripped, None),
-                "overall": (self.pscu.getPumpOutput, None),
-                "latched": (self.pscu.getPumpLatched, None),
+                "flow": (self.pscu.get_pump_flow, None),
+                "setpoint": (self.pscu.get_pump_set_point, None),
+                "tripped": (self.pscu.get_pump_tripped, None),
+                "overall": (self.pscu.get_pump_output, None),
+                "latched": (self.pscu.get_pump_latched, None),
             },
             "trace": {
                  "overall": (self.pscu.getTraceOutput, None),
                  "latched": (self.pscu.getTraceLatched,  None),
             },
-            "position": (self.pscu.getPosition, None),
-            "overall": (self.pscu.getHealth,  None),
-            "latched": (self.getAllLatched, None),
-            "armed": (self.pscu.getArmed, self.pscu.setArmed),
-            "allEnabled": (self.pscu.getAllEnabled, self.pscu.enableAll),
-            "enableInterval": (self.pscu.getEnableInterval, None),
-            "displayError": (self.pscu.getDisplayError, None),
+            "position": (self.pscu.get_position, None),
+            "overall": (self.pscu.get_health,  None),
+            "latched": (self.get_all_latched, None),
+            "armed": (self.pscu.get_armed, self.pscu.set_armed),
+            "allEnabled": (self.pscu.get_all_enabled, self.pscu.enable_all),
+            "enableInterval": (self.pscu.get_enable_interval, None),
+            "displayError": (self.pscu.get_display_error, None),
         })
 
     def get(self, path):
@@ -156,10 +156,10 @@ class PSCUData(object):
         except ParameterTreeError as e:
             raise PSCUDataError(e)
 
-    def getAllLatched(self):
+    def get_all_latched(self):
         
-        return all(self.pscu.getAllLatched())
+        return all(self.pscu.get_all_latched())
     
     def getQuadTraces(self):
-        return {str(q) : self.pscu.getQuadTrace(q) for q in range(self.pscu.numQuads)}
+        return {str(q) : self.pscu.get_quad_trace(q) for q in range(self.pscu.numQuads)}
          

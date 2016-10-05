@@ -144,109 +144,109 @@ class PSCU(I2CContainer):
     def handle_deferred(self):
         self.deferred_executor.process()
 
-    def getTemperature(self, sensor):
+    def get_temperature(self, sensor):
         if sensor > 10 or sensor < 0:
             raise I2CException('Illegal sensor index {} specified'.format(sensor))
 
         return self.__tempValues[sensor]
 
-    def getTempSetPoint(self, sensor):
+    def get_temp_set_point(self, sensor):
         if sensor > 10 or sensor < 0:
             raise I2CException('Illegal sensor index {} specified'.format(sensor))
 
         return self.__tempSetPoints[sensor]
 
-    def getTempTripped(self, sensor):
+    def get_temp_tripped(self, sensor):
         if sensor > 10 or sensor < 0:
             raise I2CException('Illegal sensor index {} specified'.format(sensor))
 
         return self.__tempTrips[sensor]
 
-    def getTempTrace(self, sensor):
+    def get_temp_trace(self, sensor):
         if sensor > 10 or sensor < 0:
             raise I2CException('Illegal sensor index {} specified'.format(sensor))
 
         return self.__tempTraces[sensor]
 
-    def getTempDisabled(self, sensor):
+    def get_temp_disabled(self, sensor):
         if sensor > 10 or sensor < 0:
             raise I2CException('Illegal sensor index {} specified'.format(sensor))
 
         return self.__tempDisabled[sensor]
 
-    def getHumidity(self, sensor):
+    def get_humidity(self, sensor):
         if sensor > 1 or sensor < 0:
             raise I2CException('Illegal sensor index {} specified'.format(sensor))
 
         return self.__hValues[sensor]
 
-    def getHSetPoint(self, sensor):
+    def get_humidity_set_point(self, sensor):
         if sensor > 1 or sensor < 0:
             raise I2CException('Illegal sensor index {} specified'.format(sensor))
 
         return self.__hSetPoints[sensor]
 
-    def getHTripped(self, sensor):
+    def get_humidity_tripped(self, sensor):
         if sensor > 1 or sensor < 0:
             raise I2CException('Illegal sensor index {} specified'.format(sensor))
 
         return self.__hTrips[sensor]
 
-    def getHTrace(self, sensor):
+    def get_humidity_trace(self, sensor):
         if sensor > 1 or sensor < 0:
             raise I2CException('Illegal sensor index {} specified'.format(sensor))
 
         return self.__hTraces[sensor]
 
-    def getHDisabled(self, sensor):
+    def get_humidity_disabled(self, sensor):
         if sensor > 1 or sensor < 0:
             raise I2CException('Illegal sensor index {} specified'.format(sensor))
 
         return self.__hDisabled[sensor]
 
-    def getPumpFlow(self):
+    def get_pump_flow(self):
         return self.__pumpFlow
 
-    def getPumpSetPoint(self):
+    def get_pump_set_point(self):
         return self.__pumpSetPoint
 
-    def getPumpTripped(self):
+    def get_pump_tripped(self):
         return self.__pumpTrip
 
-    def getFanSpeed(self):
+    def get_fan_speed(self):
         return self.__fanSpeed
 
-    def getFanSetPoint(self):
+    def get_fan_set_point(self):
         return self.__fanSetPoint
 
-    def getFanTarget(self):
+    def get_fan_target(self):
         return self.__fanTarget
 
-    def getFanTripped(self):
+    def get_fan_tripped(self):
         return self.__fanTrip
 
-    def getQuadTrace(self, quad_idx):
+    def get_quad_trace(self, quad_idx):
         if quad_idx > 3 or quad_idx < 0:
             raise I2CException("Illegal quad index {} specified".format(quad_idx))
 
         return self.__qTraces[quad_idx]
 
-    def getPosition(self):
+    def get_position(self):
         return self.__position
 
-    def getArmed(self):
+    def get_armed(self):
         return self.__armed
 
-    def getAllEnabled(self):
+    def get_all_enabled(self):
         return self.__allEnabled
 
-    def getHealth(self):
+    def get_health(self):
         return self.__healthy
 
-    def getTempOutput(self):
+    def get_temp_output(self):
         return self.__sensorOutputs[0]
 
-    def getTempLatched(self):
+    def get_temp_latched(self):
         return self.__latchedOutputs[0]
 
     def getTraceOutput(self):
@@ -255,28 +255,28 @@ class PSCU(I2CContainer):
     def getTraceLatched(self):
         return self.__latchedOutputs[3]
 
-    def getFanOutput(self):
+    def get_fan_output(self):
         return self.__sensorOutputs[1]
 
-    def getFanLatched(self):
+    def get_fan_latched(self):
         return self.__latchedOutputs[1]
 
-    def getPumpOutput(self):
+    def get_pump_output(self):
         return self.__sensorOutputs[2]
 
-    def getPumpLatched(self):
+    def get_pump_latched(self):
         return self.__latchedOutputs[2]
 
-    def getHumidityOutput(self):
+    def get_humidity_output(self):
         return self.__sensorOutputs[3]
 
-    def getHumidityLatched(self):
+    def get_humidity_latched(self):
         return self.__latchedOutputs[4]
 
-    def getAllLatched(self):
+    def get_all_latched(self):
         return self.__latchedOutputs
 
-    def getEnableInterval(self):
+    def get_enable_interval(self):
         return self.quad_enable_interval
 
     def quad_enable_channel(self, quad_idx, channel):
@@ -290,8 +290,8 @@ class PSCU(I2CContainer):
         logging.debug("Enabling quad {} channel {} output".format(quad_idx, channel))
         self.quad[quad_idx].set_enable(channel, True)
 
-    def enableAll(self, enable):
-        logging.debug("Called enableAll with value {}".format(enable))
+    def enable_all(self, enable):
+        logging.debug("Called enable_all with value {}".format(enable))
 
         if enable:
             # Loop over all quads and channels in system, adding enable command to deferred
@@ -316,20 +316,20 @@ class PSCU(I2CContainer):
                     self.quad[quad_idx].set_enable(channel, False)
             self.__allEnabled = False
 
-    def setArmed(self, value):
+    def set_armed(self, value):
         pin = 0 if value else 1
         self.mcpMisc[0].output(pin, MCP23008.LOW)
         self.mcpMisc[0].output(pin, MCP23008.HIGH)
         self.mcpMisc[0].output(pin, MCP23008.LOW)
 
-    def setFanTarget(self, value):
+    def set_fan_target(self, value):
         self.__fanTarget = value
         self.fanSpd.set_output_scaled(1.0 - (value / 100.0))
 
-    def getDisplayError(self):
+    def get_display_error(self):
         return self.lcd_display_error
 
-    def updateLCD(self):
+    def update_lcd(self):
 
         # Do nothing if display was not initlialised OK
         if self.lcd_display_error:

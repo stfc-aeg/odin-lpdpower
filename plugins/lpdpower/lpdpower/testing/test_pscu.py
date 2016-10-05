@@ -65,16 +65,16 @@ class TestPSCU():
 
 
         for (method, return_type) in [
-            ('getTemperature', float),
-            ('getTempSetPoint', float),
-            ('getTempTripped', bool),
-            ('getTempTrace', bool),
-            ('getTempDisabled', bool),
-            ('getHumidity', float),
-            ('getHSetPoint', float),
-            ('getHTripped', bool),
-            ('getHTrace', bool),
-            ('getHDisabled', bool),
+            ('get_temperature', float),
+            ('get_temp_set_point', float),
+            ('get_temp_tripped', bool),
+            ('get_temp_trace', bool),
+            ('get_temp_disabled', bool),
+            ('get_humidity', float),
+            ('get_humidity_set_point', float),
+            ('get_humidity_tripped', bool),
+            ('get_humidity_trace', bool),
+            ('get_humidity_disabled', bool),
         ]:
             for (legal_sensor, label) in [(True, 'legal'), (False, 'illegal')]:
                 test_func = partial(self._test_pscu_indexed_getter, method, legal_sensor, return_type)
@@ -100,29 +100,29 @@ class TestPSCU():
     def test_generate_simple_getter_tests(self):
 
         for (method, return_type) in [
-          ('getPumpFlow', float),
-          ('getPumpSetPoint', float),
-          ('getPumpTripped', bool),
-          ('getFanSpeed', float),
-          ('getFanSetPoint', float),
-          ('getFanTarget', float),
-          ('getFanTripped', bool),
-          ('getPosition', float),
-          ('getArmed', bool),
-          ('getTempOutput', bool),
-          ('getTempLatched', bool),
+          ('get_pump_flow', float),
+          ('get_pump_set_point', float),
+          ('get_pump_tripped', bool),
+          ('get_fan_speed', float),
+          ('get_fan_set_point', float),
+          ('get_fan_target', float),
+          ('get_fan_tripped', bool),
+          ('get_position', float),
+          ('get_armed', bool),
+          ('get_temp_output', bool),
+          ('get_temp_latched', bool),
           ('getTraceOutput', bool),
           ('getTraceLatched', bool),
-          ('getFanOutput', bool),
-          ('getFanLatched', bool),
-          ('getPumpOutput', bool),
-          ('getPumpLatched', bool),
-          ('getHumidityOutput', bool),
-          ('getHumidityLatched', bool),
-          ('getAllLatched', list),
-          ('getEnableInterval', float),
-          ('getAllEnabled', bool),
-          ('getHealth', bool),
+          ('get_fan_output', bool),
+          ('get_fan_latched', bool),
+          ('get_pump_output', bool),
+          ('get_pump_latched', bool),
+          ('get_humidity_output', bool),
+          ('get_humidity_latched', bool),
+          ('get_all_latched', list),
+          ('get_enable_interval', float),
+          ('get_all_enabled', bool),
+          ('get_health', bool),
         ]:
             test_func = partial(self._test_pscu_simple_getter, method, return_type)
             test_func.description = '{}.{}.test_{}'.format(
@@ -137,14 +137,14 @@ class TestPSCU():
 
     def test_get_quad_trace(self):
 
-        val = self.pscu.getQuadTrace(0)
+        val = self.pscu.get_quad_trace(0)
         assert_equal(type(val), bool)
 
     def test_get_quad_trace_illegal_quad(self):
 
         for illegal_quad in [-1, 4]:
             with assert_raises_regexp(I2CException, 'Illegal quad index {} specified'.format(illegal_quad)):
-                self.pscu.getQuadTrace(illegal_quad)
+                self.pscu.get_quad_trace(illegal_quad)
 
 
     def test_quad_enable_channel(self):
@@ -167,7 +167,7 @@ class TestPSCU():
 
     def test_enable_all(self):
 
-        enable_interval = self.pscu.getEnableInterval()
+        enable_interval = self.pscu.get_enable_interval()
         self.pscu.quad_enable_interval = 0.0
 
         enable_calls = []
@@ -176,7 +176,7 @@ class TestPSCU():
                 enable_calls.append(call(chan, True))
 
         with patch('lpdpower.pscu.Quad.set_enable') as mock_enable:
-            self.pscu.enableAll(True)
+            self.pscu.enable_all(True)
             while self.pscu.deferred_executor.pending():
                 self.pscu.handle_deferred()
             mock_enable.assert_has_calls(enable_calls)
@@ -186,7 +186,7 @@ class TestPSCU():
 
     def test_disable_all(self):
 
-        enable_interval = self.pscu.getEnableInterval()
+        enable_interval = self.pscu.get_enable_interval()
         self.pscu.quad_enable_interval = 0.0
 
         enable_calls = []
@@ -196,8 +196,8 @@ class TestPSCU():
 
         with patch('lpdpower.pscu.Quad.set_enable') as mock_enable:
             # Enable all to push pending enables onto deferred executor queue
-            self.pscu.enableAll(True)
-            self.pscu.enableAll(False)
+            self.pscu.enable_all(True)
+            self.pscu.enable_all(False)
             while self.pscu.deferred_executor.pending():
                 self.pscu.handle_deferred()
             mock_enable.assert_has_calls(enable_calls)
@@ -211,7 +211,7 @@ class TestPSCU():
         arm_calls = [call(arm_pin, 0), call(arm_pin, 1), call(arm_pin, 0)]
 
         with patch('lpdpower.pscu.MCP23008.output') as mock_output:
-            self.pscu.setArmed(True)
+            self.pscu.set_armed(True)
             mock_output.assert_has_calls(arm_calls)
             assert_equal(len(mock_output.mock_calls), len(arm_calls))
 
@@ -221,19 +221,19 @@ class TestPSCU():
 
             for target in [0.0, 50.0, 100.0]:
                 output_value = (1.0 - (target / 100.0))
-                self.pscu.setFanTarget(target)
+                self.pscu.set_fan_target(target)
                 mock_output.assert_called_with(output_value)
 
     def test_get_display_error(self):
 
-        assert_equal(self.pscu.getDisplayError(), False)
+        assert_equal(self.pscu.get_display_error(), False)
 
     def test_udpate_lcd_no_event(self):
 
         with patch('lpdpower.pscu.LcdDisplay.update') as mock_update:
             with patch('lpdpower.pscu.GPIO.event_detected', return_value=False) as mock_event:
                 current_page = self.pscu.lcd.current_page
-                self.pscu.updateLCD()
+                self.pscu.update_lcd()
                 assert_equal(self.pscu.lcd.current_page, current_page)
                 mock_update.assert_called_once()
 
@@ -242,7 +242,7 @@ class TestPSCU():
         with patch('lpdpower.pscu.GPIO.event_detected', side_effect=[True, False]) as mock_event:
             expected_page = self.pscu.lcd.current_page - 1
             expected_page %= len(self.pscu.lcd.registered_pages)
-            self.pscu.updateLCD()
+            self.pscu.update_lcd()
             assert_equal(self.pscu.lcd.current_page, expected_page)
 
     def test_update_lcd_btn_next(self):
@@ -250,14 +250,14 @@ class TestPSCU():
         with patch('lpdpower.pscu.GPIO.event_detected', side_effect=[False, True]) as mock_event:
             expected_page = self.pscu.lcd.current_page + 1
             expected_page %= len(self.pscu.lcd.registered_pages)
-            self.pscu.updateLCD()
+            self.pscu.update_lcd()
             assert_equal(self.pscu.lcd.current_page, expected_page)
 
     def test_update_lcd_healthy(self):
 
         current_health = self.pscu._PSCU__healthy
         self.pscu._PSCU__healthy = True
-        self.pscu.updateLCD()
+        self.pscu.update_lcd()
         assert_equal(self.pscu.lcd.lcd_colour, self.pscu.lcd.GREEN)
         self.pscu._PSCU__healthy = current_health
 
@@ -265,17 +265,17 @@ class TestPSCU():
 
         current_health = self.pscu._PSCU__healthy
         self.pscu._PSCU__healthy = False
-        self.pscu.updateLCD()
+        self.pscu.update_lcd()
         assert_equal(self.pscu.lcd.lcd_colour, self.pscu.lcd.RED)
         self.pscu._PSCU__healthy = current_health
 
     def test_update_lcd_with_error(self):
 
-        current_error = self.pscu.getDisplayError()
+        current_error = self.pscu.get_display_error()
         self.pscu.lcd_display_error = True
 
         with patch('lpdpower.pscu.LcdDisplay.update') as mock_update:
-            self.pscu.updateLCD()
+            self.pscu.update_lcd()
             mock_update.assert_not_called()
 
         self.pscu.lcd_display_error = current_error
@@ -283,14 +283,27 @@ class TestPSCU():
     def test_poll_all_sensors(self):
 
         self.bus.reset_mock()
+        self.bus.read_byte_data.return_value = 0
+        
         self.pscu.poll_all_sensors()
+        
         assert_true(len(self.bus.mock_calls) > 0)
-        #print self.bus.mock_calls
+        i2c_methods_called = set()
+        i2c_addrs_called = set()
+        for name, args, _ in self.bus.mock_calls:
+            i2c_methods_called.add(name)
+            if len(args):
+                i2c_addrs_called.add(args[0]) 
 
+        expected_i2c_methods = set(['read_word_data', 'read_byte_data', 'write_byte_data'])
+        expected_i2c_addrs = set([0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x70])
+        assert_equal(i2c_methods_called, expected_i2c_methods)
+        assert_equal(i2c_addrs_called, expected_i2c_addrs)
+        
     def test_poll_all_sensors_disables_when_not_armed(self):
 
         with patch('lpdpower.pscu.MCP23008.input_pins', return_value=[0]*8) as mock_mcp:
-            self.pscu.enableAll(True)
-            self.pscu.setArmed(False)
+            self.pscu.enable_all(True)
+            self.pscu.set_armed(False)
             self.pscu.poll_all_sensors()
-            assert_equal(self.pscu.getAllEnabled(), False)
+            assert_equal(self.pscu.get_all_enabled(), False)

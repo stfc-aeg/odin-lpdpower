@@ -29,23 +29,23 @@ class TestTempData():
         
     def test_setpoint_get(self):
         self.temp_data.param_tree.get('setpoint')
-        self.pscu.getTempSetPoint.assert_called_with(self.number)
+        self.pscu.get_temp_set_point.assert_called_with(self.number)
         
     def test_temp_get(self):
         self.temp_data.param_tree.get('temperature')
-        self.pscu.getTemperature.assert_called_with(self.number)
+        self.pscu.get_temperature.assert_called_with(self.number)
         
     def test_trace_get(self):
         self.temp_data.param_tree.get('trace')
-        self.pscu.getTempTrace.assert_called_with(self.number)
+        self.pscu.get_temp_trace.assert_called_with(self.number)
 
     def test_tripped_get(self):
         self.temp_data.param_tree.get('tripped')
-        self.pscu.getTempTripped.assert_called_with(self.number)
+        self.pscu.get_temp_tripped.assert_called_with(self.number)
 
     def test_disabled_get(self):
         self.temp_data.param_tree.get('disabled')
-        self.pscu.getTempDisabled.assert_called_with(self.number)
+        self.pscu.get_temp_disabled.assert_called_with(self.number)
 
 class TestHumidityData():
     
@@ -57,23 +57,23 @@ class TestHumidityData():
         
     def test_setpoint_get(self):
         self.humidity_data.param_tree.get('setpoint')
-        self.pscu.getHSetPoint.assert_called_with(self.number)
+        self.pscu.get_humidity_set_point.assert_called_with(self.number)
         
     def test_temp_get(self):
         self.humidity_data.param_tree.get('humidity')
-        self.pscu.getHumidity.assert_called_with(self.number)
+        self.pscu.get_humidity.assert_called_with(self.number)
         
     def test_trace_get(self):
         self.humidity_data.param_tree.get('trace')
-        self.pscu.getHTrace.assert_called_with(self.number)
+        self.pscu.get_humidity_trace.assert_called_with(self.number)
 
     def test_tripped_get(self):
         self.humidity_data.param_tree.get('tripped')
-        self.pscu.getHTripped.assert_called_with(self.number)
+        self.pscu.get_humidity_tripped.assert_called_with(self.number)
 
     def test_disabled_get(self):
         self.humidity_data.param_tree.get('disabled')
-        self.pscu.getHDisabled.assert_called_with(self.number)
+        self.pscu.get_humidity_disabled.assert_called_with(self.number)
         
 class TestPscuData():
     
@@ -82,7 +82,7 @@ class TestPscuData():
         cls.pscu = Mock()
         cls.pscu.numQuads = 4
         cls.pscu.quad = [Mock()] * cls.pscu.numQuads
-        cls.pscu.getAllLatched.return_value = [True]*4
+        cls.pscu.get_all_latched.return_value = [True]*4
         cls.pscu_data = PSCUData(pscu=cls.pscu)
         
     @patch('lpdpower.pscu_data.PSCU')
@@ -93,13 +93,13 @@ class TestPscuData():
     def test_get_param(self):
         
         val = self.pscu_data.get('position')
-        self.pscu.getPosition.assert_called()
+        self.pscu.get_position.assert_called()
         
     def test_set_param(self):
         
         enabled = True
         self.pscu_data.set('allEnabled', enabled)
-        self.pscu.enableAll.assert_called_with(enabled)
+        self.pscu.enable_all.assert_called_with(enabled)
         
     def test_get_missing_param(self):
         
@@ -115,11 +115,11 @@ class TestPscuData():
             
     def test_get_all_latched(self):
         
-        self.pscu_data.getAllLatched()
-        self.pscu.getAllLatched.assert_called()
+        self.pscu_data.get_all_latched()
+        self.pscu.get_all_latched.assert_called()
         
     def test_get_quad_traces(self):
         
         traces = self.pscu_data.getQuadTraces()
         assert_equal(len(traces), self.pscu.numQuads)
-        self.pscu.getQuadTrace.assert_has_calls([call(i) for i in range(self.pscu.numQuads)])    
+        self.pscu.get_quad_trace.assert_has_calls([call(i) for i in range(self.pscu.numQuads)])    
