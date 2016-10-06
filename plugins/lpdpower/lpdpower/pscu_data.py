@@ -122,8 +122,8 @@ class PSCUData(object):
                 "latched": (self.pscu.get_pump_latched, None),
             },
             "trace": {
-                 "overall": (self.pscu.getTraceOutput, None),
-                 "latched": (self.pscu.getTraceLatched,  None),
+                 "overall": (self.pscu.get_trace_output, None),
+                 "latched": (self.pscu.get_trace_latched,  None),
             },
             "position": (self.pscu.get_position, None),
             "overall": (self.pscu.get_health,  None),

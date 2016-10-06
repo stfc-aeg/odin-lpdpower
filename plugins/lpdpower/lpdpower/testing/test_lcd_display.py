@@ -163,7 +163,7 @@ class TestLcdDisplay():
 
         content = self.display.trace_page()
         for call in [
-            'getTraceOutput', 'getTraceLatched', 'get_temp_trace', 'get_humidity_trace', 'get_quad_trace'
+            'get_trace_output', 'get_trace_latched', 'get_temp_trace', 'get_humidity_trace', 'get_quad_trace'
         ]:
             assert_true(getattr(self.pscu, call).called)
         assert_equal(type(content), str)

@@ -249,10 +249,10 @@ class PSCU(I2CContainer):
     def get_temp_latched(self):
         return self.__latchedOutputs[0]
 
-    def getTraceOutput(self):
+    def get_trace_output(self):
         return self.__sensorOutputs[4]
 
-    def getTraceLatched(self):
+    def get_trace_latched(self):
         return self.__latchedOutputs[3]
 
     def get_fan_output(self):

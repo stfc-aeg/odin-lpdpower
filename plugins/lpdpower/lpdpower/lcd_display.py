@@ -298,7 +298,7 @@ class LcdDisplay(object):
         """
         content = self.page_header()
 
-        state_str = self.format_state_str(self.pscu.getTraceOutput(), self.pscu.getTraceLatched())
+        state_str = self.format_state_str(self.pscu.get_trace_output(), self.pscu.get_trace_latched())
 
         temp_traces = [self.pscu.get_temp_trace(chan) for chan in range(self.pscu.numTemperatures)]
         humidity_traces = [self.pscu.get_humidity_trace(chan) for chan in range(self.pscu.numHumidities)]
