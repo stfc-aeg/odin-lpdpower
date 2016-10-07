@@ -84,6 +84,8 @@ class TestPscuData():
         cls.pscu.numTemperatures = 11
         cls.pscu.numQuads = 4
         cls.pscu.quad = [Mock()] * cls.pscu.numQuads
+        for quad in cls.pscu.quad:
+            quad.num_channels = 4
         cls.pscu.get_all_latched.return_value = [True]*4
         cls.pscu_data = PSCUData(pscu=cls.pscu)
         
