@@ -191,7 +191,7 @@ class PSCUData(object):
         :param kwargs: keyword arguments to be passed if creating a new PSCU, or if
         a pscu key is present, that is used as an existing PSCU object instance
         """
-        # If a PSCU has been pass in keyword arguments, use that otherwise create a new one
+        # If a PSCU has been passed in keyword arguments use that, otherwise create a new one
         if 'pscu' in kwargs:
             self.pscu = kwargs['pscu']
         else:
@@ -200,9 +200,13 @@ class PSCUData(object):
         # Get the QuadData containers associated with the PSCU
         self.quad_data = [QuadData(quad=q) for q in self.pscu.quad]
 
-        # Get the temperature and humidity containers assocated with the PSCU
-        self.temperature_data = [TempData(self.pscu, i) for i in range(11)]
-        self.humidity_data = [HumidityData(self.pscu, i) for i in range(2)]
+        # Get the temperature and humidity containers associated with the PSCU
+        self.temperature_data = [
+            TempData(self.pscu, i) for i in range(self.pscu.numTemperatures)
+        ]
+        self.humidity_data = [
+            HumidityData(self.pscu, i) for i in range(self.pscu.numHumidities)
+        ]
 
         # Build the parameter tree of the PSCU
         self.param_tree = ParameterTree({
