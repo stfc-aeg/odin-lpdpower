@@ -1,8 +1,8 @@
-"""PSCU - device class for the LPD power supply control unit
+"""PSCU - device class for the LPD power supply control unit.
 
 This class implements support for the LPD power supply control unit, providing control
 and monitoring functionality for the PSCU and all connected Quad output boxes and
-sensors. The PSCU also handles updating the front-panel LCD and respondnng to the 
+sensors. The PSCU also handles updating the front-panel LCD and responding to the
 page up/down buttons on the front panel.
 
 James Hogge, STFC Application Engineering Group.
@@ -18,23 +18,25 @@ from lcd_display import LcdDisplay, LcdDisplayError
 from deferred_executor import DeferredExecutor
 
 import Adafruit_BBIO.GPIO as GPIO
-
 import logging
+
+
 class PSCU(I2CContainer):
     """PSCU - device class for the LPD power supply control unit.
-    
+
     The class implements support for the LPD power supply control unit.
     """
+
     ALL_PINS = [0, 1, 2, 3, 4, 5, 6, 7]
     DEFAULT_QUAD_ENABLE_INTERVAL = 1.0
 
     def __init__(self, quad_enable_interval=DEFAULT_QUAD_ENABLE_INTERVAL):
         """Initialse the PSCU instance.
-        
+
         The constructor initialises the PSCU instance, setting up all the I2C
         devices on the PSCU, intialising and attached the quads, and setting up the
         front panel display and buttons.
-        
+
         :param quad_enable_interval: time interval between quad enable commands
         """
         # Turn off exception raising in the I2C device class
@@ -52,7 +54,7 @@ class PSCU(I2CContainer):
         for i in range(self.numQuads):
             self.quad.append(self.tca.attach_device(i, Quad))
 
-        # Attach the internal I2C bus 4 sensor and IO devices 
+        # Attach the internal I2C bus 4 sensor and IO devices
         # Temperature monitor ADC channels
         self.adcTempMon = []
         self.adcTempMon.append(self.tca.attach_device(4, AD7998, 0x21))
@@ -98,7 +100,7 @@ class PSCU(I2CContainer):
         for i in range(8):
             self.mcpMisc[3].setup(i, MCP23008.IN)
 
-        # Attach the fan speed DAC device 
+        # Attach the fan speed DAC device
         self.fanSpd = self.tca.attach_device(5, AD5321, 0x0c)
 
         # Create internal buffer variables for all sensor parameters
@@ -161,91 +163,216 @@ class PSCU(I2CContainer):
         self.deferred_executor = DeferredExecutor()
 
     def handle_deferred(self):
+        """Handle deferred commands.
+
+        This method handles any deferred PSCU commands currently queued in the deferred
+        executor. This is intended to be called periodically by e.g. an update loop that is
+        updating the PSCU status.
+        """
         self.deferred_executor.process()
 
     def get_temperature(self, sensor):
-        if sensor > 10 or sensor < 0:
+        """Get the value of a PSCU temperature sensor.
+
+        This method returns the current temperature value of the specified sensor.
+
+        :param sensor: temperature sensor index
+        :returns: temperature value for sensor
+        """
+        if sensor >= self.numTemperatures or sensor < 0:
             raise I2CException('Illegal sensor index {} specified'.format(sensor))
 
         return self.__tempValues[sensor]
 
     def get_temp_set_point(self, sensor):
-        if sensor > 10 or sensor < 0:
+        """Get the set point of a PSCU temperature sensor.
+
+        This method returns the current set point for the specified temperature sensor.
+
+        :param sensor: temperature sensor index
+        :returns: value of the temperature sensor set point
+        """
+        if sensor >= self.numTemperatures or sensor < 0:
             raise I2CException('Illegal sensor index {} specified'.format(sensor))
 
         return self.__tempSetPoints[sensor]
 
     def get_temp_tripped(self, sensor):
-        if sensor > 10 or sensor < 0:
+        """Get the trip status of a PSCU temperature sensor.
+
+        This method returns the current set point for the specified temperature sensor.
+
+        :param sensor: temperature sensor index
+        :returns: temperature sensor trip status
+        """
+        if sensor >= self.numTemperatures or sensor < 0:
             raise I2CException('Illegal sensor index {} specified'.format(sensor))
 
         return self.__tempTrips[sensor]
 
     def get_temp_trace(self, sensor):
-        if sensor > 10 or sensor < 0:
+        """Get the trace status of a PSCU temperature sensor.
+
+        This method returns the current trace status for the specified temperature sensor.
+
+        :param sensor: temperature sensor index
+        :returns: temperature sensor trace status
+        """
+        if sensor >= self.numTemperatures or sensor < 0:
             raise I2CException('Illegal sensor index {} specified'.format(sensor))
 
         return self.__tempTraces[sensor]
 
     def get_temp_disabled(self, sensor):
-        if sensor > 10 or sensor < 0:
+        """Get the disabled status of a PSCU temperature sensor.
+
+        This method returns the current disable status for the specified temperature sensor.
+
+        :param sensor: temperature sensor index
+        :returns: temperature sensor disable status
+        """
+        if sensor >= self.numTemperatures or sensor < 0:
             raise I2CException('Illegal sensor index {} specified'.format(sensor))
 
         return self.__tempDisabled[sensor]
 
     def get_humidity(self, sensor):
-        if sensor > 1 or sensor < 0:
+        """Get the value of a PSCU humidity sensor.
+
+        This method returns the current humidity value of the specified sensor.
+
+        :param sensor: humidity sensor index
+        :returns: humidity value for sensor
+        """
+        if sensor >= self. numHumidities or sensor < 0:
             raise I2CException('Illegal sensor index {} specified'.format(sensor))
 
         return self.__hValues[sensor]
 
     def get_humidity_set_point(self, sensor):
-        if sensor > 1 or sensor < 0:
+        """Get the set point of a PSCU humidity sensor.
+
+        This method returns the current set point for the specified humidity sensor.
+
+        :param sensor: humidity sensor index
+        :returns: value of the humidity sensor set point
+        """
+        if sensor >= self. numHumidities or sensor < 0:
             raise I2CException('Illegal sensor index {} specified'.format(sensor))
 
         return self.__hSetPoints[sensor]
 
     def get_humidity_tripped(self, sensor):
-        if sensor > 1 or sensor < 0:
+        """Get the trip status of a PSCU humidity sensor.
+
+        This method returns the current trip status for the specified humidity sensor.
+
+        :param sensor: humidity sensor index
+        :returns: humidity sensor trip status
+        """
+        if sensor >= self. numHumidities or sensor < 0:
             raise I2CException('Illegal sensor index {} specified'.format(sensor))
 
         return self.__hTrips[sensor]
 
     def get_humidity_trace(self, sensor):
-        if sensor > 1 or sensor < 0:
+        """Get the trip status of a PSCU humidity sensor.
+
+        This method returns the current trace status for the specified humidity sensor.
+
+        :param sensor: humidity sensor index
+        :returns: humidity sensor trace status
+        """
+        if sensor >= self. numHumidities or sensor < 0:
             raise I2CException('Illegal sensor index {} specified'.format(sensor))
 
         return self.__hTraces[sensor]
 
     def get_humidity_disabled(self, sensor):
-        if sensor > 1 or sensor < 0:
+        """Get the disabled status of a PSCU humidity sensor.
+
+        This method returns the current disable status for the specified humidity sensor.
+
+        :param sensor: humidity sensor index
+        :returns: humidity sensor disable status
+        """
+        if sensor >= self. numHumidities or sensor < 0:
             raise I2CException('Illegal sensor index {} specified'.format(sensor))
 
         return self.__hDisabled[sensor]
 
     def get_pump_flow(self):
+        """Get the value of the PSCU pump flow sensor.
+
+        This method returns the current pump flow sensor value.
+
+        :returns: pump flow in l/min
+        """
         return self.__pumpFlow
 
     def get_pump_set_point(self):
+        """Get the value of the PSCU pump flow set point.
+
+        This method returns the current pump flow sensor set point value.
+
+        :returns: pump flow set point in l/min
+        """
         return self.__pumpSetPoint
 
     def get_pump_tripped(self):
+        """Get the trip status of the PSCU pump flow meter.
+
+        This method returns the current trip status for the specified humidity sensor.
+
+        :returns: pump flow sensor trip status
+        """
         return self.__pumpTrip
 
     def get_fan_speed(self):
+        """Get the current fan speed.
+
+        This method returns the current LPD fan speed in Hz.
+
+        :returns: fan speed in Hz
+        """
         return self.__fanSpeed
 
     def get_fan_set_point(self):
+        """Get the current fan speed set point.
+
+        This method returns the current LPD fan speed set point in Hz.
+
+        :returns: fan speed set point in Hz
+        """
         return self.__fanSetPoint
 
     def get_fan_target(self):
+        """Get the current fan target speed.
+
+        This method returns the current target LPD fan speed set point in percent of maxiumum
+
+        :returns: target fan speed set point in percent
+        """
         return self.__fanTarget
 
     def get_fan_tripped(self):
+        """Get the trip status of the LPD fan.
+
+        This method returns the current trip status for the fan.
+
+        :returns: fan speed trip status
+        """
         return self.__fanTrip
 
     def get_quad_trace(self, quad_idx):
-        if quad_idx > 3 or quad_idx < 0:
+        """Get the trace status for a specified quad.
+
+        This method returns the trace status for the specified quad.
+
+        :param quad_idx: quad index
+        :returns: quad trace status as bool
+        """
+        if quad_idx >= self.numQuads or quad_idx < 0:
             raise I2CException("Illegal quad index {} specified".format(quad_idx))
 
         return self.__qTraces[quad_idx]
@@ -300,7 +427,7 @@ class PSCU(I2CContainer):
 
     def quad_enable_channel(self, quad_idx, channel):
 
-        if quad_idx > 3 or quad_idx < 0:
+        if quad_idx >= self.numQuads or quad_idx < 0:
             raise I2CException("Illegal quad index {} specified".format(quad_idx))
 
         if channel >= Quad.NUM_CHANNELS or channel < 0:
