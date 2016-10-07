@@ -80,6 +80,8 @@ class TestPscuData():
     @classmethod
     def setup_class(cls):
         cls.pscu = Mock()
+        cls.pscu.numHumidities = 2
+        cls.pscu.numTemperatures = 11
         cls.pscu.numQuads = 4
         cls.pscu.quad = [Mock()] * cls.pscu.numQuads
         cls.pscu.get_all_latched.return_value = [True]*4
