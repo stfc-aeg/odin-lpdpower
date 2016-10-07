@@ -14,5 +14,5 @@ pp = pprint.PrettyPrinter(indent=2)
 quadKeys = response.json()['quad']['quads']
 for quad in range( len(quadKeys) ):         # Loop over Quads..
     for channel in range( len(quadKeys['0']['channels']) ):         # Loop over Quad's channels
-        print "Quad{}, Channel{} is enabled? {}".format(quad, channel, quadKeys[str(quad)]['channels'][str(channel)]['enabled'] )
-    print "---------------"
+        print("Quad{}, Channel{} is enabled? {}".format(quad, channel, quadKeys[str(quad)]['channels'][str(channel)]['enabled'] ))
+    print("---------------")

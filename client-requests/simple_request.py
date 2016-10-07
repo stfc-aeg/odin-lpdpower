@@ -2,9 +2,9 @@
 
 import requests
 
-theLot = requests.get('http://beagle03.aeg.lan:8888/api/0.1/lpdpower/')
+theLot = requests.get('http://beagle04.aeg.lan:8888/api/0.1/lpdpower/')
 
 for index in range(11):
-    print "Temp{}: {:.1f}C".format(index, theLot.json()['temperature']['sensors'][str(index)]['temperature'])
+    print("Temp{}: {:.1f}C".format(index, theLot.json()['temperature']['sensors'][str(index)]['temperature']))
 
-print "All Done"
+print("All Done")
