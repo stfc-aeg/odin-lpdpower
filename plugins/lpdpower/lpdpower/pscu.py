@@ -1,3 +1,12 @@
+"""PSCU - device class for the LPD power supply control unit
+
+This class implements support for the LPD power supply control unit, providing control
+and monitoring functionality for the PSCU and all connected Quad output boxes and
+sensors. The PSCU also handles updating the front-panel LCD and respondnng to the 
+page up/down buttons on the front panel.
+
+James Hogge, STFC Application Engineering Group.
+"""
 from i2c_device import I2CDevice, I2CException
 from i2c_container import I2CContainer
 from tca9548 import TCA9548
@@ -11,37 +20,46 @@ from deferred_executor import DeferredExecutor
 import Adafruit_BBIO.GPIO as GPIO
 
 import logging
-import time
-
-# PSCU consisting of 4x Quads & Other sensors
-
-
 class PSCU(I2CContainer):
+    """PSCU - device class for the LPD power supply control unit.
+    
+    The class implements support for the LPD power supply control unit.
+    """
     ALL_PINS = [0, 1, 2, 3, 4, 5, 6, 7]
     DEFAULT_QUAD_ENABLE_INTERVAL = 1.0
 
     def __init__(self, quad_enable_interval=DEFAULT_QUAD_ENABLE_INTERVAL):
-
+        """Initialse the PSCU instance.
+        
+        The constructor initialises the PSCU instance, setting up all the I2C
+        devices on the PSCU, intialising and attached the quads, and setting up the
+        front panel display and buttons.
+        
+        :param quad_enable_interval: time interval between quad enable commands
+        """
+        # Turn off exception raising in the I2C device class
         I2CDevice.disable_exceptions()
 
+        # Set up the quad enable interval with the specified value
         self.quad_enable_interval = quad_enable_interval
 
+        # Create the TCA I2C bus multiplexer instance
         self.tca = TCA9548(0x70)
 
-        # Attach quads to tca
+        # Attach the quads to the TCA
         self.numQuads = 4
         self.quad = []
         for i in range(self.numQuads):
             self.quad.append(self.tca.attach_device(i, Quad))
 
-        # Attach bus 4 devices
-        # Temperature monitor AD7998s
+        # Attach the internal I2C bus 4 sensor and IO devices 
+        # Temperature monitor ADC channels
         self.adcTempMon = []
         self.adcTempMon.append(self.tca.attach_device(4, AD7998, 0x21))
         self.adcTempMon.append(self.tca.attach_device(4, AD7998, 0x22))
         self.adcTempMon.append(self.tca.attach_device(4, AD7998, 0x23))
 
-        # Temperature monitor MCP23008s
+        # Temperature monitor GPIO channels
         self.mcpTempMon = []
         self.mcpTempMon.append(self.tca.attach_device(4, MCP23008, 0x24))
         for i in range(8):
@@ -59,13 +77,13 @@ class PSCU(I2CContainer):
         for i in range(8):
             self.mcpTempMon[3].setup(i, MCP23008.IN)
 
-        # Attach bus 5 devices
-        # Misc AD7998s
+        # Attach the miscellaneous I2C bus 5 devices
+        # Miscellaneous ADC channels
         self.adcMisc = []
         self.adcMisc.append(self.tca.attach_device(5, AD7998, 0x21))
         self.adcMisc.append(self.tca.attach_device(5, AD7998, 0x22))
 
-        # Misc MCP23008s
+        # Miscellaneous monitor GPIO channels
         self.mcpMisc = []
         self.mcpMisc.append(self.tca.attach_device(5, MCP23008, 0x24))
         for i in range(8):
@@ -80,10 +98,10 @@ class PSCU(I2CContainer):
         for i in range(8):
             self.mcpMisc[3].setup(i, MCP23008.IN)
 
-        # Fan speed AD5321
+        # Attach the fan speed DAC device 
         self.fanSpd = self.tca.attach_device(5, AD5321, 0x0c)
 
-        # Buffers for all I2C sensors
+        # Create internal buffer variables for all sensor parameters
         # Temperature
         self.numTemperatures = 11
         self.__tempValues = [0.0] * self.numTemperatures
@@ -123,7 +141,7 @@ class PSCU(I2CContainer):
         self.__sensorOutputs = [False] * 5  # Tmp, F, P, H, T
         self.__latchedOutputs = [False] * 5  # Tmp, F, P, T, H
 
-        # LCD Display
+        # Initialise the front panel LCD
         try:
             self.lcd = LcdDisplay(self, "/dev/ttyACM0", 57600, rows=4, cols=20)
             self.lcd_display_error = False
@@ -131,6 +149,7 @@ class PSCU(I2CContainer):
             logging.warning(e)
             self.lcd_display_error = True
 
+        # Intialise the front panel push buttons on GPIO pins and enable rising edge detection
         GPIO.setup("P9_11", GPIO.IN)
         GPIO.setup("P9_12", GPIO.IN)
         GPIO.add_event_detect("P9_11", GPIO.RISING)
