@@ -39,12 +39,12 @@ class TestParameterTree():
         cls.nested_tree = ParameterTree(cls.nested_dict)
 
         cls.callback_tree = deepcopy(cls.nested_tree)
-        cls.callback_tree.addCallback('branch/', cls.branch_callback)
+        cls.callback_tree.add_callback('branch/', cls.branch_callback)
 
         cls.branch_callback_count = 0
 
         cls.complex_tree_branch = ParameterTree(deepcopy(cls.nested_dict))
-        cls.complex_tree_branch.addCallback('', cls.branch_callback)
+        cls.complex_tree_branch.add_callback('', cls.branch_callback)
 
         cls.complex_tree = ParameterTree({
             'intParam': cls.int_value,
