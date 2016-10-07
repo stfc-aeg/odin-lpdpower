@@ -29,15 +29,17 @@ class Quad(I2CContainer):
         for all sensor channels.
         """
         I2CContainer.__init__(self)
+        
+        self.num_channels = Quad.NUM_CHANNELS
 
         # Set up MCP GPIO device - first 4 channels are output enables, second 4 channels
         # are enable status inputs
         self.mcp = self.attach_device(MCP23008, 0x20)
 
-        for i in range(self.NUM_CHANNELS):
+        for i in range(self.num_channels):
             self.mcp.setup(i, MCP23008.OUT)
 
-        for i in range(self.NUM_CHANNELS, self.NUM_CHANNELS*2):
+        for i in range(self.num_channels, self.num_channels*2):
             self.mcp.setup(i, MCP23008.IN)
 
         # Attach ADC devices for monitoring
@@ -45,10 +47,10 @@ class Quad(I2CContainer):
         self.adcFuse = self.attach_device(AD7998, 0x21)
 
         # Create internal buffers for all sensor channels
-        self.__channelVoltage = [0.0] * self.NUM_CHANNELS
-        self.__channelCurrent = [0.0] * self.NUM_CHANNELS
-        self.__fuseVoltage = [0.0] * self.NUM_CHANNELS
-        self.__channelEnable = [False] * self.NUM_CHANNELS
+        self.__channelVoltage = [0.0] * self.num_channels
+        self.__channelCurrent = [0.0] * self.num_channels
+        self.__fuseVoltage = [0.0] * self.num_channels
+        self.__channelEnable = [False] * self.num_channels
         self.__supplyVoltage = 0.0
 
     def get_channel_voltage(self, channel):
