@@ -235,6 +235,7 @@ class PSCUData(object):
             },
             "pump": {
                 "flow": (self.pscu.get_pump_flow, None),
+                "setpoint": (self.pscu.get_pump_set_point, None),
                 "tripped": (self.pscu.get_pump_tripped, None),
                 "overall": (self.pscu.get_pump_state, None),
                 "latched": (self.pscu.get_pump_latched, None),
