@@ -44,7 +44,7 @@ class TestChannelData():
         enable = True
         # Force underlying Quad enable value so test can validate call tree
         self.quad._Quad__channelEnable[self.channel] = enable       
-        self.channel_data.param_tree.set('enable', enable)
+        self.channel_data.param_tree.set('enabled', enable)
         response = self.channel_data.param_tree.get('enabled')
         assert_equal(response['enabled'], enable)
 

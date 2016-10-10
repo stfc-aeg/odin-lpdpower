@@ -119,6 +119,7 @@ class Quad
 			var elem_name = "btn" + chan.toString();
 			var el = this.map.get(elem_name);
 			update_button_state(el, data.channels[chan].enabled, 'Disable', 'Enable')
+			this.enabled[chan] = data.channels[chan].enabled
 		}
 
 	}
@@ -574,7 +575,7 @@ function quadEnable(qid, bid)
 		{method: 'PUT',
 		contentType: 'application/json',
 		processData: false,
-		data: JSON.stringify({enable: !quads[qid].enabled[bid]})});
+		data: JSON.stringify({enabled: !quads[qid].enabled[bid]})});
 }
 
 function tmpEnable(tmpid)

@@ -34,8 +34,7 @@ class ChannelData(object):
             "voltage": (self.get_voltage, None),
             "current": (self.get_current, None),
             "fusevoltage": (self.get_fuse, None),
-            "enabled": (self.get_enable, None),
-            "enable": (False,  self.set_enable),
+            "enabled": (self.get_enable, self.set_enable),
             })
 
     def get_voltage(self):
