@@ -57,7 +57,7 @@ class TempData(object):
 
         :returns: set point value in Celsius
         """
-        return self.pscu.get_temp_set_point(self.sensor_idx)
+        return self.pscu.get_temperature_set_point(self.sensor_idx)
 
     def get_tripped(self):
         """Get the trip status of the temperature sensor.
@@ -67,7 +67,7 @@ class TempData(object):
 
         :returns: trip status as boolean.
         """
-        return self.pscu.get_temp_tripped(self.sensor_idx)
+        return self.pscu.get_temperature_tripped(self.sensor_idx)
 
     def get_trace(self):
         """Get the trace status of the temperature sensor.
@@ -76,7 +76,7 @@ class TempData(object):
 
         :returns: trace status as boolean.
         """
-        return self.pscu.get_temp_trace(self.sensor_idx)
+        return self.pscu.get_temperature_trace(self.sensor_idx)
 
     def get_disabled(self):
         """Get the disabled status of the temperature sensor.
@@ -86,7 +86,7 @@ class TempData(object):
 
         :returns: disabled status as boolean.
         """
-        return self.pscu.get_temp_disabled(self.sensor_idx)
+        return self.pscu.get_temperature_disabled(self.sensor_idx)
 
 
 class HumidityData(object):
@@ -168,6 +168,7 @@ class HumidityData(object):
 
 class PSCUDataError(Exception):
     """Simple exception class for PSCUData to wrap lower-level exceptions."""
+
     pass
 
 
@@ -202,10 +203,10 @@ class PSCUData(object):
 
         # Get the temperature and humidity containers associated with the PSCU
         self.temperature_data = [
-            TempData(self.pscu, i) for i in range(self.pscu.numTemperatures)
+            TempData(self.pscu, i) for i in range(self.pscu.num_temperatures)
         ]
         self.humidity_data = [
-            HumidityData(self.pscu, i) for i in range(self.pscu.numHumidities)
+            HumidityData(self.pscu, i) for i in range(self.pscu.num_humidities)
         ]
 
         # Build the parameter tree of the PSCU
@@ -216,12 +217,12 @@ class PSCUData(object):
             },
             "temperature": {
                 "sensors": [t.param_tree for t in self.temperature_data],
-                "overall": (self.pscu.get_temp_output,  None),
-                "latched": (self.pscu.get_temp_latched,  None),
+                "overall": (self.pscu.get_temp_state,  None),
+                "latched": (self.pscu.get_temperature_latched,  None),
             },
             "humidity": {
                 "sensors": [h.param_tree for h in self.humidity_data],
-                "overall": (self.pscu.get_humidity_output, None),
+                "overall": (self.pscu.get_humidity_state, None),
                 "latched": (self.pscu.get_humidity_latched, None),
             },
             "fan": {
@@ -229,18 +230,17 @@ class PSCUData(object):
                 "currentspeed": (self.pscu.get_fan_speed, None),
                 "setpoint": (self.pscu.get_fan_set_point, None),
                 "tripped": (self.pscu.get_fan_tripped, None),
-                "overall": (self.pscu.get_fan_output, None),
+                "overall": (self.pscu.get_fan_state, None),
                 "latched": (self.pscu.get_fan_latched, None),
             },
             "pump": {
                 "flow": (self.pscu.get_pump_flow, None),
-                "setpoint": (self.pscu.get_pump_set_point, None),
                 "tripped": (self.pscu.get_pump_tripped, None),
-                "overall": (self.pscu.get_pump_output, None),
+                "overall": (self.pscu.get_pump_state, None),
                 "latched": (self.pscu.get_pump_latched, None),
             },
             "trace": {
-                 "overall": (self.pscu.get_trace_output, None),
+                 "overall": (self.pscu.get_trace_state, None),
                  "latched": (self.pscu.get_trace_latched,  None),
             },
             "position": (self.pscu.get_position, None),
@@ -297,4 +297,4 @@ class PSCUData(object):
 
         :returns: dictionary of the quad trace status
         """
-        return {str(q): self.pscu.get_quad_trace(q) for q in range(self.pscu.numQuads)}
+        return {str(q): self.pscu.get_quad_trace(q) for q in range(self.pscu.num_quads)}

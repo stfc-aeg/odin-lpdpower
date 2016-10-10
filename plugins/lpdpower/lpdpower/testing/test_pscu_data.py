@@ -29,7 +29,7 @@ class TestTempData():
         
     def test_setpoint_get(self):
         self.temp_data.param_tree.get('setpoint')
-        self.pscu.get_temp_set_point.assert_called_with(self.sensor_idx)
+        self.pscu.get_temperature_set_point.assert_called_with(self.sensor_idx)
         
     def test_temp_get(self):
         self.temp_data.param_tree.get('temperature')
@@ -37,15 +37,15 @@ class TestTempData():
         
     def test_trace_get(self):
         self.temp_data.param_tree.get('trace')
-        self.pscu.get_temp_trace.assert_called_with(self.sensor_idx)
+        self.pscu.get_temperature_trace.assert_called_with(self.sensor_idx)
 
     def test_tripped_get(self):
         self.temp_data.param_tree.get('tripped')
-        self.pscu.get_temp_tripped.assert_called_with(self.sensor_idx)
+        self.pscu.get_temperature_tripped.assert_called_with(self.sensor_idx)
 
     def test_disabled_get(self):
         self.temp_data.param_tree.get('disabled')
-        self.pscu.get_temp_disabled.assert_called_with(self.sensor_idx)
+        self.pscu.get_temperature_disabled.assert_called_with(self.sensor_idx)
 
 class TestHumidityData():
     
@@ -80,10 +80,10 @@ class TestPscuData():
     @classmethod
     def setup_class(cls):
         cls.pscu = Mock()
-        cls.pscu.numHumidities = 2
-        cls.pscu.numTemperatures = 11
-        cls.pscu.numQuads = 4
-        cls.pscu.quad = [Mock()] * cls.pscu.numQuads
+        cls.pscu.num_humidities = 2
+        cls.pscu.num_temperatures = 11
+        cls.pscu.num_quads = 4
+        cls.pscu.quad = [Mock()] * cls.pscu.num_quads
         for quad in cls.pscu.quad:
             quad.num_channels = 4
         cls.pscu.get_all_latched.return_value = [True]*4
@@ -125,5 +125,5 @@ class TestPscuData():
     def test_get_quad_traces(self):
         
         traces = self.pscu_data.get_quad_traces()
-        assert_equal(len(traces), self.pscu.numQuads)
-        self.pscu.get_quad_trace.assert_has_calls([call(i) for i in range(self.pscu.numQuads)])    
+        assert_equal(len(traces), self.pscu.num_quads)
+        self.pscu.get_quad_trace.assert_has_calls([call(i) for i in range(self.pscu.num_quads)])    

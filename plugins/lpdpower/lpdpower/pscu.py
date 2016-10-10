@@ -49,99 +49,99 @@ class PSCU(I2CContainer):
         self.tca = TCA9548(0x70)
 
         # Attach the quads to the TCA
-        self.numQuads = 4
+        self.num_quads = 4
         self.quad = []
-        for i in range(self.numQuads):
+        for i in range(self.num_quads):
             self.quad.append(self.tca.attach_device(i, Quad))
 
         # Attach the internal I2C bus 4 sensor and IO devices
         # Temperature monitor ADC channels
-        self.adcTempMon = []
-        self.adcTempMon.append(self.tca.attach_device(4, AD7998, 0x21))
-        self.adcTempMon.append(self.tca.attach_device(4, AD7998, 0x22))
-        self.adcTempMon.append(self.tca.attach_device(4, AD7998, 0x23))
+        self.adc_temp_mon = []
+        self.adc_temp_mon.append(self.tca.attach_device(4, AD7998, 0x21))
+        self.adc_temp_mon.append(self.tca.attach_device(4, AD7998, 0x22))
+        self.adc_temp_mon.append(self.tca.attach_device(4, AD7998, 0x23))
 
         # Temperature monitor GPIO channels
-        self.mcpTempMon = []
-        self.mcpTempMon.append(self.tca.attach_device(4, MCP23008, 0x24))
+        self.mcp_temp_mon = []
+        self.mcp_temp_mon.append(self.tca.attach_device(4, MCP23008, 0x24))
         for i in range(8):
-            self.mcpTempMon[0].setup(i, MCP23008.IN if i < 7 else MCP23008.IN)
+            self.mcp_temp_mon[0].setup(i, MCP23008.IN if i < 7 else MCP23008.IN)
 
-        self.mcpTempMon.append(self.tca.attach_device(4, MCP23008, 0x25))
+        self.mcp_temp_mon.append(self.tca.attach_device(4, MCP23008, 0x25))
         for i in range(8):
-            self.mcpTempMon[1].setup(i, MCP23008.IN)
+            self.mcp_temp_mon[1].setup(i, MCP23008.IN)
 
-        self.mcpTempMon.append(self.tca.attach_device(4, MCP23008, 0x26))
+        self.mcp_temp_mon.append(self.tca.attach_device(4, MCP23008, 0x26))
         for i in range(8):
-            self.mcpTempMon[2].setup(i, MCP23008.IN)
+            self.mcp_temp_mon[2].setup(i, MCP23008.IN)
 
-        self.mcpTempMon.append(self.tca.attach_device(4, MCP23008, 0x27))
+        self.mcp_temp_mon.append(self.tca.attach_device(4, MCP23008, 0x27))
         for i in range(8):
-            self.mcpTempMon[3].setup(i, MCP23008.IN)
+            self.mcp_temp_mon[3].setup(i, MCP23008.IN)
 
         # Attach the miscellaneous I2C bus 5 devices
         # Miscellaneous ADC channels
-        self.adcMisc = []
-        self.adcMisc.append(self.tca.attach_device(5, AD7998, 0x21))
-        self.adcMisc.append(self.tca.attach_device(5, AD7998, 0x22))
+        self.adc_misc = []
+        self.adc_misc.append(self.tca.attach_device(5, AD7998, 0x21))
+        self.adc_misc.append(self.tca.attach_device(5, AD7998, 0x22))
 
         # Miscellaneous monitor GPIO channels
-        self.mcpMisc = []
-        self.mcpMisc.append(self.tca.attach_device(5, MCP23008, 0x24))
+        self.mcp_misc = []
+        self.mcp_misc.append(self.tca.attach_device(5, MCP23008, 0x24))
         for i in range(8):
-            self.mcpMisc[0].setup(i, MCP23008.OUT if i < 2 else MCP23008.IN)
-        self.mcpMisc.append(self.tca.attach_device(5, MCP23008, 0x25))
+            self.mcp_misc[0].setup(i, MCP23008.OUT if i < 2 else MCP23008.IN)
+        self.mcp_misc.append(self.tca.attach_device(5, MCP23008, 0x25))
         for i in range(8):
-            self.mcpMisc[1].setup(i, MCP23008.IN)
-        self.mcpMisc.append(self.tca.attach_device(5, MCP23008, 0x26))
+            self.mcp_misc[1].setup(i, MCP23008.IN)
+        self.mcp_misc.append(self.tca.attach_device(5, MCP23008, 0x26))
         for i in range(8):
-            self.mcpMisc[2].setup(i, MCP23008.IN)
-        self.mcpMisc.append(self.tca.attach_device(5, MCP23008, 0x27))
+            self.mcp_misc[2].setup(i, MCP23008.IN)
+        self.mcp_misc.append(self.tca.attach_device(5, MCP23008, 0x27))
         for i in range(8):
-            self.mcpMisc[3].setup(i, MCP23008.IN)
+            self.mcp_misc[3].setup(i, MCP23008.IN)
 
         # Attach the fan speed DAC device
-        self.fanSpd = self.tca.attach_device(5, AD5321, 0x0c)
+        self.fan_speed_dac = self.tca.attach_device(5, AD5321, 0x0c)
 
         # Create internal buffer variables for all sensor parameters
         # Temperature
-        self.numTemperatures = 11
-        self.__tempValues = [0.0] * self.numTemperatures
-        self.__tempSetPoints = [0.0] * self.numTemperatures
-        self.__tempTrips = [False] * self.numTemperatures
-        self.__tempTraces = [False] * self.numTemperatures
-        self.__tempDisabled = [False] * self.numTemperatures
+        self.num_temperatures = 11
+        self.__temperature_values = [0.0] * self.num_temperatures
+        self.__temperature_set_points = [0.0] * self.num_temperatures
+        self.__temperature_trips = [False] * self.num_temperatures
+        self.__temperature_traces = [False] * self.num_temperatures
+        self.__temperature_disabled = [False] * self.num_temperatures
 
         # Humidity
-        self.numHumidities = 2
-        self.__hValues = [0.0] * self.numHumidities
-        self.__hSetPoints = [0.0] * self.numHumidities
-        self.__hTrips = [False] * self.numHumidities
-        self.__hTraces = [False] * self.numHumidities
-        self.__hDisabled = [False] * self.numHumidities
+        self.num_humidities = 2
+        self.__humidity_values = [0.0] * self.num_humidities
+        self.__humidity_set_points = [0.0] * self.num_humidities
+        self.__humidity_trips = [False] * self.num_humidities
+        self.__humidity_traces = [False] * self.num_humidities
+        self.__humidity_disabled = [False] * self.num_humidities
 
         # Pump
-        self.__pumpFlow = 0.0
-        self.__pumpSetPoint = 0.0
-        self.__pumpTrip = False
+        self.__pump_flow = 0.0
+        self.__pump_set_point = 0.0
+        self.__pump_trip = False
 
         # Fan
-        self.__fanSpeed = 0.0
-        self.__fanTarget = 100.0
-        self.__fanSetPoint = 0.0
-        self.__fanTrip = False
+        self.__fan_speed = 0.0
+        self.__fan_target = 100.0
+        self.__fan_set_point = 0.0
+        self.__fan_trip = False
 
         # Position
         self.__position = 0.0
 
         # Quad traces
-        self.__qTraces = [False] * self.numQuads
+        self.__quad_traces = [False] * self.num_quads
 
         # Overall
         self.__armed = False
         self.__healthy = False
-        self.__sensorOutputs = [False] * 5  # Tmp, F, P, H, T
-        self.__latchedOutputs = [False] * 5  # Tmp, F, P, T, H
+        self.__sensor_states = [False] * 5  # Tmp, F, P, H, T
+        self.__latched_states = [False] * 5  # Tmp, F, P, T, H
 
         # Initialise the front panel LCD
         try:
@@ -158,7 +158,7 @@ class PSCU(I2CContainer):
         GPIO.add_event_detect("P9_12", GPIO.RISING)
 
         # Internal flag tracking state of quads 'enable all' command
-        self.__allEnabled = False
+        self.__all_enabled = False
 
         self.deferred_executor = DeferredExecutor()
 
@@ -179,12 +179,12 @@ class PSCU(I2CContainer):
         :param sensor: temperature sensor index
         :returns: temperature value for sensor
         """
-        if sensor >= self.numTemperatures or sensor < 0:
+        if sensor >= self.num_temperatures or sensor < 0:
             raise I2CException('Illegal sensor index {} specified'.format(sensor))
 
-        return self.__tempValues[sensor]
+        return self.__temperature_values[sensor]
 
-    def get_temp_set_point(self, sensor):
+    def get_temperature_set_point(self, sensor):
         """Get the set point of a PSCU temperature sensor.
 
         This method returns the current set point for the specified temperature sensor.
@@ -192,12 +192,12 @@ class PSCU(I2CContainer):
         :param sensor: temperature sensor index
         :returns: value of the temperature sensor set point
         """
-        if sensor >= self.numTemperatures or sensor < 0:
+        if sensor >= self.num_temperatures or sensor < 0:
             raise I2CException('Illegal sensor index {} specified'.format(sensor))
 
-        return self.__tempSetPoints[sensor]
+        return self.__temperature_set_points[sensor]
 
-    def get_temp_tripped(self, sensor):
+    def get_temperature_tripped(self, sensor):
         """Get the trip status of a PSCU temperature sensor.
 
         This method returns the current set point for the specified temperature sensor.
@@ -205,12 +205,12 @@ class PSCU(I2CContainer):
         :param sensor: temperature sensor index
         :returns: temperature sensor trip status
         """
-        if sensor >= self.numTemperatures or sensor < 0:
+        if sensor >= self.num_temperatures or sensor < 0:
             raise I2CException('Illegal sensor index {} specified'.format(sensor))
 
-        return self.__tempTrips[sensor]
+        return self.__temperature_trips[sensor]
 
-    def get_temp_trace(self, sensor):
+    def get_temperature_trace(self, sensor):
         """Get the trace status of a PSCU temperature sensor.
 
         This method returns the current trace status for the specified temperature sensor.
@@ -218,12 +218,12 @@ class PSCU(I2CContainer):
         :param sensor: temperature sensor index
         :returns: temperature sensor trace status
         """
-        if sensor >= self.numTemperatures or sensor < 0:
+        if sensor >= self.num_temperatures or sensor < 0:
             raise I2CException('Illegal sensor index {} specified'.format(sensor))
 
-        return self.__tempTraces[sensor]
+        return self.__temperature_traces[sensor]
 
-    def get_temp_disabled(self, sensor):
+    def get_temperature_disabled(self, sensor):
         """Get the disabled status of a PSCU temperature sensor.
 
         This method returns the current disable status for the specified temperature sensor.
@@ -231,10 +231,10 @@ class PSCU(I2CContainer):
         :param sensor: temperature sensor index
         :returns: temperature sensor disable status
         """
-        if sensor >= self.numTemperatures or sensor < 0:
+        if sensor >= self.num_temperatures or sensor < 0:
             raise I2CException('Illegal sensor index {} specified'.format(sensor))
 
-        return self.__tempDisabled[sensor]
+        return self.__temperature_disabled[sensor]
 
     def get_humidity(self, sensor):
         """Get the value of a PSCU humidity sensor.
@@ -244,10 +244,10 @@ class PSCU(I2CContainer):
         :param sensor: humidity sensor index
         :returns: humidity value for sensor
         """
-        if sensor >= self. numHumidities or sensor < 0:
+        if sensor >= self. num_humidities or sensor < 0:
             raise I2CException('Illegal sensor index {} specified'.format(sensor))
 
-        return self.__hValues[sensor]
+        return self.__humidity_values[sensor]
 
     def get_humidity_set_point(self, sensor):
         """Get the set point of a PSCU humidity sensor.
@@ -257,10 +257,10 @@ class PSCU(I2CContainer):
         :param sensor: humidity sensor index
         :returns: value of the humidity sensor set point
         """
-        if sensor >= self. numHumidities or sensor < 0:
+        if sensor >= self. num_humidities or sensor < 0:
             raise I2CException('Illegal sensor index {} specified'.format(sensor))
 
-        return self.__hSetPoints[sensor]
+        return self.__humidity_set_points[sensor]
 
     def get_humidity_tripped(self, sensor):
         """Get the trip status of a PSCU humidity sensor.
@@ -270,10 +270,10 @@ class PSCU(I2CContainer):
         :param sensor: humidity sensor index
         :returns: humidity sensor trip status
         """
-        if sensor >= self. numHumidities or sensor < 0:
+        if sensor >= self. num_humidities or sensor < 0:
             raise I2CException('Illegal sensor index {} specified'.format(sensor))
 
-        return self.__hTrips[sensor]
+        return self.__humidity_trips[sensor]
 
     def get_humidity_trace(self, sensor):
         """Get the trip status of a PSCU humidity sensor.
@@ -283,10 +283,10 @@ class PSCU(I2CContainer):
         :param sensor: humidity sensor index
         :returns: humidity sensor trace status
         """
-        if sensor >= self. numHumidities or sensor < 0:
+        if sensor >= self. num_humidities or sensor < 0:
             raise I2CException('Illegal sensor index {} specified'.format(sensor))
 
-        return self.__hTraces[sensor]
+        return self.__humidity_traces[sensor]
 
     def get_humidity_disabled(self, sensor):
         """Get the disabled status of a PSCU humidity sensor.
@@ -296,10 +296,10 @@ class PSCU(I2CContainer):
         :param sensor: humidity sensor index
         :returns: humidity sensor disable status
         """
-        if sensor >= self. numHumidities or sensor < 0:
+        if sensor >= self. num_humidities or sensor < 0:
             raise I2CException('Illegal sensor index {} specified'.format(sensor))
 
-        return self.__hDisabled[sensor]
+        return self.__humidity_disabled[sensor]
 
     def get_pump_flow(self):
         """Get the value of the PSCU pump flow sensor.
@@ -308,7 +308,7 @@ class PSCU(I2CContainer):
 
         :returns: pump flow in l/min
         """
-        return self.__pumpFlow
+        return self.__pump_flow
 
     def get_pump_set_point(self):
         """Get the value of the PSCU pump flow set point.
@@ -317,7 +317,7 @@ class PSCU(I2CContainer):
 
         :returns: pump flow set point in l/min
         """
-        return self.__pumpSetPoint
+        return self.__pump_set_point
 
     def get_pump_tripped(self):
         """Get the trip status of the PSCU pump flow meter.
@@ -326,7 +326,7 @@ class PSCU(I2CContainer):
 
         :returns: pump flow sensor trip status
         """
-        return self.__pumpTrip
+        return self.__pump_trip
 
     def get_fan_speed(self):
         """Get the current fan speed.
@@ -335,7 +335,7 @@ class PSCU(I2CContainer):
 
         :returns: fan speed in Hz
         """
-        return self.__fanSpeed
+        return self.__fan_speed
 
     def get_fan_set_point(self):
         """Get the current fan speed set point.
@@ -344,7 +344,7 @@ class PSCU(I2CContainer):
 
         :returns: fan speed set point in Hz
         """
-        return self.__fanSetPoint
+        return self.__fan_set_point
 
     def get_fan_target(self):
         """Get the current fan target speed.
@@ -353,7 +353,7 @@ class PSCU(I2CContainer):
 
         :returns: target fan speed set point in percent
         """
-        return self.__fanTarget
+        return self.__fan_target
 
     def get_fan_tripped(self):
         """Get the trip status of the LPD fan.
@@ -362,7 +362,7 @@ class PSCU(I2CContainer):
 
         :returns: fan speed trip status
         """
-        return self.__fanTrip
+        return self.__fan_trip
 
     def get_quad_trace(self, quad_idx):
         """Get the trace status for a specified quad.
@@ -372,71 +372,207 @@ class PSCU(I2CContainer):
         :param quad_idx: quad index
         :returns: quad trace status as bool
         """
-        if quad_idx >= self.numQuads or quad_idx < 0:
+        if quad_idx >= self.num_quads or quad_idx < 0:
             raise I2CException("Illegal quad index {} specified".format(quad_idx))
 
-        return self.__qTraces[quad_idx]
+        return self.__quad_traces[quad_idx]
 
     def get_position(self):
+        """Get the value of the detector position sensor.
+
+        This method returns the value of the the potentiometer reading the position
+        of the quadrant motion system. The value is (currently) returned as a percentage
+        of the full scale potentiometer reading.
+
+        :returns: detector position as a percentage of full scale
+        """
         return self.__position
 
     def get_armed(self):
+        """Get the PSCU interlock armed state.
+
+        This method returns the current armed state of the PSCU interlock system. The
+        system can be armed if all sensors are in healthy state.
+
+        :returns: PSCU interlock armed state as bool
+        """
         return self.__armed
 
     def get_all_enabled(self):
-        return self.__allEnabled
+        """Get the status indicating all outputs are enabled.
+
+        This method returns a status indicating if all PSCU quad outputs are enabled, which is
+        primarily beneficial to clients determining the next action for an enable/disable all
+        command.
+
+        :returns: PSCU 'all enabled' status as bool
+        """
+        return self.__all_enabled
 
     def get_health(self):
+        """Get the overall PSCU health status.
+
+        This method returns the overall PSCU health status, which indicates if all
+        sensor channels have healthy values and are within setpoints.
+
+        :returns: PSCU health state as bool
+        """
         return self.__healthy
 
-    def get_temp_output(self):
-        return self.__sensorOutputs[0]
+    def get_temperature_state(self):
+        """Get the status of the PSCU temperature interlock.
 
-    def get_temp_latched(self):
-        return self.__latchedOutputs[0]
+        This method returns the global status of the the temperature interlock, i.e. if
+        all temperature sensors are within setpoints.
 
-    def get_trace_output(self):
-        return self.__sensorOutputs[4]
+        :returns: PSCU overall temperature status as bool
+        """
+        return self.__sensor_states[0]
+
+    def get_temperature_latched(self):
+        """Get the status of the PSCU temperature latch.
+
+        This method returns the status of the temperature latch condition, i.e. if a
+        sensor has exceeded a setpoint and been latched. The latch state is cleared
+        on a subsequent arm command.
+
+        :returns: PSCU temperature latch state as bool
+        """
+        return self.__latched_states[0]
+
+    def get_trace_state(self):
+        """Get the status of the PSCU trace interlock.
+
+        This method returns the global status of the the trace interlock, i.e. if
+        all trace channels are connected.
+
+        :returns: PSCU overall trace status as bool
+        """
+        return self.__sensor_states[4]
 
     def get_trace_latched(self):
-        return self.__latchedOutputs[3]
+        """Get the status of the PSCU trace latch.
 
-    def get_fan_output(self):
-        return self.__sensorOutputs[1]
+        This method returns the status of the trace latch condition, i.e. if a
+        trace circuit has opened and been latched. The latch state is cleared
+        on a subsequent arm command.
+
+        :returns: PSCU trace latch state as bool
+        """
+        return self.__latched_states[3]
+
+    def get_fan_state(self):
+        """Get the status of the PSCU fan speed interlock.
+
+        This method returns the global status of the the fan speed interlock, i.e. if
+        the fan speed value is within the setpoint.
+
+        :returns: PSCU fan speed status as bool
+        """
+        return self.__sensor_states[1]
 
     def get_fan_latched(self):
-        return self.__latchedOutputs[1]
+        """Get the status of the PSCU fan speed latch.
 
-    def get_pump_output(self):
-        return self.__sensorOutputs[2]
+        This method returns the status of the fan speed latch condition, i.e. if the
+        fan speed has gone outside the setpoint and been latched. The latch state is cleared
+        on a subsequent arm command.
+
+        :returns: PSCU fan speed latch state as bool
+        """
+        return self.__latched_states[1]
+
+    def get_pump_state(self):
+        """Get the status of the PSCU pump flow rate interlock.
+
+        This method returns the global status of the the pump flow rate interlock, i.e. if
+        the pump flow rate is within the setpoint.
+
+        :returns: PSCU pump flow rate status as bool
+        """
+        return self.__sensor_states[2]
 
     def get_pump_latched(self):
-        return self.__latchedOutputs[2]
+        """Get the status of the PSCU pump flow rate latch.
 
-    def get_humidity_output(self):
-        return self.__sensorOutputs[3]
+        This method returns the status of the pump flow rate latch condition, i.e. if the
+        pump flow rate has gone outside the setpoint and been latched. The latch state is cleared
+        on a subsequent arm command.
+
+        :returns: PSCU pump flow rate latch state as bool
+        """
+        return self.__latched_states[2]
+
+    def get_humidity_state(self):
+        """Get the status of the PSCU humidity interlock.
+
+        This method returns the global status of the the humidity interlock, i.e. if
+        all temperature sensors are within setpoints.
+
+        :returns: PSCU overall humidity status as bool
+        """
+        return self.__sensor_states[3]
 
     def get_humidity_latched(self):
-        return self.__latchedOutputs[4]
+        """Get the status of the PSCU humidity latch.
+
+        This method returns the status of the humidity latch condition, i.e. if a
+        sensor has exceeded a setpoint and been latched. The latch state is cleared
+        on a subsequent arm command.
+
+        :returns: PSCU humidity latch state as bool
+        """
+        return self.__latched_states[4]
 
     def get_all_latched(self):
-        return self.__latchedOutputs
+        """Get the state of all latch conditions.
+
+        This method returns the state of all PSCU latch conditions as a list, and is
+        provided as a convenience for a client requested all latch states simultaneously.
+
+        :returns: PSCU latch states as a list of bools
+        """
+        return self.__latched_states
 
     def get_enable_interval(self):
+        """Get the quad output enable interval.
+
+        This method returns the quad output enable interval, which is used to sequence
+        quad outputs on at a fixed rate to avoid inrush. The enable interval is set
+        as an argument at initialisation, i.e. passed in as an option.
+
+        :returns: enable interval in seconds
+        """
         return self.quad_enable_interval
 
-    def quad_enable_channel(self, quad_idx, channel):
+    def quad_enable_channel(self, quad_idx, channel_idx):
+        """Enable a quad output channel.
 
-        if quad_idx >= self.numQuads or quad_idx < 0:
+        This method enables the specified quad output channel. It is primarily intended
+        for use within a sequenced turn on via call to enable_all().
+
+        :param quad_idx: index of quad to control
+        :param channel_idx: index of the channel to turn on
+        """
+        if quad_idx >= self.num_quads or quad_idx < 0:
             raise I2CException("Illegal quad index {} specified".format(quad_idx))
 
-        if channel >= Quad.NUM_CHANNELS or channel < 0:
-            raise I2CException("Illegal channel index {} specified".format(channel))
+        if channel_idx >= Quad.NUM_CHANNELS or channel_idx < 0:
+            raise I2CException("Illegal channel index {} specified".format(channel_idx))
 
-        logging.debug("Enabling quad {} channel {} output".format(quad_idx, channel))
-        self.quad[quad_idx].set_enable(channel, True)
+        logging.debug("Enabling quad {} channel {} output".format(quad_idx, channel_idx))
+        self.quad[quad_idx].set_enable(channel_idx, True)
 
     def enable_all(self, enable):
+        """Enable or disable all quad output channels.
+
+        This method enables or disables all quad output channels. To avoid excessive inrush
+        current, an enable command launches a sequence of deferred calls to enable the channels
+        at the interval specified as an initialisation argument. A disable command clears any
+        queued enables and turns off all channels at once.
+
+        :param enable: bool flag indicating requested enable or disable state
+        """
         logging.debug("Called enable_all with value {}".format(enable))
 
         if enable:
@@ -447,7 +583,7 @@ class PSCU(I2CContainer):
                     self.deferred_executor.enqueue(
                         self.quad_enable_channel, self.quad_enable_interval, quad_idx, channel
                     )
-            self.__allEnabled = True
+            self.__all_enabled = True
         else:
             # Clear any pending turn-on command from the queue first, then turn off all channels
             # immediately.
@@ -460,130 +596,232 @@ class PSCU(I2CContainer):
             for quad_idx in range(len(self.quad)):
                 for channel in range(Quad.NUM_CHANNELS):
                     self.quad[quad_idx].set_enable(channel, False)
-            self.__allEnabled = False
+            self.__all_enabled = False
 
-    def set_armed(self, value):
-        pin = 0 if value else 1
-        self.mcpMisc[0].output(pin, MCP23008.LOW)
-        self.mcpMisc[0].output(pin, MCP23008.HIGH)
-        self.mcpMisc[0].output(pin, MCP23008.LOW)
+    def set_armed(self, arm):
+        """Arm or disarm the PSCU interlock.
 
-    def set_fan_target(self, value):
-        self.__fanTarget = value
-        self.fanSpd.set_output_scaled(1.0 - (value / 100.0))
+        This method arms or disarms the PSCU interlock by toggling the appropriate arm/disarm
+        output pin with a low-high-low transition.
+
+        :param value: bool flag indicating arm or disarm
+        """
+        pin = 0 if arm else 1
+        self.mcp_misc[0].output(pin, MCP23008.LOW)
+        self.mcp_misc[0].output(pin, MCP23008.HIGH)
+        self.mcp_misc[0].output(pin, MCP23008.LOW)
+
+    def set_fan_target(self, target_percent):
+        """Set the fan speed target value.
+
+        This method sets the fan speed target value as a percentage of the maximum.
+
+        :param target_percent: fan speed target in percent
+        """
+        self.__fan_target = target_percent
+        self.fan_speed_dac.set_output_scaled(1.0 - (target_percent / 100.0))
 
     def get_display_error(self):
+        """Get the status of the LCD error flag.
+
+        This method returns the status of the LCD error flag, which is set if the PSCU
+        instance cannot initialise the display at startup.
+
+        :returns: LCD error status as bool
+        """
         return self.lcd_display_error
 
     def update_lcd(self):
+        """Update the front-panel LCD.
 
-        # Do nothing if display was not initlialised OK
+        This method updates the front-panel LCD, detecting front-panel button presses to
+        change page and refreshing the content and colour of the display. This is
+        intended to be called periodically as part of an update loop to keep the display
+        output reflecting the PSCU state.
+        """
+        # Do nothing if display was not initialised OK
         if self.lcd_display_error:
             return
 
-        # Get input
+        # Detect front-panel button presses to cycle through the LCD pages
         if GPIO.event_detected("P9_11"):
             self.lcd.previous_page()
         elif GPIO.event_detected("P9_12"):
             self.lcd.next_page()
 
+        # Set the LCD backlight colour depending on the overall system health
         if self.__healthy:
             self.lcd.set_colour(LcdDisplay.GREEN)
         else:
             self.lcd.set_colour(LcdDisplay.RED)
 
+        # Update the LCD content
         self.lcd.update()
 
-    def convert_ad7998_temp(self, fs_val):
+    def convert_ad7998_temp(self, scaled_adc_val):
+        """Convert a scaled ADC reading into temperature.
 
+        This method takes a scaled ADC channel reading, i.e. as returned by the
+        read_input_scaled() method and converts it into temperature in Celsius.
+
+        :input scaled_adc_val ADC channel reading as fraction of full-scale
+        :returns: temperature value in Celsius.
+        """
         temp_vref = 3.0
         temp_scale_v_kelvin = 0.005
-        temp_val = ((fs_val * temp_vref) / temp_scale_v_kelvin) - 273.15
+        temp_celsius = ((scaled_adc_val * temp_vref) / temp_scale_v_kelvin) - 273.15
 
-        return temp_val
+        return temp_celsius
+
+    def convert_ad7998_humidity(self, scaled_adc_val):
+        """Convert a scaled ADC reading into humidity.
+
+        This method takes a scaled ADC channel reading, i.e. as returned by the
+        read_input_scaled() method and converts it into temperature in percent.
+
+        :input scaled_adc_val ADC channel reading as fraction of full-scale
+        :returns: humidity value in percent.
+        """
+        humidity_vref = 5.0
+        humidity_scale = 3.9
+        humidity_max = 100.0
+
+        humidity_percent = ((scaled_adc_val * humidity_vref) / humidity_scale) * humidity_max
+
+        return humidity_percent
+
+    def convert_ad7998_fan(self, scaled_adc_val):
+        """Convert a scaled ADC reading into fan speed.
+
+        This method takes a scaled ADC channel reading, i.e. as returned by the
+        read_input_scaled() method and converts it into fan speed in Hertz.
+
+        :input scaled_adc_val ADC channel reading as fraction of full-scale
+        :returns: fan speed value in Hertz.
+        """
+        fan_vref = 5.0
+        fan_scale = 4.5
+        fan_max = 50.0
+
+        fan_hertz = ((scaled_adc_val * fan_vref) / fan_scale) * fan_max
+
+        return fan_hertz
+
+    def convert_ad7998_pump(self, scaled_adc_val):
+        """Convert a scaled ADC reading into pump flow rate.
+
+        This method takes a scaled ADC channel reading, i.e. as returned by the
+        read_input_scaled() method and converts it into pump flow rate in litres/min.
+
+        :input scaled_adc_val ADC channel reading as fraction of full-scale
+        :returns: pump flow rate in listre/min
+        """
+        pump_vref = 5.0
+        pump_scale = 4.32
+        pump_max = 35.0
+
+        pump_lpermin = ((scaled_adc_val * pump_vref) / pump_scale) * pump_max
+
+        return pump_lpermin
 
     def poll_all_sensors(self):
+        """Poll all sensor channels and update their values in the internal buffers.
 
-        # Temperature ADCs
-        for i in range(8):
-            adc_input_fs = self.adcTempMon[0].read_input_scaled(i)
-            set_point = self.convert_ad7998_temp(adc_input_fs)
-            #logging.debug("poll_all_sensors %d %f %f %f " %( i, adc_input_fs, adc_input_fs*4095, set_point))
-            # self.convert_ad7998_temp(self.adcTempMon[0].read_input_scaled(i))
-            self.__tempSetPoints[i] = set_point
+        This method polls all PSCU sensor channels, converts to the appropriate values and stores
+        them in the internal buffer variables for future access by the appropriate get_xxxx methods.
+        This is intended to be called periodically by an update loop and avoids a client access
+        dependent load being placed on the hardware.
+        """
+        # Read input pin state of the monitor MCPs
+        mcp_mon_0 = self.mcp_temp_mon[0].input_pins([0, 1, 2, 3, 4, 5, 7])
+        mcp_mon_1 = self.mcp_temp_mon[1].input_pins(self.ALL_PINS)
+        mcp_mon_2 = self.mcp_temp_mon[2].input_pins(self.ALL_PINS)
+        mcp_mon_3 = self.mcp_temp_mon[3].input_pins([0, 1, 2, 3, 4, 5])
 
+        # Read input pin state of the misc MPCs
+        mcp_misc_0 = self.mcp_misc[0].input_pins([2, 3, 4, 5, 6, 7])
+        mcp_misc_1 = self.mcp_misc[1].input_pins([0, 1, 2, 3])
+        mcp_misc_2 = self.mcp_misc[2].input_pins([1, 2, 4, 5, 6, 7])
+        mcp_misc_3 = self.mcp_misc[3].input_pins([0, 1, 2, 3, 4])
+
+        # Read, convert and store all temperature values and setpoints from the ADCs and
+        # extract and store all trip, trace and disabled states from the MCPs
         for i in range(8):
-            self.__tempValues[i] = self.convert_ad7998_temp(
-                self.adcTempMon[1].read_input_scaled(i))
+            self.__temperature_set_points[i] = self.convert_ad7998_temp(
+                self.adc_temp_mon[0].read_input_scaled(i)
+            )
+            self.__temperature_values[i] = self.convert_ad7998_temp(
+                self.adc_temp_mon[1].read_input_scaled(i)
+            )
+            self.__temperature_trips[i] = not bool(mcp_mon_1[i])
+            self.__temperature_traces[i] = bool(mcp_mon_2[i])
 
         for i in range(3):
-            self.__tempValues[
-                i + 8] = self.convert_ad7998_temp(self.adcTempMon[2].read_input_scaled(i))
+            self.__temperature_values[i + 8] = self.convert_ad7998_temp(
+                self.adc_temp_mon[2].read_input_scaled(i)
+            )
+            self.__temperature_set_points[i + 8] = self.convert_ad7998_temp(
+                self.adc_temp_mon[2].read_input_scaled(i+4)
+            )
+            self.__temperature_trips[i + 8] = not bool(mcp_mon_3[i])
+            self.__temperature_traces[i + 8] = bool(mcp_mon_3[i+3])
 
-        for i in range(4, 7):
-            self.__tempSetPoints[
-                i + 4] = self.convert_ad7998_temp(self.adcTempMon[2].read_input_scaled(i))
-
-        # Temperature MCPs
-        buff = self.mcpTempMon[0].input_pins([0, 1, 2, 3, 4, 5, 7])
         for i in range(4):
-            self.__tempDisabled[i + 4] = buff[i]
-        self.__tempDisabled[10] = buff[4]
-        self.__hDisabled[1] = buff[5]
-        self.__sensorOutputs[0] = buff[6]
+            self.__temperature_disabled[i + 4] = mcp_mon_0[i]
 
-        buff = self.mcpTempMon[1].input_pins(self.ALL_PINS)
-        for i in range(8):
-            self.__tempTrips[i] = not bool(buff[i])
+        self.__temperature_disabled[10] = mcp_mon_0[4]
 
-        buff = self.mcpTempMon[2].input_pins(self.ALL_PINS)
-        for i in range(8):
-            self.__tempTraces[i] = bool(buff[i])
+        # Read, convert and store all humidity values and setpoints from the ADCs and
+        # extract and store all trip, trace and disabled states from the MCPs
+        for i in range(self.num_humidities):
 
-        buff = self.mcpTempMon[3].input_pins([0, 1, 2, 3, 4, 5])
-        for i in range(3):
-            self.__tempTrips[i + 8] = not bool(buff[i])
-        for i in range(3, 6):
-            self.__tempTraces[i + 5] = bool(buff[i])
+            self.__humidity_set_points[i] = self.convert_ad7998_humidity(
+                self.adc_misc[0].read_input_scaled(i+1)
+            )
+            self.__humidity_values[i] = self.convert_ad7998_humidity(
+                self.adc_misc[1].read_input_scaled(i+1)
+            )
 
-        #Misc. ADCs
-        self.__fanSpeed = self.adcMisc[1].read_input_scaled(0) * 5 / 4.5 * 50
-        self.__hValues[0] = self.adcMisc[1].read_input_scaled(1) * 100 * 5 / 3.9
-        self.__hValues[1] = self.adcMisc[1].read_input_scaled(2) * 100 * 5 / 3.9
-        self.__pumpFlow = self.adcMisc[1].read_input_scaled(3) * 5 / 4.32 * 35
-        self.__position = self.adcMisc[1].read_input_scaled(4) * 100
+            self.__humidity_trips[i] = not bool(mcp_misc_1[i+1])
+            self.__humidity_traces[i] = bool(mcp_misc_2[i])
 
-        self.__fanSetPoint = self.adcMisc[0].read_input_scaled(0) * 5 / 4.5 * 50
-        self.__hSetPoints[0] = self.adcMisc[0].read_input_scaled(1) * 100 * 5 / 3.9
-        self.__hSetPoints[1] = self.adcMisc[0].read_input_scaled(2) * 100 * 5 / 3.9
-        self.__pumpSetPoint = self.adcMisc[0].read_input_scaled(3) * 5 / 4.32 * 35
+        self.__humidity_disabled[1] = mcp_mon_0[5]
 
-        #Misc. MCPs
-        buff = self.mcpMisc[0].input_pins([2, 3, 4, 5, 6, 7])
-        self.__armed = bool(buff[0])
-        for i in range(1, 5):
-            self.__sensorOutputs[i] = bool(buff[i])
-        self.__healthy = bool(buff[5])
+        # Read, convert and store fan speed and setpoint ADC values and extract and store
+        # the fan trip status
+        self.__fan_speed = self.convert_ad7998_fan(self.adc_misc[1].read_input_scaled(0))
+        self.__fan_set_point = self.convert_ad7998_fan(self.adc_misc[0].read_input_scaled(0))
+        self.__fan_trip = not bool(mcp_misc_1[0])
 
-        buff = self.mcpMisc[1].input_pins([0, 1, 2, 3])
-        self.__fanTrip = not bool(buff[0])
-        self.__hTrips[0] = not bool(buff[1])
-        self.__hTrips[1] = not bool(buff[2])
-        self.__pumpTrip = not bool(buff[3])
+        # Read, convert and store pump flow speed and setpoint ADC values and extract and store
+        # the pump trip status
+        self.__pump_flow = self.convert_ad7998_pump(self.adc_misc[1].read_input_scaled(3))
+        self.__pump_set_point = self.convert_ad7998_pump(self.adc_misc[0].read_input_scaled(3))
+        self.__pump_trip = not bool(mcp_misc_1[3])
 
-        buff = self.mcpMisc[2].input_pins([1, 2, 4, 5, 6, 7])
-        self.__hTraces[0] = bool(buff[0])
-        self.__hTraces[1] = bool(buff[1])
+        # Read, convert and save the detector position
+        self.__position = self.adc_misc[1].read_input_scaled(4) * 100
+
+        # Extract and save global armed and health states
+        self.__armed = bool(mcp_misc_0[0])
+        self.__healthy = bool(mcp_misc_0[5])
+
+        # Extract and save the quad trace states
         for i in range(2, 6):
-            self.__qTraces[i - 2] = bool(buff[i])
+            self.__quad_traces[i - 2] = bool(mcp_misc_2[i])
 
-        buff = self.mcpMisc[3].input_pins([0, 1, 2, 3, 4])
-        self.__latchedOutputs = [bool(i) for i in buff]
+        # Extract and save the global sensor channel states
+        self.__sensor_states[0] = mcp_mon_0[6]
+        for i in range(1, 5):
+            self.__sensor_states[i] = bool(mcp_misc_0[i])
 
-        # Update internal allEnabled state based on current armed state since being disarmed
+        # Extract and save the global latch states
+        self.__latched_states = [bool(i) for i in mcp_misc_3]
+
+        # Update internal all_enabled state based on current armed state since being disarmed
         # automatically turns off all quad outputs
         if not self.__armed:
-            self.__allEnabled = False
+            self.__all_enabled = False
 
         # Poll sensors for all quads also
         for quad in self.quad:
