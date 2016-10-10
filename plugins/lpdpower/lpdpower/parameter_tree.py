@@ -1,4 +1,4 @@
-""" ParameterTree - classes representing a tree of parameters and their accessor methods.
+"""ParameterTree - classes representing a tree of parameters and their accessor methods.
 
 This module implements an arbitrarily-structured, recursively-managed tree of parameters and
 the appropriate accessor methods that are used to read and write those parameters. Its
@@ -11,6 +11,7 @@ James Hogge, Tim Nicholls, STFC Application Engineering Group.
 
 class ParameterTreeError(Exception):
     """Simple error class for raising parameter tree parameter tree exceptions."""
+
     pass
 
 
@@ -64,12 +65,14 @@ class ParameterAccessor(object):
 
 
 class ParameterTree(object):
-    """
-    This module implements an arbitrarily-structured, recursively-managed tree of parameters and
+    """Class implementing a tree of parameters and their accessors.
+
+    This class implements an arbitrarily-structured, recursively-managed tree of parameters and
     the appropriate accessor methods that are used to read and write those parameters. Its
     particular use is in the definition of a tree of parameters for an API adapter and help
     interfacing of those to the underlying device or object.
     """
+
     def __init__(self, tree):
         """Initialise the ParameterTree object.
 
@@ -161,7 +164,7 @@ class ParameterTree(object):
         merge_point[levels[-1]] = merged
 
     def add_callback(self, path, callback):
-        """Add a callback to a given path in the tree - DEPRECATED
+        """Add a callback to a given path in the tree - DEPRECATED.
 
         This now deprecated method adds a callback to the specified path in the
         tree. Originally intended to allow set() calls to update values in the
@@ -185,7 +188,6 @@ class ParameterTree(object):
         :param path: path to node within overall tree
         :returns: built node
         """
-
         # If the node is a ParameterTree instance, replace with its own built tree
         if isinstance(node, ParameterTree):
             # Merge in callbacks in node if present

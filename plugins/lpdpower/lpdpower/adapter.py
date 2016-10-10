@@ -1,4 +1,4 @@
-""" adapter.py - ODIN API adapter for the LpdPower plugin
+"""adapter.py - ODIN API adapter for the LpdPower plugin.
 
 This module implements the LPDPowerAdapter API adapter plugin for the ODIN server.
 
@@ -11,7 +11,7 @@ from pscu_data import PSCUData, PSCUDataError
 
 
 class LPDPowerAdapter(ApiAdapter):
-    """ LPDPowerAdapter - ODIN API adapter class for the lpdpower plugin.
+    """LPDPowerAdapter - ODIN API adapter class for the lpdpower plugin.
 
     This class implements an API adapter for the lpdpower plugin to be used in the ODIN
     server to control the LPD Power Supply Control Unit (PSCU). The adapter transforms the

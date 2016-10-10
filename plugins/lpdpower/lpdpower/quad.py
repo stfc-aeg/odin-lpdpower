@@ -29,7 +29,7 @@ class Quad(I2CContainer):
         for all sensor channels.
         """
         I2CContainer.__init__(self)
-        
+
         self.num_channels = Quad.NUM_CHANNELS
 
         # Set up MCP GPIO device - first 4 channels are output enables, second 4 channels

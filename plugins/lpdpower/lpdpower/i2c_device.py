@@ -16,11 +16,15 @@ import logging
 
 class I2CException(Exception):
     """Simple I2C exception class for wrapping underlying access errors."""
+
     pass
 
 
 def call_pre_access(func):
-    """Decorator method for I2CDevice access methods to allow pre-access attribute to be called if defined."""
+    """Call pre-access decorator for I2CDevice access methods.
+
+    Allows pre-access attribute to be called if defined on I2C device accessors.
+    """
     def wrapper(_self, *args, **kwargs):
         if _self.pre_access is not None and callable(_self.pre_access):
             _self.pre_access(_self)
@@ -29,7 +33,6 @@ def call_pre_access(func):
 
 
 class I2CDevice(object):
-
     """I2CDevice class.
 
     This class implements the I2C device access interface, providing read and write
@@ -39,7 +42,7 @@ class I2CDevice(object):
     """
 
     _enable_exceptions = False
-    
+
     ERROR = -1
 
     @classmethod
@@ -72,7 +75,6 @@ class I2CDevice(object):
         If exceptions are enabled, raise an exception based on the passed arguments,
         otherwise, log an message if debugging is turned on and return an error value.
         """
-
         err_msg = 'I2C {} error from device {:#x} register {:#x}: {}'.format(
              access_name, self.address, register, error
         )
@@ -147,7 +149,8 @@ class I2CDevice(object):
         """Read a signed byte from the I2C device."""
         try:
             result = self.bus.read_byte_data(self.address, reg)
-            if result > 127: result -= 256
+            if result > 127:
+                result -= 256
             if self.debug:
                 logging.debug("I2C: Device 0x%02X returned 0x%02X from reg 0x%02X" %
                               (self.address, result & 0xFF, reg))
@@ -159,7 +162,7 @@ class I2CDevice(object):
     def readU16(self, reg):
         """Read an unsigned 16-bit value from the I2C device."""
         try:
-            result = self.bus.read_word_data(self.address,reg)
+            result = self.bus.read_word_data(self.address, reg)
             if (self.debug):
                 logging.debug("I2C: Device 0x%02X returned 0x%04X from reg 0x%02X" %
                               (self.address, result & 0xFFFF, reg))
@@ -169,9 +172,9 @@ class I2CDevice(object):
 
     @call_pre_access
     def readS16(self, reg):
-        "''Read a signed 16-bit value from the I2C device."""
+        """"Read a signed 16-bit value from the I2C device."""
         try:
-            result = self.bus.read_word_data(self.address,reg)
+            result = self.bus.read_word_data(self.address, reg)
             if (self.debug):
                 logging.debug("I2C: Device 0x%02X returned 0x%04X from reg 0x%02X" %
                               (self.address, result & 0xFFFF, reg))

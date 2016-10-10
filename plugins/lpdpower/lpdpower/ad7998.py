@@ -24,7 +24,6 @@ class AD7998(I2CDevice):
         :param address: address of the AD7998 device on the I2C bus
         :param kwargs: keyword arguments to be passed to the underlying I2CDevice
         """
-
         # Initialise the I2CDevice superclass instance
         I2CDevice.__init__(self, address, **kwargs)
 
@@ -40,7 +39,6 @@ class AD7998(I2CDevice):
         :param channel: channel to convert
         :return raw conversion result
         """
-
         # Check legal channel requested
         if channel < 0 or channel >= self.NUM_ADC_CHANNELS:
             raise I2CException("Illegal channel {} requested".format(channel))
@@ -66,7 +64,6 @@ class AD7998(I2CDevice):
         :param channel: channel to convert
         :return scaled conversion result
         """
-
         # Trigger conversion and read raw value
         data = self.read_input_raw(channel)
 

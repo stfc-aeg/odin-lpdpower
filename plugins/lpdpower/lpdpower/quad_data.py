@@ -91,6 +91,7 @@ class QuadData(object):
     output channels, allowing the channel parameters to be read and the output of
     each channel to be controlled.
     """
+
     def __init__(self, *args, **kwargs):
         """Initilise the QuadData instance.
 

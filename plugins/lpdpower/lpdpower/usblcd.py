@@ -17,6 +17,7 @@ class UsbLcd(object):
     This module provides a simple driver class for an LCD module interfaced via
     an Adafruit USB LCD backpack.
     """
+
     # Define RGB value tuples for common colours
     RED = (0xFF, 0x00, 0x00)
     GREEN = (0x00, 0xFF, 0x00)

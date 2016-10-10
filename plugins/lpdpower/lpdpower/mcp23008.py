@@ -76,7 +76,6 @@ class MCP23008(I2CDevice):
         :param pin: set to set pullup state for
         :param enabled: pullup state to set (e.g 0, 1, True or False)
         """
-
         # Set state in register buffer value
         if enabled:
             self.__gppu |= 1 << pin
