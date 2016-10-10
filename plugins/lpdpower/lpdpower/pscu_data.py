@@ -217,7 +217,7 @@ class PSCUData(object):
             },
             "temperature": {
                 "sensors": [t.param_tree for t in self.temperature_data],
-                "overall": (self.pscu.get_temp_state,  None),
+                "overall": (self.pscu.get_temperature_state,  None),
                 "latched": (self.pscu.get_temperature_latched,  None),
             },
             "humidity": {
