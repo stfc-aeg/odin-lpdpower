@@ -149,8 +149,7 @@ class I2CDevice(object):
         """Read a signed byte from the I2C device."""
         try:
             result = self.bus.read_byte_data(self.address, reg)
-            if result > 127:
-                result -= 256
+            result = (result - 256) if result > 127 else result
             if self.debug:
                 logging.debug("I2C: Device 0x%02X returned 0x%02X from reg 0x%02X" %
                               (self.address, result & 0xFF, reg))
