@@ -7,6 +7,8 @@ Tim Nicholls, STFC Application Engineering
 """
 import logging
 import tornado
+import platform
+import time
 
 from odin.adapters.adapter import ApiAdapter, ApiAdapterResponse, request_types, response_types
 from odin.adapters.parameter_tree import ParameterTree, ParameterTreeError
@@ -102,12 +104,29 @@ class SystemInfo(object):
 
     def __init__(self):
 
+        self.init_time = time.time()
+
         version_info = get_versions()
+
+        (system, node, release, version, machine, processor) = platform.uname()
+        platform_tree = ParameterTree({
+            'system': system,
+            'node': node,
+            'release': release,
+            'version': version,
+            'processor': processor
+        })
 
         self.param_tree = ParameterTree({
             'odin_version': version_info['version'],
-            'tornado_version': tornado.version
+            'tornado_version': tornado.version,
+            'platform': platform_tree,
+            'server_uptime': (self.get_server_uptime, None),
         })
+
+    def get_server_uptime(self):
+
+        return time.time() - self.init_time
 
     def get(self, path):
 
