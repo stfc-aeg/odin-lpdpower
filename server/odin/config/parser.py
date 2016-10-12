@@ -2,6 +2,7 @@
 
 Tim Nicholls, STFC Application Engineering Group
 """
+from odin._version import get_versions
 
 import sys
 from argparse import ArgumentParser
@@ -114,9 +115,20 @@ class ConfigParser(object):
         # default value specified by this call is resolved at parse time if necessary.
         default = None
 
+        # Build the kwargs for the add_argument call for the parser. If a boolean
+        # flag action has been specified, i.e. store_true or store_false, don't add the
+        # type and metavar keyword arguments as their presence causes an exception to be
+        # thrown
+        add_kwargs = {
+            'action': action, 'default': default,
+            'help': option_help,
+        }
+        if action != 'store_true' and action != 'store_false':
+            add_kwargs['type'] = option_type
+            add_kwargs['metavar'] = metavar
+
         # Add the option as an argument to the CLI parser
-        self.arg_parser.add_argument(opt_switch, action=action, type=option_type, default=default,
-                                     help=option_help, metavar=metavar)
+        self.arg_parser.add_argument(opt_switch, **add_kwargs)
 
         # Set this option as an attribute in the current instance but with an undefined
         # value until parsing occurs. The allows the parser.<option> syntax to be used
@@ -176,7 +188,6 @@ class ConfigParser(object):
 
                 # If this option has a callback, call it
                 if self.allowed_options[section][option].callback is not None:
-                    print "Going to call callback"
                     self.allowed_options[section][option].callback(option_val)
 
         # Run the tornado parser callbacks to replicate the tornado parser behaviour
@@ -253,8 +264,10 @@ class ConfigParser(object):
                 )
 
     def _version_callback(self, value):
-
-        print "In version callback, value=", value
+        """Print the odin server version information and exit."""
+        if value:
+            print("odin server {}".format(get_versions()['version']))
+            sys.exit(0)
 
     def resolve_adapters(self, adapter_list=None):
         """Resolve any adapter sections present in the configuration file.
