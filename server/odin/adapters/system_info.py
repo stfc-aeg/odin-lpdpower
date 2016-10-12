@@ -10,6 +10,7 @@ import tornado
 
 from odin.adapters.adapter import ApiAdapter, ApiAdapterResponse, request_types, response_types
 from odin.adapters.parameter_tree import ParameterTree, ParameterTreeError
+from odin._version import get_versions
 
 class SystemInfoAdapter(ApiAdapter):
     """System info adapter class for the ODIN server.
@@ -93,8 +94,10 @@ class SystemInfo(object):
 
     def __init__(self):
 
+        version_info = get_versions()
+
         self.param_tree = ParameterTree({
-            'version': 1.234,
+            'odin_version': version_info['version'],
             'tornado_version': tornado.version
         })
 
