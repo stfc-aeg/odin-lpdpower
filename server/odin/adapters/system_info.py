@@ -14,6 +14,7 @@ from odin.adapters.adapter import ApiAdapter, ApiAdapterResponse, request_types,
 from odin.adapters.parameter_tree import ParameterTree, ParameterTreeError
 from odin._version import get_versions
 
+
 class SystemInfoAdapter(ApiAdapter):
     """System info adapter class for the ODIN server.
 
@@ -24,7 +25,7 @@ class SystemInfoAdapter(ApiAdapter):
     def __init__(self, **kwargs):
         """Initialize the SystemInfoAdapter object.
 
-        This constructor Initializes the SystemInfoAdapter object, including resolving any
+        This constructor initializes the SystemInfoAdapter object, including resolving any
         system-level information that the adapter can provide to clients subsequently.
 
         :param kwargs: keyword arguments specifying options
@@ -92,22 +93,37 @@ class SystemInfoAdapter(ApiAdapter):
 
         return ApiAdapterResponse(response, status_code=status_code)
 
+
 class Singleton(type):
+    """Singleton metaclass for use with SystemInfo to ensure only one instance is created."""
+
     _instances = {}
+
     def __call__(cls, *args, **kwargs):
+        """Ensure only a single instance of any class is created."""
         if cls not in cls._instances:
             cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
         return cls._instances[cls]
 
+
 class SystemInfo(object):
+    """SystemInfo - class that extracts and stores information about system-level parameters."""
+
     __metaclass__ = Singleton
 
     def __init__(self):
+        """Initialise the SystemInfo object.
 
+        This constructor initlialises the SystemInfo object, extracting various system-level
+        parameters and storing them in a parameter tree to be accessible to clients.
+        """
+        # Store initialisation time
         self.init_time = time.time()
 
+        # Get package version information
         version_info = get_versions()
 
+        # Extract platform information and store in parameter tree
         (system, node, release, version, machine, processor) = platform.uname()
         platform_tree = ParameterTree({
             'system': system,
@@ -117,6 +133,7 @@ class SystemInfo(object):
             'processor': processor
         })
 
+        # Store all information in a parameter tree
         self.param_tree = ParameterTree({
             'odin_version': version_info['version'],
             'tornado_version': tornado.version,
@@ -125,9 +142,17 @@ class SystemInfo(object):
         })
 
     def get_server_uptime(self):
+        """Get the uptime for the ODIN server.
 
+        This method returns the current uptime for the ODIN server.
+        """
         return time.time() - self.init_time
 
     def get(self, path):
+        """Get the parameter tree.
 
+        This method returns the parameter tree for use by clients via the SystemInfo adapter.
+
+        :param path: path to retrieve from tree
+        """
         return self.param_tree.get(path)
