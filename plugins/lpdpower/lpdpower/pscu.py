@@ -7,15 +7,15 @@ page up/down buttons on the front panel.
 
 James Hogge, STFC Application Engineering Group.
 """
-from i2c_device import I2CDevice, I2CException
-from i2c_container import I2CContainer
-from tca9548 import TCA9548
-from ad7998 import AD7998
-from ad5321 import AD5321
-from mcp23008 import MCP23008
-from quad import Quad
-from lcd_display import LcdDisplay, LcdDisplayError
-from deferred_executor import DeferredExecutor
+from lpdpower.i2c_device import I2CDevice, I2CException
+from lpdpower.i2c_container import I2CContainer
+from lpdpower.tca9548 import TCA9548
+from lpdpower.ad7998 import AD7998
+from lpdpower.ad5321 import AD5321
+from lpdpower.mcp23008 import MCP23008
+from lpdpower.quad import Quad
+from lpdpower.lcd_display import LcdDisplay, LcdDisplayError
+from lpdpower.deferred_executor import DeferredExecutor
 
 import Adafruit_BBIO.GPIO as GPIO
 import logging

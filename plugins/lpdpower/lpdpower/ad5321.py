@@ -7,7 +7,7 @@ scaled setting back.
 James Hogge, STFC Application Engineering Group.
 """
 
-from i2c_device import I2CDevice, I2CException
+from lpdpower.i2c_device import I2CDevice, I2CException
 
 
 class AD5321(I2CDevice):

@@ -97,7 +97,7 @@ class TestPscuData():
     def test_get_param(self):
 
         val = self.pscu_data.get('position')
-        self.pscu.get_position.assert_called()
+        self.pscu.get_position.assert_called_with()
 
     def test_set_param(self):
 
@@ -120,7 +120,7 @@ class TestPscuData():
     def test_get_all_latched(self):
 
         self.pscu_data.get_all_latched()
-        self.pscu.get_all_latched.assert_called()
+        self.pscu.get_all_latched.assert_called_with()
 
     def test_get_quad_traces(self):
 

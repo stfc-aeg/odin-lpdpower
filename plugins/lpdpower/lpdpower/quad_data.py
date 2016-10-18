@@ -6,7 +6,7 @@ parameter data for the LPD power supply Quad boxes.
 James Hogge, STFC Application Engineering Group.
 """
 from odin.adapters.parameter_tree import ParameterTree
-from quad import Quad
+from lpdpower.quad import Quad
 
 
 class ChannelData(object):

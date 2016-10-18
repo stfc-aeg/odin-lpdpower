@@ -7,7 +7,7 @@ James Hogge, STFC Application Engineering Group.
 from odin.adapters.adapter import ApiAdapter, ApiAdapterResponse, request_types, response_types
 from tornado.escape import json_decode
 from tornado.ioloop import IOLoop
-from pscu_data import PSCUData, PSCUDataError
+from lpdpower.pscu_data import PSCUData, PSCUDataError
 
 
 class LPDPowerAdapter(ApiAdapter):

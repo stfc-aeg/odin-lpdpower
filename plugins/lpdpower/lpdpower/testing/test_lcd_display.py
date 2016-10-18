@@ -52,7 +52,7 @@ class TestLcdDisplay():
         return fuse_voltage
 
     def test_basic_init(self):
-        assert_true(self.display.registered_pages > 0)
+        assert_true(len(self.display.registered_pages) > 0)
 
     @patch('lpdpower.lcd_display.UsbLcd')
     def test_usb_init_exception(self, mock_usblcd):

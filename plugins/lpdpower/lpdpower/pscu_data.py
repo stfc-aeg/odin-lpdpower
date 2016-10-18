@@ -8,8 +8,8 @@ provide data containers for sensors on the PSCU, such as temperature and humidit
 James Hogge, STFC Application Engineering Group.
 """
 from odin.adapters.parameter_tree import ParameterTree, ParameterTreeError
-from quad_data import QuadData
-from pscu import PSCU
+from lpdpower.quad_data import QuadData
+from lpdpower.pscu import PSCU
 
 
 class TempData(object):

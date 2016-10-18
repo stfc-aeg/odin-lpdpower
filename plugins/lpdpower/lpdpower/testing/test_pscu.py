@@ -4,7 +4,7 @@ Tim Nicholls, STFC Application Engineering
 """
 
 import sys
-from compiler.pyassem import FlowGraph
+
 if sys.version_info[0] == 3:  # pragma: no cover
     from unittest.mock import Mock, patch, call
 else:                         # pragma: no cover
@@ -235,7 +235,7 @@ class TestPSCU():
                 current_page = self.pscu.lcd.current_page
                 self.pscu.update_lcd()
                 assert_equal(self.pscu.lcd.current_page, current_page)
-                mock_update.assert_called_once()
+                mock_update.assert_called_once_with()
 
     def test_update_lcd_btn_previous(self):
 
@@ -279,22 +279,22 @@ class TestPSCU():
             mock_update.assert_not_called()
 
         self.pscu.lcd_display_error = current_error
-        
+
     def test_convert_ad7998_temp(self):
-        
+
         expected_results = [
             (0.0, -273.15),
             (0.488583, 20.0),
             (0.5, 26.85),
             (1.0, 326.85),
         ]
-        
+
         for (scaled_adc_val, expected_temp) in expected_results:
             converted_temp = self.pscu.convert_ad7998_temp(scaled_adc_val)
             assert_almost_equal(converted_temp, expected_temp, places=3)
 
     def test_convert_ad7998_humidity(self):
-        
+
         expected_results = [
             (0.00, 0.0),
             (0.50, 64.103),
@@ -306,7 +306,7 @@ class TestPSCU():
             assert_almost_equal(converted_humidity, expected_humidity, places=3)
 
     def test_convert_ad7998_fan(self):
-         
+
         expected_results = [
             (0.0, 0.0),
             (0.5, 27.778),
@@ -318,7 +318,7 @@ class TestPSCU():
             assert_almost_equal(converted_speed, expected_speed, places=3)
 
     def test_convert_ad7998_pump(self):
-         
+
         expected_results = [
             (0.000, 0.0),
             (0.500, 20.255),
@@ -330,27 +330,27 @@ class TestPSCU():
             assert_almost_equal(converted_flow, converted_flow, places=3)
 
     def test_poll_all_sensors(self):
- 
+
         self.bus.reset_mock()
         self.bus.read_byte_data.return_value = 0
-         
+
         self.pscu.poll_all_sensors()
-         
+
         assert_true(len(self.bus.mock_calls) > 0)
         i2c_methods_called = set()
         i2c_addrs_called = set()
         for name, args, _ in self.bus.mock_calls:
             i2c_methods_called.add(name)
             if len(args):
-                i2c_addrs_called.add(args[0]) 
- 
+                i2c_addrs_called.add(args[0])
+
         expected_i2c_methods = set(['read_word_data', 'read_byte_data', 'write_byte_data'])
         expected_i2c_addrs = set([0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x70])
         assert_equal(i2c_methods_called, expected_i2c_methods)
         assert_equal(i2c_addrs_called, expected_i2c_addrs)
-         
+
     def test_poll_all_sensors_disables_when_not_armed(self):
- 
+
         with patch('lpdpower.pscu.MCP23008.input_pins', return_value=[0]*8) as mock_mcp:
             self.pscu.enable_all(True)
             self.pscu.set_armed(False)

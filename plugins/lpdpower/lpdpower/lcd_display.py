@@ -9,7 +9,7 @@ list is easy to extend via a page registration mechanism and standardised render
 Tim Nicholls, STFC Application Engineering Group.
 """
 
-from usblcd import UsbLcd
+from lpdpower.usblcd import UsbLcd
 
 from functools import partial
 import time

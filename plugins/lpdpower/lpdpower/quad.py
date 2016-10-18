@@ -6,10 +6,10 @@ the I2C bus.
 
 James Hogge, STFC Application Engineering Group.
 """
-from i2c_device import I2CException
-from i2c_container import I2CContainer
-from mcp23008 import MCP23008
-from ad7998 import AD7998
+from lpdpower.i2c_device import I2CException
+from lpdpower.i2c_container import I2CContainer
+from lpdpower.mcp23008 import MCP23008
+from lpdpower.ad7998 import AD7998
 
 
 class Quad(I2CContainer):

@@ -6,7 +6,7 @@ Tim Nicholls, STFC Application Engineering Group
 import sys
 
 if sys.version_info[0] == 3:  # pragma: no cover
-    from unittest.mock import Mock, call
+    from unittest.mock import Mock, MagicMock, call
 else:                         # pragma: no cover
     from mock import Mock, MagicMock, call
 
@@ -81,7 +81,7 @@ class TestI2CDevice(object):
     def _test_device_access(self, method, smbus_method, exc_mode, args, exp_rc):
 
         cached_side_effect = getattr(self.device.bus, smbus_method).side_effect
-        
+
         if exc_mode == self.EXC_MODE_NONE:
             side_effect = None
             exc_enable = False
@@ -95,17 +95,14 @@ class TestI2CDevice(object):
             exc_enable = True
         else:
             raise Exception('Illegal exception test mode {}'.format(exc_mode))
-        
+
         getattr(self.device.bus, smbus_method).side_effect = side_effect
         self.device.enable_exceptions() if exc_enable else self.device.disable_exceptions()
-        
+
         rc = None
-    
+
         with assert_raises_regexp(I2CException, 'error from device') if exc_enable else dummy_cm():
             rc = getattr(self.device, method)(*args)
             assert_equal(rc, exp_rc)
-            
+
         getattr(self.device.bus, smbus_method).side_effect = cached_side_effect
-        
-
-

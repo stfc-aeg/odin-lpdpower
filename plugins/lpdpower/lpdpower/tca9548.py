@@ -8,8 +8,8 @@ attached to an instance of this class, through a callback mechanism.
 James Hogge, STFC Application Engineering Group.
 """
 
-from i2c_device import I2CDevice, I2CException
-from i2c_container import I2CContainer
+from lpdpower.i2c_device import I2CDevice, I2CException
+from lpdpower.i2c_container import I2CContainer
 
 
 class TCA9548(I2CDevice):
