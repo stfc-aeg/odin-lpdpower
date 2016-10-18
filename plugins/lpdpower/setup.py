@@ -13,5 +13,9 @@ setup(
     author='Tim Nicholls',
     author_email='tim.nicholls@stfc.ac.uk',
     packages = find_packages(),
-    install_requires=required,
+    install_requires=['odin==0.1'],
+    dependency_links=['https://github.com/percival-detector/odin/zipball/v0.1#egg=odin-0.1'],
+    extras_require={
+        'test' : ['nose', 'coverage', 'mock']
+    }
 )
