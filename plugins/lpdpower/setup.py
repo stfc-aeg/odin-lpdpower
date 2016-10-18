@@ -1,9 +1,10 @@
 from setuptools import setup, find_packages
-import os
+import versioneer
 
 setup(
     name='lpdpower',
-    version='0.1',
+    version=versioneer.get_version(),
+    cmdclass=versioneer.get_cmdclass(),
     description='XFEL LPD PSCU plugin for ODIN framework',
     url='https://github.com/timcnicholls/odin',
     author='Tim Nicholls',
