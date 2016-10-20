@@ -256,8 +256,8 @@ class LcdDisplay(object):
         state_str = self.format_state_str(self.pscu.get_fan_state(), self.pscu.get_fan_latched())
 
         content += 'Fan: {}\r'.format(state_str)
-        content += 'Target:  {:3d}%\r'.format(self.pscu.get_fan_target())
-        content += 'Speed : {:4.1f}Hz\r'.format(self.pscu.get_fan_speed())
+        content += 'Target: {:5.1f}%\r'.format(self.pscu.get_fan_target())
+        content += 'Speed : {:5.1f}Hz\r'.format(self.pscu.get_fan_speed())
         content += time.strftime(self.time_format)
 
         return content
