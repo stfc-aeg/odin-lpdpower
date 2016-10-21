@@ -386,10 +386,11 @@ class PSCU(I2CContainer):
         """Get the value of the detector position sensor.
 
         This method returns the value of the the potentiometer reading the position
-        of the quadrant motion system. The value is (currently) returned as a percentage
-        of the full scale potentiometer reading.
+        of the quadrant motion system. The value is returned as the transverse opening
+        of the quadrant assembly (i.e. width of the beam pipe hole) in mm, and is signed
+        according the which direction the quadrants are opened in.
 
-        :returns: detector position as a percentage of full scale
+        :returns: transverse position in mm
         """
         return self.__position
 
