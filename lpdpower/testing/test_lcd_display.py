@@ -30,6 +30,8 @@ class TestLcdDisplay():
         cls.pscu.get_fan_speed.return_value = 45.0
         cls.pscu.get_fan_target.return_value = 90
         cls.pscu.get_pump_flow.return_value = 4.2
+        cls.pscu.get_position.return_value = 11.36
+
         cls.pscu.quad = [Mock()]*4
         for q in range(cls.pscu.num_quads):
             cls.pscu.quad[q].get_supply_voltage.return_value = 48.1
@@ -124,7 +126,7 @@ class TestLcdDisplay():
         for page in range(self.display.num_temp_pages):
             content = self.display.temperature_page(page)
             for call in ['get_temperature', 'get_temperature_latched', 'get_temperature_state', 'get_temperature_tripped']:
-                assert_true(getattr(self.pscu, call).called)
+                assert_true(getattr(self.pscu, call).called, 'PSCU method {} not called'.format(call))
             assert_equal(type(content), str)
             assert_true(len(content) > 0)
             assert_true('Temp' in content)
@@ -133,7 +135,7 @@ class TestLcdDisplay():
 
         content = self.display.humidity_page()
         for call in ['get_humidity', 'get_humidity_latched', 'get_humidity_state', 'get_humidity_tripped']:
-            assert_true(getattr(self.pscu, call).called)
+            assert_true(getattr(self.pscu, call).called, 'PSCU method {} not called'.format(call))
         assert_equal(type(content), str)
         assert_true(len(content) > 0)
         assert_true('Humidity' in content)
@@ -142,7 +144,7 @@ class TestLcdDisplay():
 
         content = self.display.fan_page()
         for call in ['get_fan_speed', 'get_fan_target', 'get_fan_latched']:
-            assert_true(getattr(self.pscu, call).called)
+            assert_true(getattr(self.pscu, call).called, 'PSCU method {} not called'.format(call))
         assert_true
         assert_equal(type(content), str)
         assert_true(len(content) > 0)
@@ -153,10 +155,20 @@ class TestLcdDisplay():
 
         content = self.display.pump_page()
         for call in ['get_pump_flow', 'get_pump_state', 'get_pump_latched']:
-            assert_true(getattr(self.pscu, call).called)
+            assert_true(getattr(self.pscu, call).called, 'PSCU method {} not called'.format(call))
         assert_equal(type(content), str)
         assert_true(len(content) > 0)
         for item in ['Pump', 'Flow']:
+            assert_true(item in content)
+
+    def test_position_page(self):
+
+        content = self.display.position_page()
+        for call in ['get_position']:
+            assert_true(getattr(self.pscu, call).called, 'PSCU method {} not called'.format(call))
+        assert_equal(type(content), str)
+        assert_true(len(content) > 0)
+        for item in ['Position']:
             assert_true(item in content)
 
     def test_trace_page(self):
@@ -165,7 +177,7 @@ class TestLcdDisplay():
         for call in [
             'get_trace_state', 'get_trace_latched', 'get_temperature_trace', 'get_humidity_trace', 'get_quad_trace'
         ]:
-            assert_true(getattr(self.pscu, call).called)
+            assert_true(getattr(self.pscu, call).called, 'PSCU method {} not called'.format(call))
         assert_equal(type(content), str)
         assert_true(len(content) > 0)
         for item in ['Trace', 'Temp', 'Hum', 'Quad']:
@@ -175,10 +187,8 @@ class TestLcdDisplay():
 
         content = self.display.quad_supply_page()
         for q in range(self.pscu.num_quads):
-            for call in [
-                'get_supply_voltage'
-            ]:
-                assert_true(getattr(self.pscu.quad[q], call).called)
+            for call in ['get_supply_voltage']:
+                assert_true(getattr(self.pscu.quad[q], call).called, 'PSCU method {} not called'.format(call))
             assert_equal(type(content), str)
             assert_true(len(content) > 0)
             assert_true('Quad supplies' in content)
@@ -191,7 +201,7 @@ class TestLcdDisplay():
                 for call in [
                     'get_supply_voltage', 'get_enable', 'get_channel_voltage', 'get_channel_current'
                 ]:
-                    assert_true(getattr(self.pscu.quad[quad], call).called)
+                    assert_true(getattr(self.pscu.quad[quad], call).called, 'PSCU method {} not called'.format(call))
                 assert_equal(type(content), str)
                 assert_true(len(content) > 0)
                 assert_true('Quad' in content)

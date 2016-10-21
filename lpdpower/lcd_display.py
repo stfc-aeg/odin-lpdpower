@@ -71,7 +71,7 @@ class LcdDisplay(object):
         self.registered_pages.append(self.humidity_page)
         self.registered_pages.append(self.fan_page)
         self.registered_pages.append(self.pump_page)
-
+        self.registered_pages.append(self.position_page)
         self.registered_pages.append(self.trace_page)
 
         self.registered_pages.append(self.quad_supply_page)
@@ -276,6 +276,21 @@ class LcdDisplay(object):
         content += 'Pump: {}\r'.format(state_str)
         content += 'Flow: {:.1f}l/min\r'.format(self.pscu.get_pump_flow())
         content += '\r'
+
+        return content
+
+    def position_page(self):
+        """Render the PSCU detector position page.
+
+        This method renders a page showing the state of the detector position readout.
+
+        :return: rendered page as a string
+        """
+        content = self.page_header()
+
+        content += 'Position: {:.2f}mm\r'.format(self.pscu.get_position())
+        content += '** DO NOT EXCEED ** '
+        content += '**  +/-35.5mm!   ** '
 
         return content
 
