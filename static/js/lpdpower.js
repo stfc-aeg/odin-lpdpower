@@ -11,6 +11,11 @@ function round1dp(flt)
     return flt.toFixed(1);
 }
 
+function round2dp(flt)
+{
+    return flt.toFixed(2);
+}
+
 function generateQuad(id)
 {
 	return `
@@ -548,7 +553,7 @@ function updateAll()
 		update_status_box(global_elems.get("overall-armed"), response.armed, 'Yes', 'No')
 		update_status_box(global_elems.get("trace-status"), response.trace.overall, 'OK', 'Error')
 		update_status_box(global_elems.get("trace-latched"), response.trace.latched, 'No', 'Yes')
-		global_elems.get("position").innerHTML = round1dp(response.position).toString() + 'mm'
+		global_elems.get("position").innerHTML = round2dp(response.position).toString() + 'mm'
 
 		// Handle health states
 		update_status_box(global_elems.get("tmp-health"), response.temperature.overall, 'Healthy', 'Error');
