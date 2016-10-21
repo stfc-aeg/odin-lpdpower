@@ -35,10 +35,13 @@ class LPDPowerAdapter(ApiAdapter):
 
         # Retrieve adapter options from incoming argument list
         self.update_interval = float(self.options.get('update_interval', 0.05))
-        quad_enable_interval = float(self.options.get('quad_enable_interval', 1.0))
+        pscu_data_options = {
+            'quad_enable_interval': float(self.options.get('quad_enable_interval', 1.0)),
+            'detector_position_offset': float(self.options.get('detector_position_offset', 0.0)),
+        }
 
         # Create a PSCUData instance
-        self.pscuData = PSCUData(quad_enable_interval=quad_enable_interval)
+        self.pscuData = PSCUData(**pscu_data_options)
 
         # Start the update loop
         self.update_loop()

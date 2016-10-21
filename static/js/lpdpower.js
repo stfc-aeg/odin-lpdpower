@@ -143,7 +143,7 @@ function generateTempSensors(count)
 		<div class="row caption-row">
 			<div class="col-xs-5">Latched:</div>
 			<div id="tmp-latched"  class="col-xs-5 status vertical-align">&nbsp;</div>
-		</div>	
+		</div>
 	</div>
 </div>
 <table class="table table-striped">
@@ -221,7 +221,7 @@ function generateHumiditySensors(count)
 		<div class="row caption-row">
 			<div class="col-xs-5">Latched:</div>
 			<div id="h-latched"  class="col-xs-5 status vertical-align">&nbsp;</div>
-		</div>	
+		</div>
 	</div>
 </div>
 <table class="table table-striped">
@@ -299,7 +299,7 @@ function generatePumpSensors(count)
 		<div class="row caption-row">
 			<div class="col-xs-5">Latched:</div>
 			<div id="p-latched"  class="col-xs-5 status vertical-align">&nbsp;</div>
-		</div>	
+		</div>
 	</div>
 </div>
 <table class="table table-striped">
@@ -372,7 +372,7 @@ function generateFanSensors(count)
 	<div class="row caption-row">
 		<div class="col-xs-5">Latched:</div>
 		<div id="f-latched"  class="col-xs-5 status vertical-align">&nbsp;</div>
-	</div>	
+	</div>
 </div>
 </div>
 <table class="table table-striped">
@@ -492,7 +492,7 @@ $(document).ready(function()
 
 	global_elems.set("overall-status", document.querySelector("#overall-status"));
 	global_elems.set("overall-latched", document.querySelector("#overall-latched"));
-	global_elems.set("overall-armed", document.querySelector("#overall-armed"));	
+	global_elems.set("overall-armed", document.querySelector("#overall-armed"));
 	global_elems.set("trace-status", document.querySelector("#trace-status"));
     global_elems.set("trace-latched", document.querySelector("#trace-latched"));
     global_elems.set("position", document.querySelector("#position"));
@@ -503,7 +503,7 @@ $(document).ready(function()
 	setInterval(updateAll, 200);
 });
 
-function update_status_box(el, value, text_true, text_false) 
+function update_status_box(el, value, text_true, text_false)
 {
 	el.style.backgroundColor = value ? colorOk : colorFail;
 	el.innerHTML = value ? text_true : text_false;
@@ -548,14 +548,14 @@ function updateAll()
 		update_status_box(global_elems.get("overall-armed"), response.armed, 'Yes', 'No')
 		update_status_box(global_elems.get("trace-status"), response.trace.overall, 'OK', 'Error')
 		update_status_box(global_elems.get("trace-latched"), response.trace.latched, 'No', 'Yes')
-		global_elems.get("position").innerHTML = round1dp(response.position).toString() + '%'
-		
+		global_elems.get("position").innerHTML = round1dp(response.position).toString() + 'mm'
+
 		// Handle health states
 		update_status_box(global_elems.get("tmp-health"), response.temperature.overall, 'Healthy', 'Error');
 		update_status_box(global_elems.get("h-health"), response.humidity.overall, 'Healthy', 'Error');
 		update_status_box(global_elems.get("p-health"), response.pump.overall, 'Healthy', 'Error');
 		update_status_box(global_elems.get("f-health"), response.fan.overall, 'Healthy', 'Error');
-		
+
 	    // Handle latched states
 		update_status_box(global_elems.get("tmp-latched"), response.temperature.latched, 'No', 'Yes')
 		update_status_box(global_elems.get("h-latched"), response.humidity.latched, 'No', 'Yes')
@@ -565,7 +565,7 @@ function updateAll()
         // Handle button states
         update_button_state(global_elems.get("arm"), response.armed, 'Disarm Interlock', 'Arm Interlock');
         update_button_state(global_elems.get("enable"), response.allEnabled, 'Disable Quads', 'Enable Quads');
-       
+
 	});
 }
 

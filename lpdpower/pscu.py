@@ -7,6 +7,8 @@ page up/down buttons on the front panel.
 
 James Hogge, STFC Application Engineering Group.
 """
+from math import sqrt
+
 from lpdpower.i2c_device import I2CDevice, I2CException
 from lpdpower.i2c_container import I2CContainer
 from lpdpower.tca9548 import TCA9548
@@ -29,9 +31,11 @@ class PSCU(I2CContainer):
 
     ALL_PINS = [0, 1, 2, 3, 4, 5, 6, 7]
     DEFAULT_QUAD_ENABLE_INTERVAL = 1.0
+    DEFAULT_DETECTOR_POSITION_OFFSET = 0.0
 
-    def __init__(self, quad_enable_interval=DEFAULT_QUAD_ENABLE_INTERVAL):
-        """Initialse the PSCU instance.
+    def __init__(self, quad_enable_interval=DEFAULT_QUAD_ENABLE_INTERVAL,
+                 detector_position_offset=DEFAULT_DETECTOR_POSITION_OFFSET):
+        """Initialise the PSCU instance.
 
         The constructor initialises the PSCU instance, setting up all the I2C
         devices on the PSCU, intialising and attached the quads, and setting up the
@@ -44,6 +48,7 @@ class PSCU(I2CContainer):
 
         # Set up the quad enable interval with the specified value
         self.quad_enable_interval = quad_enable_interval
+        self.detector_position_offset = detector_position_offset
 
         # Create the TCA I2C bus multiplexer instance
         self.tca = TCA9548(0x70)
@@ -714,7 +719,7 @@ class PSCU(I2CContainer):
         read_input_scaled() method and converts it into pump flow rate in litres/min.
 
         :input scaled_adc_val ADC channel reading as fraction of full-scale
-        :returns: pump flow rate in listre/min
+        :returns: pump flow rate in litre/min
         """
         pump_vref = 5.0
         pump_scale = 4.32
@@ -723,6 +728,24 @@ class PSCU(I2CContainer):
         pump_lpermin = ((scaled_adc_val * pump_vref) / pump_scale) * pump_max
 
         return pump_lpermin
+
+    def convert_ad7998_position(self, scaled_adc_val):
+        """Convert a scaled ADC reading into a transverse detector position.
+
+        This method takes a scaled ADC channel reading, i.e. as returned by the read_input_scaled()
+        method and converts it into a transverse detector position. The detector position offset
+        specified as an initalisation option is taken into account.
+
+        :input scaled_adc_val ADC channel reading as fraction of full scale
+        :returns: transverse detector position in mm.
+        """
+        posn_vref = 5.0
+        posn_scale = 0.1
+
+        linear_posn = ((scaled_adc_val * posn_vref) / posn_scale)
+        transverse_posn = ((2.0 * linear_posn) / sqrt(2.0)) - self.detector_position_offset
+
+        return transverse_posn
 
     def poll_all_sensors(self):
         """Poll all sensor channels and update their values in the internal buffers.
@@ -800,7 +823,7 @@ class PSCU(I2CContainer):
         self.__pump_trip = not bool(mcp_misc_1[3])
 
         # Read, convert and save the detector position
-        self.__position = self.adc_misc[1].read_input_scaled(4) * 100
+        self.__position = self.convert_ad7998_position(self.adc_misc[1].read_input_scaled(4))
 
         # Extract and save global armed and health states
         self.__armed = bool(mcp_misc_0[0])

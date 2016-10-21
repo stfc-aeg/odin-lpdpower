@@ -28,13 +28,26 @@ class TestPSCU():
 
         cls.mock_bus = mock_bus
 
-        cls.pscu = PSCU()
+        cls.pscu_options = {
+            'quad_enable_interval': 0.9,
+            'detector_position_offset': 35.355,
+        }
+
+        cls.pscu = PSCU(**cls.pscu_options)
         cls.bus = cls.pscu.tca.bus
         cls.bus.read_word_data.return_value = 0
 
     def test_init(self):
 
         assert_equal(self.bus, self.pscu.tca.bus)
+        assert_equal(self.pscu.quad_enable_interval, self.pscu_options['quad_enable_interval'])
+        assert_equal(self.pscu.detector_position_offset, self.pscu_options['detector_position_offset'])
+
+    def test_init_default_options(self):
+
+        pscu = PSCU()
+        assert_equal(pscu.quad_enable_interval, PSCU.DEFAULT_QUAD_ENABLE_INTERVAL)
+        assert_equal(pscu.detector_position_offset, PSCU.DEFAULT_DETECTOR_POSITION_OFFSET)
 
     @patch('lpdpower.lcd_display.UsbLcd')
     @patch('lpdpower.i2c_device.smbus.SMBus')
@@ -327,7 +340,18 @@ class TestPSCU():
         ]
         for (scaled_adc_val, expected_flow) in expected_results:
             converted_flow = self.pscu.convert_ad7998_pump(scaled_adc_val)
-            assert_almost_equal(converted_flow, converted_flow, places=3)
+            assert_almost_equal(converted_flow, expected_flow, places=3)
+
+    def test_convert_ad7998_position(self):
+
+        expected_results = [
+            (0.000, -1.0 * self.pscu_options['detector_position_offset']),
+            (0.5, 0.0),
+            (1.000, 70.711 - self.pscu_options['detector_position_offset']),
+        ]
+        for (scaled_adc_val, expected_posn) in expected_results:
+            converted_posn = self.pscu.convert_ad7998_position(scaled_adc_val)
+            assert_almost_equal(converted_posn, expected_posn, places=3)
 
     def test_poll_all_sensors(self):
 
