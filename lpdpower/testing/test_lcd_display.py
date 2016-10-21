@@ -168,7 +168,7 @@ class TestLcdDisplay():
             assert_true(getattr(self.pscu, call).called, 'PSCU method {} not called'.format(call))
         assert_equal(type(content), str)
         assert_true(len(content) > 0)
-        for item in ['Quad position']:
+        for item in ['Position']:
             assert_true(item in content)
 
     def test_trace_page(self):

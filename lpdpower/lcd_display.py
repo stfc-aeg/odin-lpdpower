@@ -288,9 +288,9 @@ class LcdDisplay(object):
         """
         content = self.page_header()
 
-        content += 'Quad position: {:.1f}mm\r'.format(self.pscu.get_position())
-        content += '\r'
-        content += 'DO NOT EXCEED +/-35mm!\r'
+        content += 'Position: {:.2f}mm\r'.format(self.pscu.get_position())
+        content += '** DO NOT EXCEED ** '
+        content += '**  +/-35.5mm!   ** '
 
         return content
 
