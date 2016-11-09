@@ -850,3 +850,16 @@ class PSCU(I2CContainer):
         # Poll sensors for all quads also
         for quad in self.quad:
             quad.poll_all_sensors()
+
+    def cleanup(self):
+        """Clean up the PSCU server state.
+
+        This method cleans up the state of the PSCU at shutdown, when called by the adapter.
+        This is simply a case of setting an appropriate message on the PSCU LCD to indicate
+        that the server is no longer running.
+        """
+        logging.debug("PSCU cleanup: setting display message")
+
+        if not self.lcd_display_error:
+            self.lcd.set_colour(LcdDisplay.YELLOW)
+            self.lcd.set_content('\r   PSCU server is\r    NOT running\r\r')

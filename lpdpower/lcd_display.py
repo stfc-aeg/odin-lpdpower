@@ -30,6 +30,9 @@ class LcdDisplay(object):
     # Definition of backlight colours imported from the UsbLcd class
     GREEN = UsbLcd.GREEN
     RED = UsbLcd.RED
+    YELLOW = UsbLcd.YELLOW
+    BLUE = UsbLcd.BLUE
+    WHITE = UsbLcd.WHITE
 
     def __init__(self, pscu, serial_dev, baud=57600, rows=4, cols=20):
         """Initialise the LcdDisplay device.
@@ -124,12 +127,18 @@ class LcdDisplay(object):
     def update(self):
         """Update the displayed content on the LCD.
 
-        This method updates the display with the content from the current registered page. The
-        content is compared with the internal buffer and the display only updated on change to avoid
-        excessive updates or display flicker.
+        This method updates the display with the content from the current registered page.
         """
         content = self.registered_pages[self.current_page]()
+        self.set_content(content)
 
+    def set_content(self, content):
+        """Set the displayed content on the LCD.
+
+        This method sets the displayed content on the LCD. The content is compared with the
+        internal buffer and the display only updated on change to avoid excessive updates or
+        display flicker.
+        """
         if content != self.lcd_buffer:
             self.lcd_buffer = content
             self.lcd.home()

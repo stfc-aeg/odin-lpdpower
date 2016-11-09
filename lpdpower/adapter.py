@@ -109,3 +109,11 @@ class LPDPowerAdapter(ApiAdapter):
         # Schedule the update loop to run in the IOLoop instance again after appropriate
         # interval
         IOLoop.instance().call_later(self.update_interval, self.update_loop)
+
+    def cleanup(self):
+        """Clean up the state of the adapter at shutdown.
+
+        This method is called by the ODIN server at shutdown to allow the adapter to
+        clean up its internal state and that of any connected hardware.
+        """
+        self.pscuData.pscu.cleanup()
