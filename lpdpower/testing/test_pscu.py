@@ -385,5 +385,5 @@ class TestPSCU():
 
         with patch('lpdpower.pscu.LcdDisplay.set_content') as mock_set_content:
             self.pscu.cleanup()
-            assert_true(mock_set_content.mock_calls > 0)
+            assert_true(len(mock_set_content.mock_calls) > 0)
             assert_equal(self.pscu.lcd.lcd_colour, self.pscu.lcd.YELLOW)
