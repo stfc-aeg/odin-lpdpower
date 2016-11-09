@@ -380,3 +380,10 @@ class TestPSCU():
             self.pscu.set_armed(False)
             self.pscu.poll_all_sensors()
             assert_equal(self.pscu.get_all_enabled(), False)
+
+    def test_cleanup(self):
+
+        with patch('lpdpower.pscu.LcdDisplay.set_content') as mock_set_content:
+            self.pscu.cleanup()
+            assert_true(mock_set_content.mock_calls > 0)
+            assert_equal(self.pscu.lcd.lcd_colour, self.pscu.lcd.YELLOW)
