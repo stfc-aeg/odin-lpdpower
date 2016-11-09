@@ -858,7 +858,7 @@ class PSCU(I2CContainer):
         This is simply a case of setting an appropriate message on the PSCU LCD to indicate
         that the server is no longer running.
         """
-	logging.debug("PSCU cleanup: setting display message")
+        logging.debug("PSCU cleanup: setting display message")
 
         if not self.lcd_display_error:
             self.lcd.set_colour(LcdDisplay.YELLOW)
