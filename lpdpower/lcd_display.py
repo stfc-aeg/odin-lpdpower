@@ -31,6 +31,8 @@ class LcdDisplay(object):
     GREEN = UsbLcd.GREEN
     RED = UsbLcd.RED
     YELLOW = UsbLcd.YELLOW
+    BLUE = UsbLcd.BLUE
+    WHITE = UsbLcd.WHITE
 
     def __init__(self, pscu, serial_dev, baud=57600, rows=4, cols=20):
         """Initialise the LcdDisplay device.
