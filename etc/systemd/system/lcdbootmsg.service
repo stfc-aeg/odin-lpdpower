@@ -7,8 +7,8 @@ DefaultDependencies=no
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart=/home/debian/odin-lpdpower/scripts/lcdbootmsg '\r   PSCU server is\r     booting ...'
-ExecStop=/home/debian/odin-lpdpower/scripts/lcdbootmsg '\r   PSCU server is\r   shutting down'
+ExecStart=/home/pscu/odin-lpdpower/scripts/lcdbootmsg '\r   PSCU server is\r     booting ...'
+ExecStop=/home/pscu/odin-lpdpower/scripts/lcdbootmsg '\r   PSCU server is\r   shutting down'
 
 [Install]
 WantedBy=basic.target
