@@ -1,4 +1,4 @@
-#!/home/debian/venv/bin/python
+#!/home/pscu/venv/bin/python
 
 from lpdpower.usblcd import UsbLcd
 import sys

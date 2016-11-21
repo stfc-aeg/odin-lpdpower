@@ -202,6 +202,17 @@ install_supervisord()
 {
     echo "Installing supervisord packages:"
     install_apt_pkgs supervisor
+    
+    echo "Ensuring supervisor init script checks for log directory"
+    supervisor_init=/etc/init.d/supervisor
+    #logdircmd='test -d $LOGDIR || mkdir -p $LOGDIR'
+    grep -q 'mkdir\ -p\ \$LOGDIR'  $supervisor_init
+    if [ $? != 0 ]; then
+	sed '/^LOGDIR\=/ atest -d \$LOGDIR \|\| mkdir -p \$LOGDIR' -i.orig ${supervisor_init}
+	echo "  Done."
+    else
+	echo "  OK, script already checks of existing of LOGDIR"
+    fi
 }
 
 install_virtualenv()
@@ -377,6 +388,74 @@ install_pscu_startup()
     fi
 }
 
+create_tempfs_fstab_entry()
+{
+    fstab_file=$1
+    mnt_point=$2
+    mode=$3
+    size=$4
+
+    fstab_file_modified=0
+
+    file_entry=$(grep ${mnt_point} ${fstab_file})
+    if [ $? != 0 ]; then
+	/bin/echo -n "  Adding ${mnt_point} tmpfs entry to ${fstab_file}: "
+	echo "tmpfs $entry ${mnt_point} tmpfs defaults,noatime,nosuid,mode=${mode},size=${size} 0 0 ">> ${fstab_file}
+	fstab_file_modified=1
+	echo "done"
+    else
+	fstype=$(echo ${file_entry} | awk '{print $1}')
+	if [ "$fstype" == 'tmpfs' ]; then
+	    echo "  OK, ${fstab_file} already has a tmpfs entry for ${mnt_point}"
+	else
+	    echo "  WARNING, ${fstab_file} has an entry for ${mnt_point} but it does not appear to be of type tmpfs"
+	fi
+    fi
+
+    return $fstab_file_modified
+}
+
+set_rootfs_readonly()
+{
+    echo "Setting up root file system as read-only"
+    etc_fstab=/etc/fstab
+    fstab_modified=0
+
+    orig_fstab=$(mktemp /tmp/etc_fstab_orig.XXXXX)
+    cp -f $etc_fstab ${orig_fstab}
+    
+
+    root_mntops=$(grep " / " $etc_fstab | awk '{print $4}' | sed 's/,/ /g')
+    has_ro_opt=0
+    for opt in $root_mntops; do
+	if [ $opt == 'ro' ]; then
+	    has_ro_opt=1
+	    break
+	fi
+    done
+    if [ $has_ro_opt == 0 ]; then
+	/bin/echo -n "  Adding read-only option to rootfs entry in $etc_fstab: "
+	tmp_fstab=$(mktemp /tmp/etc_fstab.XXXXX)
+	cat $etc_fstab > $tmp_fstab
+	cat $tmp_fstab | awk '/\ \/\ /{$4="ro,"$4}{print}' > $etc_fstab
+	rm -f ${tmp_fstab}
+	fstab_modified=1
+	echo "done"
+    else
+	echo "  OK, rootfs entry is $etc_fstab is already marked for read-only"
+    fi
+
+    create_tempfs_fstab_entry ${etc_fstab} '/var/log'  '1777' '128M'
+    create_tempfs_fstab_entry ${etc_fstab} '/var/lib/dhcp' '1777' '1M'
+    create_tempfs_fstab_entry ${etc_fstab} '/tmp' '1777' '32M'
+
+    if [ $fstab_modified != 0 ]; then
+	echo "  Making backup copy of ${etc_fstab} to ${etc_fstab}.orig"
+	cp -f ${orig_fstab} ${etc_fstab}.orig
+    fi
+    rm -f ${orig_fstab}
+}
+
 echo "*******************************************"
 echo "*                                         *"
 echo "*    XFEL LPD PSCU Installation Script    *"
@@ -404,3 +483,4 @@ clone_odin_lpdpower
 install_odin_lpdpower
 set_pscu_splashscreen
 install_pscu_startup
+set_rootfs_readonly
