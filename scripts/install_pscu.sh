@@ -447,7 +447,8 @@ set_rootfs_readonly()
 
     create_tempfs_fstab_entry ${etc_fstab} '/var/log'  '1777' '128M'
     create_tempfs_fstab_entry ${etc_fstab} '/var/lib/dhcp' '1777' '1M'
-    create_tempfs_fstab_entry ${etc_fstab} '/tmp' '1777' '32M'
+    create_tempfs_fstab_entry ${etc_fstab} '/var/lib/sudo' '1777' '1M'
+    create_tempfs_fstab_entry ${etc_fstab} '/tmp' '0700' '32M'
 
     if [ $fstab_modified != 0 ]; then
 	echo "  Making backup copy of ${etc_fstab} to ${etc_fstab}.orig"
