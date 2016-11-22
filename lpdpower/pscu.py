@@ -112,7 +112,9 @@ class PSCU(I2CContainer):
         # Temperature
         self.num_temperatures = 11
         self.__temperature_values = [0.0] * self.num_temperatures
+        self.__temperature_values_raw = [0.0] * self.num_temperatures
         self.__temperature_set_points = [0.0] * self.num_temperatures
+        self.__temperature_set_points_raw = [0.0] * self.num_temperatures
         self.__temperature_trips = [False] * self.num_temperatures
         self.__temperature_traces = [False] * self.num_temperatures
         self.__temperature_disabled = [False] * self.num_temperatures
@@ -120,7 +122,9 @@ class PSCU(I2CContainer):
         # Humidity
         self.num_humidities = 2
         self.__humidity_values = [0.0] * self.num_humidities
+        self.__humidity_values_raw = [0.0] * self.num_humidities
         self.__humidity_set_points = [0.0] * self.num_humidities
+        self.__humidity_set_points_raw = [0.0] * self.num_humidities
         self.__humidity_trips = [False] * self.num_humidities
         self.__humidity_traces = [False] * self.num_humidities
         self.__humidity_disabled = [False] * self.num_humidities
@@ -189,6 +193,19 @@ class PSCU(I2CContainer):
 
         return self.__temperature_values[sensor]
 
+    def get_temperature_volts(self, sensor):
+        """Get the raw value of a PSCU temperature sensor.
+
+        This method returns the current raw temperature value of the specified sensor.
+
+        :param sensor: temperature sensor index
+        :returns: raw temperature value for sensor in volts
+        """
+        if sensor >= self.num_temperatures or sensor < 0:
+            raise I2CException('Illegal sensor index {} specified'.format(sensor))
+
+        return self.__temperature_values_raw[sensor] * 3.0
+        
     def get_temperature_set_point(self, sensor):
         """Get the set point of a PSCU temperature sensor.
 
@@ -201,6 +218,19 @@ class PSCU(I2CContainer):
             raise I2CException('Illegal sensor index {} specified'.format(sensor))
 
         return self.__temperature_set_points[sensor]
+
+    def get_temperature_set_point_volts(self, sensor):
+        """Get the raw set point of a PSCU temperature sensor.
+
+        This method returns the current raw set point for the specified temperature sensor.
+
+        :param sensor: temperature sensor index
+        :returns: raw value of the temperature sensor set point in volts
+        """
+        if sensor >= self.num_temperatures or sensor < 0:
+            raise I2CException('Illegal sensor index {} specified'.format(sensor))
+
+        return self.__temperature_set_points_raw[sensor] * 3.0
 
     def get_temperature_tripped(self, sensor):
         """Get the trip status of a PSCU temperature sensor.
@@ -254,6 +284,19 @@ class PSCU(I2CContainer):
 
         return self.__humidity_values[sensor]
 
+    def get_humidity_volts(self, sensor):
+        """Get the raw value of a PSCU humidity sensor.
+
+        This method returns the current raw humidity value of the specified sensor.
+
+        :param sensor: humidity sensor index
+        :returns: raw humidity value for sensor
+        """
+        if sensor >= self. num_humidities or sensor < 0:
+            raise I2CException('Illegal sensor index {} specified'.format(sensor))
+
+        return self.__humidity_values_raw[sensor] * 5.0
+
     def get_humidity_set_point(self, sensor):
         """Get the set point of a PSCU humidity sensor.
 
@@ -266,6 +309,19 @@ class PSCU(I2CContainer):
             raise I2CException('Illegal sensor index {} specified'.format(sensor))
 
         return self.__humidity_set_points[sensor]
+
+    def get_humidity_set_point_volts(self, sensor):
+        """Get the set point of a PSCU humidity sensor.
+
+        This method returns the current set point for the specified humidity sensor.
+
+        :param sensor: humidity sensor index
+        :returns: value of the humidity sensor set point
+        """
+        if sensor >= self. num_humidities or sensor < 0:
+            raise I2CException('Illegal sensor index {} specified'.format(sensor))
+
+        return self.__humidity_set_points_raw[sensor] * 5.0
 
     def get_humidity_tripped(self, sensor):
         """Get the trip status of a PSCU humidity sensor.
@@ -771,21 +827,25 @@ class PSCU(I2CContainer):
         # Read, convert and store all temperature values and setpoints from the ADCs and
         # extract and store all trip, trace and disabled states from the MCPs
         for i in range(8):
+            self.__temperature_set_points_raw[i] = self.adc_temp_mon[0].read_input_scaled(i)
             self.__temperature_set_points[i] = self.convert_ad7998_temp(
-                self.adc_temp_mon[0].read_input_scaled(i)
+                self.__temperature_set_points_raw[i]
             )
+            self.__temperature_values_raw[i] = self.adc_temp_mon[1].read_input_scaled(i)
             self.__temperature_values[i] = self.convert_ad7998_temp(
-                self.adc_temp_mon[1].read_input_scaled(i)
+                self.__temperature_values_raw[i]
             )
             self.__temperature_trips[i] = not bool(mcp_mon_1[i])
             self.__temperature_traces[i] = bool(mcp_mon_2[i])
 
         for i in range(3):
+            self.__temperature_values_raw[i + 8] = self.adc_temp_mon[2].read_input_scaled(i)
             self.__temperature_values[i + 8] = self.convert_ad7998_temp(
-                self.adc_temp_mon[2].read_input_scaled(i)
+                self.__temperature_values_raw[i + 8]
             )
+            self.__temperature_set_points_raw[i + 8] = self.adc_temp_mon[2].read_input_scaled(i+4)
             self.__temperature_set_points[i + 8] = self.convert_ad7998_temp(
-                self.adc_temp_mon[2].read_input_scaled(i+4)
+                self.__temperature_set_points_raw[i + 8]
             )
             self.__temperature_trips[i + 8] = not bool(mcp_mon_3[i])
             self.__temperature_traces[i + 8] = bool(mcp_mon_3[i+3])
@@ -799,11 +859,13 @@ class PSCU(I2CContainer):
         # extract and store all trip, trace and disabled states from the MCPs
         for i in range(self.num_humidities):
 
+            self.__humidity_set_points_raw[i] = self.adc_misc[0].read_input_scaled(i+1)
             self.__humidity_set_points[i] = self.convert_ad7998_humidity(
-                self.adc_misc[0].read_input_scaled(i+1)
+                self.__humidity_set_points_raw[i]
             )
+            self.__humidity_values_raw[i] = self.adc_misc[1].read_input_scaled(i+1)
             self.__humidity_values[i] = self.convert_ad7998_humidity(
-                self.adc_misc[1].read_input_scaled(i+1)
+                self.__humidity_values_raw[i]
             )
 
             self.__humidity_trips[i] = not bool(mcp_misc_1[i+1])

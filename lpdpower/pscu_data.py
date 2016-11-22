@@ -32,7 +32,9 @@ class TempData(object):
         """
         self.param_tree = ParameterTree({
             "temperature": (self.get_temperature, None),
+            "temperature_volts": (self.get_temperature_volts, None),
             "setpoint": (self.get_set_point, None),
+            "setpoint_volts": (self.get_set_point_volts, None),
             "tripped": (self.get_tripped, None),
             "trace": (self.get_trace, None),
             "disabled": (self.get_disabled, None),
@@ -50,6 +52,15 @@ class TempData(object):
         """
         return self.pscu.get_temperature(self.sensor_idx)
 
+    def get_temperature_volts(self):
+        """Get the current raw temperature read by the sensor.
+
+        This method returns the raw temperature read by the sensor from the PSCU.
+
+        :returns: temperature in volts
+        """
+        return self.pscu.get_temperature_volts(self.sensor_idx)
+
     def get_set_point(self):
         """Get the setpoint value of the temperature sensor.
 
@@ -58,6 +69,15 @@ class TempData(object):
         :returns: set point value in Celsius
         """
         return self.pscu.get_temperature_set_point(self.sensor_idx)
+
+    def get_set_point_volts(self):
+        """Get the raw setpoint value of the temperature sensor.
+
+        This method returns the raw set point value of the temperature sensor from the PSCU.
+
+        :returns: raw set point value in voltage
+        """
+        return self.pscu.get_temperature_set_point_volts(self.sensor_idx)
 
     def get_tripped(self):
         """Get the trip status of the temperature sensor.
@@ -109,7 +129,9 @@ class HumidityData(object):
         """
         self.param_tree = ParameterTree({
             "humidity": (self.get_humidity, None),
+            "humidity_volts": (self.get_humidity_volts, None),
             "setpoint": (self.get_set_point, None),
+            "setpoint_volts": (self.get_set_point_volts, None),
             "tripped": (self.get_tripped, None),
             "trace": (self.get_trace, None),
             "disabled": (self.get_disabled, None),
@@ -127,6 +149,15 @@ class HumidityData(object):
         """
         return self.pscu.get_humidity(self.sensor_idx)
 
+    def get_humidity_volts(self):
+        """Get the current raw humidity read by the sensor.
+
+        This method returns the raw humidity read by the sensor from the PSCU.
+
+        :returns: raw humidity in volts
+        """
+        return self.pscu.get_humidity_volts(self.sensor_idx)
+
     def get_set_point(self):
         """Get the setpoint value of the humidity sensor.
 
@@ -135,6 +166,15 @@ class HumidityData(object):
         :returns: set point value in percent
         """
         return self.pscu.get_humidity_set_point(self.sensor_idx)
+
+    def get_set_point_volts(self):
+        """Get the raw setpoint value of the humidity sensor.
+
+        This method returns the raw set point value of the humidity sensor from the PSCU.
+
+        :returns: set raw point value in volts
+        """
+        return self.pscu.get_humidity_set_point_volts(self.sensor_idx)
 
     def get_tripped(self):
         """Get the trip status of the humidity sensor.
