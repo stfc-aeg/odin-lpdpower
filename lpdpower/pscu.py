@@ -34,6 +34,9 @@ class PSCU(I2CContainer):
     DEFAULT_DETECTOR_POSITION_OFFSET = 0.0
     TEMP_VREF = 3.0
     HUMIDITY_VREF = 5.0
+    FAN_VREF = 5.0
+    PUMP_VREF = 5.0
+    POSITION_VREF = 5.0
 
     def __init__(self, quad_enable_interval=DEFAULT_QUAD_ENABLE_INTERVAL,
                  detector_position_offset=DEFAULT_DETECTOR_POSITION_OFFSET):
@@ -133,17 +136,22 @@ class PSCU(I2CContainer):
 
         # Pump
         self.__pump_flow = 0.0
+        self.__pump_flow_raw = 0.0
         self.__pump_set_point = 0.0
+        self.__pump_set_point_raw = 0.0
         self.__pump_trip = False
 
         # Fan
         self.__fan_speed = 0.0
+        self.__fan_speed_raw = 0.0
         self.__fan_target = 100.0
         self.__fan_set_point = 0.0
+        self.__fan_set_point_raw = 0.0
         self.__fan_trip = False
 
         # Position
         self.__position = 0.0
+        self.__position_raw = 0.0
 
         # Quad traces
         self.__quad_traces = [False] * self.num_quads
@@ -313,12 +321,12 @@ class PSCU(I2CContainer):
         return self.__humidity_set_points[sensor]
 
     def get_humidity_set_point_volts(self, sensor):
-        """Get the set point of a PSCU humidity sensor.
+        """Get the raw set point of a PSCU humidity sensor.
 
         This method returns the current set point for the specified humidity sensor.
 
         :param sensor: humidity sensor index
-        :returns: value of the humidity sensor set point
+        :returns: raw value of the humidity sensor set point in volts
         """
         if sensor >= self. num_humidities or sensor < 0:
             raise I2CException('Illegal sensor index {} specified'.format(sensor))
@@ -373,6 +381,15 @@ class PSCU(I2CContainer):
         """
         return self.__pump_flow
 
+    def get_pump_flow_volts(self):
+        """Get the raw value of the PSCU pump flow sensor.
+
+        This method returns the current raw pump flow sensor value.
+
+        :returns: raw pump flow in volts
+        """
+        return self.__pump_flow_raw * PSCU.PUMP_VREF
+
     def get_pump_set_point(self):
         """Get the value of the PSCU pump flow set point.
 
@@ -381,6 +398,15 @@ class PSCU(I2CContainer):
         :returns: pump flow set point in l/min
         """
         return self.__pump_set_point
+
+    def get_pump_set_point_volts(self):
+        """Get the raw value of the PSCU pump flow set point.
+
+        This method returns the current raw pump flow sensor set point value.
+
+        :returns: raw pump flow set point in volts
+        """
+        return self.__pump_set_point_raw * PSCU.PUMP_VREF
 
     def get_pump_tripped(self):
         """Get the trip status of the PSCU pump flow meter.
@@ -400,6 +426,15 @@ class PSCU(I2CContainer):
         """
         return self.__fan_speed
 
+    def get_fan_speed_volts(self):
+        """Get the current raw fan speed.
+
+        This method returns the current raw LPD fan speed in volts.
+
+        :returns: raw fan speed in volts
+        """
+        return self.__fan_speed_raw * PSCU.FAN_VREF
+
     def get_fan_set_point(self):
         """Get the current fan speed set point.
 
@@ -408,6 +443,15 @@ class PSCU(I2CContainer):
         :returns: fan speed set point in Hz
         """
         return self.__fan_set_point
+
+    def get_fan_set_point_volts(self):
+        """Get the current raw fan speed set point.
+
+        This method returns the current raw LPD fan speed set point in volts.
+
+        :returns: raw fan speed set point in volts
+        """
+        return self.__fan_set_point_raw * PSCU.FAN_VREF
 
     def get_fan_target(self):
         """Get the current fan target speed.
@@ -451,6 +495,16 @@ class PSCU(I2CContainer):
         :returns: transverse position in mm
         """
         return self.__position
+
+    def get_position_volts(self):
+        """Get the value of the detector position sensor.
+
+        This method returns the raw value of the the potentiometer reading the position
+        of the quadrant motion system in volts.
+
+        :returns: raw poisition in volts
+        """
+        return self.__position_raw * PSCU.POSITION_VREF
 
     def get_armed(self):
         """Get the PSCU interlock armed state.
@@ -761,11 +815,10 @@ class PSCU(I2CContainer):
         :input scaled_adc_val ADC channel reading as fraction of full-scale
         :returns: fan speed value in Hertz.
         """
-        fan_vref = 5.0
         fan_scale = 4.5
         fan_max = 50.0
 
-        fan_hertz = ((scaled_adc_val * fan_vref) / fan_scale) * fan_max
+        fan_hertz = ((scaled_adc_val * PSCU.FAN_VREF) / fan_scale) * fan_max
 
         return fan_hertz
 
@@ -778,11 +831,10 @@ class PSCU(I2CContainer):
         :input scaled_adc_val ADC channel reading as fraction of full-scale
         :returns: pump flow rate in litre/min
         """
-        pump_vref = 5.0
         pump_scale = 4.32
         pump_max = 35.0
 
-        pump_lpermin = ((scaled_adc_val * pump_vref) / pump_scale) * pump_max
+        pump_lpermin = ((scaled_adc_val * PSCU.PUMP_VREF) / pump_scale) * pump_max
 
         return pump_lpermin
 
@@ -796,13 +848,12 @@ class PSCU(I2CContainer):
         :input scaled_adc_val ADC channel reading as fraction of full scale
         :returns: transverse detector position in mm.
         """
-        posn_vref = 5.0
-        posn_scale = 0.1
+        position_scale = 0.1
 
-        linear_posn = ((scaled_adc_val * posn_vref) / posn_scale)
-        transverse_posn = ((2.0 * linear_posn) / sqrt(2.0)) - self.detector_position_offset
+        linear_position = ((scaled_adc_val * PSCU.POSITION_VREF) / position_scale)
+        transverse_position = ((2.0 * linear_position) / sqrt(2.0)) - self.detector_position_offset
 
-        return transverse_posn
+        return transverse_position
 
     def poll_all_sensors(self):
         """Poll all sensor channels and update their values in the internal buffers.
@@ -875,18 +926,23 @@ class PSCU(I2CContainer):
 
         # Read, convert and store fan speed and setpoint ADC values and extract and store
         # the fan trip status
-        self.__fan_speed = self.convert_ad7998_fan(self.adc_misc[1].read_input_scaled(0))
-        self.__fan_set_point = self.convert_ad7998_fan(self.adc_misc[0].read_input_scaled(0))
+        self.__fan_speed_raw = self.adc_misc[1].read_input_scaled(0)
+        self.__fan_speed = self.convert_ad7998_fan(self.__fan_speed_raw)
+        self.__fan_set_point_raw = self.adc_misc[0].read_input_scaled(0)
+        self.__fan_set_point = self.convert_ad7998_fan(self.__fan_set_point_raw)
         self.__fan_trip = not bool(mcp_misc_1[0])
 
         # Read, convert and store pump flow speed and setpoint ADC values and extract and store
         # the pump trip status
-        self.__pump_flow = self.convert_ad7998_pump(self.adc_misc[1].read_input_scaled(3))
-        self.__pump_set_point = self.convert_ad7998_pump(self.adc_misc[0].read_input_scaled(3))
+        self.__pump_flow_raw = self.adc_misc[1].read_input_scaled(3)
+        self.__pump_flow = self.convert_ad7998_pump(self.__pump_flow_raw)
+        self.__pump_set_point_raw = self.adc_misc[0].read_input_scaled(3)
+        self.__pump_set_point = self.convert_ad7998_pump(self.__pump_set_point_raw)
         self.__pump_trip = not bool(mcp_misc_1[3])
 
         # Read, convert and save the detector position
-        self.__position = self.convert_ad7998_position(self.adc_misc[1].read_input_scaled(4))
+        self.__position_raw = self.adc_misc[1].read_input_scaled(4)
+        self.__position = self.convert_ad7998_position(self.__position_raw)
 
         # Extract and save global armed and health states
         self.__armed = bool(mcp_misc_0[0])
