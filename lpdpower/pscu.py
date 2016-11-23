@@ -32,6 +32,8 @@ class PSCU(I2CContainer):
     ALL_PINS = [0, 1, 2, 3, 4, 5, 6, 7]
     DEFAULT_QUAD_ENABLE_INTERVAL = 1.0
     DEFAULT_DETECTOR_POSITION_OFFSET = 0.0
+    TEMP_VREF = 3.0
+    HUMIDITY_VREF = 5.0
 
     def __init__(self, quad_enable_interval=DEFAULT_QUAD_ENABLE_INTERVAL,
                  detector_position_offset=DEFAULT_DETECTOR_POSITION_OFFSET):
@@ -204,8 +206,8 @@ class PSCU(I2CContainer):
         if sensor >= self.num_temperatures or sensor < 0:
             raise I2CException('Illegal sensor index {} specified'.format(sensor))
 
-        return self.__temperature_values_raw[sensor] * 3.0
-        
+        return self.__temperature_values_raw[sensor] * PSCU.TEMP_VREF
+
     def get_temperature_set_point(self, sensor):
         """Get the set point of a PSCU temperature sensor.
 
@@ -230,7 +232,7 @@ class PSCU(I2CContainer):
         if sensor >= self.num_temperatures or sensor < 0:
             raise I2CException('Illegal sensor index {} specified'.format(sensor))
 
-        return self.__temperature_set_points_raw[sensor] * 3.0
+        return self.__temperature_set_points_raw[sensor] * PSCU.TEMP_VREF
 
     def get_temperature_tripped(self, sensor):
         """Get the trip status of a PSCU temperature sensor.
@@ -295,7 +297,7 @@ class PSCU(I2CContainer):
         if sensor >= self. num_humidities or sensor < 0:
             raise I2CException('Illegal sensor index {} specified'.format(sensor))
 
-        return self.__humidity_values_raw[sensor] * 5.0
+        return self.__humidity_values_raw[sensor] * PSCU.HUMIDITY_VREF
 
     def get_humidity_set_point(self, sensor):
         """Get the set point of a PSCU humidity sensor.
@@ -321,7 +323,7 @@ class PSCU(I2CContainer):
         if sensor >= self. num_humidities or sensor < 0:
             raise I2CException('Illegal sensor index {} specified'.format(sensor))
 
-        return self.__humidity_set_points_raw[sensor] * 5.0
+        return self.__humidity_set_points_raw[sensor] * PSCU.HUMIDITY_VREF
 
     def get_humidity_tripped(self, sensor):
         """Get the trip status of a PSCU humidity sensor.
@@ -729,9 +731,8 @@ class PSCU(I2CContainer):
         :input scaled_adc_val ADC channel reading as fraction of full-scale
         :returns: temperature value in Celsius.
         """
-        temp_vref = 3.0
         temp_scale_v_kelvin = 0.005
-        temp_celsius = ((scaled_adc_val * temp_vref) / temp_scale_v_kelvin) - 273.15
+        temp_celsius = ((scaled_adc_val * PSCU.TEMP_VREF) / temp_scale_v_kelvin) - 273.15
 
         return temp_celsius
 
@@ -744,11 +745,10 @@ class PSCU(I2CContainer):
         :input scaled_adc_val ADC channel reading as fraction of full-scale
         :returns: humidity value in percent.
         """
-        humidity_vref = 5.0
         humidity_scale = 3.9
         humidity_max = 100.0
 
-        humidity_percent = ((scaled_adc_val * humidity_vref) / humidity_scale) * humidity_max
+        humidity_percent = ((scaled_adc_val * PSCU.HUMIDITY_VREF) / humidity_scale) * humidity_max
 
         return humidity_percent
 
