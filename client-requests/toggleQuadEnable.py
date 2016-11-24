@@ -1,8 +1,8 @@
-import sys, requests, json, pprint
+import sys, requests, json, pprint, time
 
 def toggleQuadEnable(quad, channel):
     
-    base_url = 'http://beagle03.aeg.lan:8888/api/0.1/lpdpower/'
+    base_url = 'http://beagle04.aeg.lan:8888/api/0.1/lpdpower/'
     
     path = 'quad/quads/{}/channels/{}'.format(quad, channel)
     url = base_url + path    
@@ -13,25 +13,26 @@ def toggleQuadEnable(quad, channel):
     # Get the appropriate quad channel status
     response = requests.get(url)
     chan_status   = response.json()[str(channel)]
-    print "Quad {} channel {} status before toggling enable:".format(quad, channel)
-    pp.pprint(chan_status)
-    chan_enable = chan_status['enable']
+    print "Quad {} channel {} status before toggling enable: {}".format(quad, channel, chan_status['enabled'])
+    #pp.pprint(chan_status)
+    chan_enable = chan_status['enabled']
     
     # Toggle the enable state
-    payload = {"enable": not chan_enable}
+    payload = {"enabled": not chan_enable}
     rep = requests.put(url, data=json.dumps(payload), headers=headers)
   
     if rep.status_code != 200:
         print "error:  {} Couldn't change quad {} channel {}".format(rep.status_code, quad, channel)
     else:
-        print "Success (Code:{}) changed quad {} channel {}".format(rep.status_code, quad, channel)
+        print "Success (Code:{}) changed quad {} channel {} to: {}".format(rep.status_code, quad, channel, payload['enabled'])
   
+    time.sleep(0.5)
     # Get the status again
     response = requests.get(url)
     chan_status = response.json()[str(channel)]
 
-    print "Quad {} channel {} status after toggling enable:".format(quad, channel)    
-    pp.pprint(chan_status)
+    print "Quad {} channel {} status after toggling enable: {}".format(quad, channel, chan_status['enabled'])
+    #pp.pprint(chan_status)
 
 if __name__ == "__main__":
     

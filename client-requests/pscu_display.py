@@ -2,7 +2,7 @@
 
 ''' Display all device information in as similar a fashion as the webpage, as possible '''
 
-from __future__ import print_function#, division, absolute_import
+from __future__ import print_function
 from pscu_client import PSCUClient
 
 if __name__ == "__main__":

@@ -6,7 +6,7 @@ Created on Aug 23, 2016
 import requests, json
 import pprint 
 
-url = 'http://beagle04.aeg.lan:8888/api/0.1/lpdpower/'
+url = 'http://beagle03.aeg.lan:8888/api/0.1/lpdpower/'
 
 pp = pprint.PrettyPrinter()
 
