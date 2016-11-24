@@ -3,8 +3,13 @@
 
 import requests, json
 import time
+import sys
 
-url = 'http://beagle03.aeg.lan:8888/api/0.1/lpdpower/'
+pscu_host='beagle03'
+if len(sys.argv) > 1:
+    pscu_host=sys.argv[1]
+
+url = 'http://{:s}.aeg.lan:8888/api/0.1/lpdpower/'.format(pscu_host)
 
 response = requests.get(url)
 pscu_status = response.json()
@@ -27,23 +32,32 @@ try:
         posn_data = pscu_status['position']
         # Print each "pair" of temp, humidity per line (but avoid humidity once beyond 2nd humidity sensor
         for index in range(temp_sensors):
-            print "Temperature{0:>2}: {1:2.1f} C ({2:2.5} V) Setpoint: {3:2.6f} C ({4:2.6f} V)".format(index, temp_data[str(index)]['temperature'], temp_data[str(index)]['temperature_volts'], 
-                                                                                               temp_data[str(index)]['setpoint'], temp_data[str(index)]['setpoint_volts']),
+            print "Temperature {0:>2}: {1:6.1f} C  ({2:6.4f} V) Setpoint: {3:6.1f} C  ({4:6.4f} V)".format(
+                index, temp_data[str(index)]['temperature'], temp_data[str(index)]['temperature_volts'], 
+                       temp_data[str(index)]['setpoint'], temp_data[str(index)]['setpoint_volts']
+                ),
             if index < 2:
-                print "   Humidity{0:>2}: {1:2.1f} % ({2:1.5f} V)) Setpoint: {3:2.6f} C ({4:2.6f} V)".format(index, humid_data[str(index)]['humidity'], humid_data[str(index)]['humidity_volts'], 
-                                                                                                     humid_data[str(index)]['setpoint'], humid_data[str(index)]['setpoint_volts'])
+                print "   Humidity{0:>2}: {1:6.1f} % ({2:6.4f} V)) Setpoint: {3:2.1f} C ({4:6.4f} V)".format(
+                    index, humid_data[str(index)]['humidity'], humid_data[str(index)]['humidity_volts'], 
+                           humid_data[str(index)]['setpoint'], humid_data[str(index)]['setpoint_volts']
+                )
             else:
                 print ""
+
         # Adding fan, pump & position
-        print "fan's currentspeed: {0:>2.1f} Hz ({1:2.1} V) Setpoint: {2:2.6f} Hz ({3:2.6f} V)".format(fan_data['currentspeed'], fan_data['currentspeed_volts'],
-                                                                                                      fan_data['setpoint'], fan_data['setpoint_volts'])
-        print "pump's currentspeed: {0:>2.1f} L/min ({1:2.1} V) Setpoint: {2:2.6f} L/min ({3:2.6f} V)".format(pump_data['flow'], pump_data['flow_volts'],
-                                                                                                       pump_data['setpoint'], pump_data['setpoint_volts'])
-        print "Position: {0:>2.4f} mm ({1:2.1} V)".format(posn_data['flow'], posn_data['flow_volts'])
-        # Placeholder in case there is a setpoint_volts key too:
-        #print "Position: {0:>2.4f} mm ({1:2.1} V) Setpoint: {2:2.6f} mm".format(posn_data['flow'], posn_data['flow_volts'])
-        print "Pause 1 sec.."
+        print "Fan speed     : {0:>6.1f} Hz ({1:6.4f} V) Setpoint: {2:6.1f} Hz ({3:6.4f} V)".format(
+            fan_data['currentspeed'], fan_data['currentspeed_volts'],
+            fan_data['setpoint'], fan_data['setpoint_volts']
+        )
+        print "Pump flow     : {0:>6.1f} L  ({1:6.4f} V) Setpoint: {2:6.1f} L  ({3:6.4f} V)".format(
+            pump_data['flow'], pump_data['flow_volts'],
+            pump_data['setpoint'], pump_data['setpoint_volts']
+        )
+        print "Position      : {0:>6.1f} mm ({1:6.4f} V)".format(pscu_status['position'], pscu_status['position_volts'])
+
+        print "Pause 1 sec..\n"
         time.sleep(1)
+
 except KeyboardInterrupt:
     print("\n")
 print("\nAll Done")
