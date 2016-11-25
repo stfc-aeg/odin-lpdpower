@@ -799,10 +799,10 @@ class PSCU(I2CContainer):
         :input scaled_adc_val ADC channel reading as fraction of full-scale
         :returns: humidity value in percent.
         """
-        humidity_scale = 3.9
-        humidity_max = 100.0
-
-        humidity_percent = ((scaled_adc_val * PSCU.HUMIDITY_VREF) / humidity_scale) * humidity_max
+        humidity_scale = 0.031
+        humidity_offset = 0.8
+           
+        humidity_percent = ((scaled_adc_val * PSCU.HUMIDITY_VREF) - humidity_offset) / humidity_scale
 
         return humidity_percent
 
