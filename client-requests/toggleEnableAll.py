@@ -1,9 +1,13 @@
 from __future__ import print_function
-import requests, json
+import requests, json, sys
 
 def toggleEnableAll():
     
-    base_url = 'http://beagle04.aeg.lan:8888/api/0.1/lpdpower/'
+    pscu_host = "beagle03.aeg.lan"
+    if len(sys.argv) > 1:
+        pscu_host = sys.argv[1]
+    
+    base_url = 'http://{:s}:8888/api/0.1/lpdpower/'.format(pscu_host)
     enable_path = 'allEnabled'
     headers = {'Content-Type': 'application/json'}
     

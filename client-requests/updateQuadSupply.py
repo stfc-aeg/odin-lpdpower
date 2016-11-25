@@ -2,9 +2,15 @@
 
 from __future__ import print_function
 from pscu_client import PSCUClient
-thePSCU = PSCUClient()
+import sys
 
 def toggleQuadSupply(quad):
+
+    pscu_host = "beagle03.aeg.lan"
+    if len(sys.argv) > 1:
+        pscu_host = sys.argv[1]
+
+    thePSCU = PSCUClient(address=pscu_host, port=8888)
 
     print("It's no longer possible to change read-only values - this script should then fail..")    
     quadPath = 'quad/quads/{}/supply'.format(quad)

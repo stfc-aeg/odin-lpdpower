@@ -1,9 +1,13 @@
 ''' by ckd27546 - read out each temperature and humidity sensor's value, actual and in volts, ditto for its' setpoint '''
 
 import requests, json
-import time
+import time, sys
 
-url = 'http://beagle03.aeg.lan:8888/api/0.1/lpdpower/'
+pscu_host='beagle03.aeg.lan'
+if len(sys.argv) > 1:
+    pscu_host=sys.argv[1]
+
+url = 'http://{:s}:8888/api/0.1/lpdpower/'.format(pscu_host)
 
 response = requests.get(url)
 pscu_status = response.json()

@@ -1,8 +1,6 @@
 import sys, requests, json, pprint, time
 
-def toggleQuadEnable(quad, channel):
-    
-    base_url = 'http://beagle04.aeg.lan:8888/api/0.1/lpdpower/'
+def toggleQuadEnable(base_url, quad, channel):
     
     path = 'quad/quads/{}/channels/{}'.format(quad, channel)
     url = base_url + path    
@@ -38,11 +36,25 @@ if __name__ == "__main__":
     
     quad = 0
     channel = 0
-    
-    if len(sys.argv) > 1:
-        quad = int(sys.argv[1])
+
+    if len(sys.argv) != 4:
+        print "Format: python test.py <address> <Quad> <Channel>"
+        print "Example Usage: python toggleQuadEnable.py beagle03.aeg.lan 0 3"
+    else:
+
+        quad = int(sys.argv[2])
+        channel = int(sys.argv[3])
+        if quad > 3:
+            print "Quad must be integer value between 0-3"
+            sys.exit(-1)
+        if channel > 3:
+            print "Channel must be integer value between 0-3"
+            sys.exit(-1)
+
+        pscu_host = "beagle03.aeg.lan"
+        if len(sys.argv) > 1:
+            pscu_host = sys.argv[1]
         
-    if len(sys.argv) > 2:
-        channel = int(sys.argv[2])
-        
-    toggleQuadEnable(quad, channel)
+        base_url = 'http://{:s}:8888/api/0.1/lpdpower/'.format(pscu_host)
+
+        toggleQuadEnable(base_url, quad, channel)

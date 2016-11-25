@@ -3,10 +3,14 @@ from __future__ import print_function#, division, absolute_import
 
 import requests, sys, time
 
+pscu_host = "beagle03.aeg.lan"
+if len(sys.argv) > 1:
+    pscu_host = sys.argv[1]
+url = 'http://{:s}:8888/api/0.1/lpdpower/'.format(pscu_host)
 print("Continuously reading all temperatures: (Use Ctrl-C to close script)")
 try:
     while True:
-        theLot = requests.get('http://beagle04.aeg.lan:8888/api/0.1/lpdpower/')
+        theLot = requests.get(url)
         # Read all 11 temperatures, display on the same line
         for index in range(11):
             print("{}: {:.1f}C  ".format(index, theLot.json()['temperature']['sensors'][str(index)]['temperature']), end=' ')

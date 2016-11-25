@@ -1,7 +1,10 @@
 import requests, json
-import pprint 
+import pprint, sys
 
-url = 'http://beagle04.aeg.lan:8888/api/0.1/lpdpower/'
+pscu_host = "beagle03.aeg.lan"
+if len(sys.argv) > 1:
+    pscu_host = sys.argv[1]
+url = 'http://{:s}:8888/api/0.1/lpdpower/'.format(pscu_host)
 
 pp = pprint.PrettyPrinter()
 

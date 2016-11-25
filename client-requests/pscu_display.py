@@ -4,10 +4,15 @@
 
 from __future__ import print_function
 from pscu_client import PSCUClient
+import sys
 
 if __name__ == "__main__":
 
-    thePSCU = PSCUClient()
+    pscu_host = "beagle03.aeg.lan"
+    if len(sys.argv) > 1:
+        pscu_host = sys.argv[1]
+
+    thePSCU = PSCUClient(address=pscu_host, port=8888)
 
     print("________________________________________________________________")
     print("Replicating \"Overall Health\", i.e. left-hand side of the webpage")

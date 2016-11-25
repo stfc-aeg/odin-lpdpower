@@ -8,11 +8,10 @@
 
 from __future__ import print_function
 import requests, json
-import pprint, time
+import pprint, time, sys
 
-def tryUpdateQuadEnable(quad, channel, bEnable):
+def tryUpdateQuadEnable(url, quad, channel, bEnable):
     ''' Toggle Quad's supply '''
-    url = 'http://beagle04.aeg.lan:8888/api/0.1/lpdpower/'
     headers  = {'Content-Type' : 'application/json'}
 
     response = requests.get(url)
@@ -55,6 +54,12 @@ def tryUpdateQuadEnable(quad, channel, bEnable):
 
 
 if __name__ == "__main__":
-    (quad, channel) = (0, 0)
+    (quad, channel) = (2, 0)
     bEnable = False #True
-    tryUpdateQuadEnable(quad, channel, bEnable)
+
+    pscu_host = "beagle03.aeg.lan"
+    if len(sys.argv) > 1:
+        pscu_host = sys.argv[1]
+    
+    url = 'http://{:s}:8888/api/0.1/lpdpower/'.format(pscu_host)
+    tryUpdateQuadEnable(url, quad, channel, bEnable)
