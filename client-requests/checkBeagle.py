@@ -1,3 +1,4 @@
+''' Test accessing and displaying of top-level keys are working '''
 import requests, sys
 
 pscu_host = "beagle03.aeg.lan"

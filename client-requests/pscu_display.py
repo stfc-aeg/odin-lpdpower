@@ -43,7 +43,7 @@ if __name__ == "__main__":
             chVoltage     = quads[str(quad)]['channels'][str(channel)]['voltage']
             print("Channel{}:  ".format(channel), end=' ')
             print("{0:.3f}A  ".format(chCurrent), end=' ')
-            print("Enabled: {}  Fuse: {}  ".format(chEnabled, chFuseVoltage), end=' ')
+            print("Enabled: {0}  Fuse: {1:2.1f}  ".format(chEnabled, chFuseVoltage), end=' ')
             print("Volt: {0:.3}V".format(chVoltage))
 
     print("________________________________________________________________")
@@ -83,9 +83,9 @@ if __name__ == "__main__":
 
     chPump = thePSCU.getKey(thePSCU.url, 'pump')
     print("Pump1 Status: {}  Latched: {}  ".format(chPump['overall'], chPump['latched']))
-    print("{0:>2.1f}l/min  Setpoint {1:>2.1f}l/min  ".format(chPump['flow'], chPump['setpoint']), end=' ')
+    print("{0:>2.1f}L/min  Setpoint {1:>2.1f}L/min  ".format(chPump['flow'], chPump['setpoint']), end=' ')
     print("Tripped: {} ".format(chPump['tripped']))
-    
+
     print("________________________________________________________________")
     
     

@@ -1,3 +1,4 @@
+''' Toggle key 'allEnabled' to the opposite of its current value '''
 from __future__ import print_function
 import requests, json, sys
 
@@ -12,8 +13,12 @@ def toggleEnableAll():
     headers = {'Content-Type': 'application/json'}
     
     url = base_url + enable_path
-    response = requests.get(url)
-    
+    try:
+        response = requests.get(url)
+    except Exception as e:
+        print("Error: ", e)
+        return
+
     if response.status_code != 200:
         print("Requesting global enable state failed with status_code {} : {}".format(
             response.status_code, response.json()))
@@ -24,8 +29,12 @@ def toggleEnableAll():
     print("Current {} state is {}".format(enable_path, enabled))
     payload = {enable_path: not enabled}
 
-    response = requests.put(base_url, data=json.dumps(payload), headers=headers)
-    
+    try:
+        response = requests.put(base_url, data=json.dumps(payload), headers=headers)
+    except Exception as e:
+        print("Error: ", e)
+        return
+
     if response.status_code != 200:
         print("Setting global enable state to {} failed with status_code {} : {}".format(
             not enabled, response.status_code, response.json()))

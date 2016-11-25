@@ -8,8 +8,11 @@ if len(sys.argv) > 1:
 
 url = 'http://{:s}:8888/api/0.1/lpdpower/'.format(pscu_host)
 
-theLot = requests.get(url)
-
+try:
+    theLot = requests.get(url)
+except Exception as e:
+    print "Error: ", e
+    sys.exit(-1)
 for index in range(11):
     print("Temp{}: {:.1f}C".format(index, theLot.json()['temperature']['sensors'][str(index)]['temperature']))
 

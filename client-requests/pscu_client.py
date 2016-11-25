@@ -1,3 +1,4 @@
+''' Provide control to PSCU's hardware; Used by other scripts '''
 from __future__ import print_function
 import requests, sys, time, json, pprint
 
@@ -10,7 +11,11 @@ class PSCUClient(object):
         if not isinstance(port, str):
             port = str(port)
         self.url      = 'http://{}:{}/api/0.1/lpdpower/'.format(address, port)
-        self.response = requests.get(self.url)
+        try:
+            self.response = requests.get(self.url)
+        except Exception as e:
+            print("Error: ", e)
+            sys.exit(-1)
         self.dict     = self.response.json()
         # Headers don't change
         self.headers = {'Content-Type' : 'application/json'}
@@ -100,7 +105,7 @@ if __name__ == "__main__":
         pscu_host = sys.argv[1]
 
     thePSCU = PSCUClient(address=pscu_host, port=8888)
-
+        
     # Toggle arm - Switch off if armed, Switch on if not
     bArmStatus = thePSCU.getArm()
     print("Arm is set to: {}, while the system is: {}".format(bArmStatus, ("Armed" if thePSCU.getArm() == True else "Not Armed")))

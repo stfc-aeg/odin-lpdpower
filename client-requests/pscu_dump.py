@@ -1,7 +1,7 @@
 '''
-Created on Aug 23, 2016
+Dump PSCU data tree (but in a formatted display)
 
-@author: tcn45
+@author: ckd27546
 '''
 import requests, json
 import pprint 
@@ -15,6 +15,9 @@ url = 'http://{:s}:8888/api/0.1/lpdpower/'.format(pscu_host)
 
 pp = pprint.PrettyPrinter()
 
-response = requests.get(url)
-pscu_status = response.json()
-pp.pprint(pscu_status)
+try:
+    response = requests.get(url)
+    pscu_status = response.json()
+    pp.pprint(pscu_status)
+except Exception as e:
+    print "Error: ", e

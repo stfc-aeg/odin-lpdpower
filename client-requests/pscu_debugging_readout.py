@@ -1,8 +1,8 @@
-''' by ckd27546 - read out each temperature and humidity sensor's value, actual and in volts, ditto for its' setpoint;
-                    Now also includes fan, pump, position values '''
+''' ckd27546 - read out each temperature and humidity sensor's value, actual and in volts, ditto for its' setpoint;
+               Now also includes fan, pump, position values; Added timestamp to differentiate between each iteration '''
 
 import requests, json
-import time
+import time, datetime
 import sys
 
 pscu_host='beagle03.aeg.lan'
@@ -10,8 +10,11 @@ if len(sys.argv) > 1:
     pscu_host=sys.argv[1]
 
 url = 'http://{:s}:8888/api/0.1/lpdpower/'.format(pscu_host)
-
-response = requests.get(url)
+try:
+    response = requests.get(url)
+except Exception as e:
+    print "Error: ", e
+    sys.exit(-1)
 pscu_status = response.json()
 
 temp_sensors = len(pscu_status['temperature']['sensors'])
@@ -23,13 +26,17 @@ time.sleep(1)
 try:
     while True:
         # Request PSCU sensors data and place into local var for temp, humidity
-        response = requests.get(url)
+        try:
+            response = requests.get(url)
+        except Exception as e:
+            print "Error: ", e
+            sys.exit(-1)
         pscu_status = response.json()
-        temp_data = pscu_status['temperature']['sensors']
-        humid_data = pscu_status['humidity']['sensors']
-        fan_data = pscu_status['fan']
-        pump_data = pscu_status['pump']
-        posn_data = pscu_status['position']
+        temp_data   = pscu_status['temperature']['sensors']
+        humid_data  = pscu_status['humidity']['sensors']
+        fan_data    = pscu_status['fan']
+        pump_data   = pscu_status['pump']
+        posn_data   = pscu_status['position']
         # Print each "pair" of temp, humidity per line (but avoid humidity once beyond 2nd humidity sensor
         for index in range(temp_sensors):
             print "Temperature {0:>2}: {1:6.1f} C  ({2:6.4f} V) Setpoint: {3:6.1f} C  ({4:6.4f} V)".format(
@@ -55,7 +62,10 @@ try:
         )
         print "Position      : {0:>6.1f} mm ({1:6.4f} V)".format(pscu_status['position'], pscu_status['position_volts'])
 
-        print "Pause 1 sec..\n"
+        # Construct and print current daytime
+        ts = time.time()
+        timeStamp = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
+        print timeStamp, "\n"
         time.sleep(1)
 
 except KeyboardInterrupt:

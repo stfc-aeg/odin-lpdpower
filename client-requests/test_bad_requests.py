@@ -11,9 +11,12 @@ pp = pprint.PrettyPrinter()
 garbage_put = 'rubbish_1234'
 headers = {"Content-Type" : 'application/json'}
 
-response = requests.put(url, data=garbage_put, headers=headers)
-print(response.status_code, response.json())
-
-get_bad_path = url + 'missing'
-response = requests.get(get_bad_path)
-print(response.status_code, response.json())
+try:
+    response = requests.put(url, data=garbage_put, headers=headers)
+    print(response.status_code, response.json())
+    
+    get_bad_path = url + 'missing'
+    response = requests.get(get_bad_path)
+    print(response.status_code, response.json())
+except Exception as e:
+    print "Error: ", e

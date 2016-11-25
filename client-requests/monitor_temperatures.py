@@ -1,4 +1,5 @@
 #!~/develop/projects/odin/venv/bin/python
+''' Readout 1/second all temperature sensors until the user interrupts '''
 from __future__ import print_function#, division, absolute_import
 
 import requests, sys, time
@@ -21,6 +22,8 @@ try:
         sys.stdout.flush()
         time.sleep(0.2)
         print("\r", end=' ')
+except Exception as e:
+    print("Error: ", e)
 except KeyboardInterrupt:
+    # The user pressed Ctrl-C (to stop the script) 
     print("\n")
-print("\nAll Done")
