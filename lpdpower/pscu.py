@@ -877,23 +877,31 @@ class PSCU(I2CContainer):
 
         # Read, convert and store all temperature values and setpoints from the ADCs and
         # extract and store all trip, trace and disabled states from the MCPs
+
+        for i in range(4):
+            self.__temperature_disabled[i + 4] = mcp_mon_0[i]
+
+        self.__temperature_disabled[10] = mcp_mon_0[4]
+
         for i in range(8):
             self.__temperature_set_points_raw[i] = self.adc_temp_mon[0].read_input_scaled(i)
             self.__temperature_set_points[i] = self.convert_ad7998_temp(
                 self.__temperature_set_points_raw[i]
             )
             self.__temperature_values_raw[i] = self.adc_temp_mon[1].read_input_scaled(i)
-            self.__temperature_values[i] = self.convert_ad7998_temp(
-                self.__temperature_values_raw[i]
-            )
+            if not self.__temperature_disabled[i]:
+                self.__temperature_values[i] = self.convert_ad7998_temp(
+                    self.__temperature_values_raw[i]
+                )
             self.__temperature_trips[i] = not bool(mcp_mon_1[i])
             self.__temperature_traces[i] = bool(mcp_mon_2[i])
 
         for i in range(3):
             self.__temperature_values_raw[i + 8] = self.adc_temp_mon[2].read_input_scaled(i)
-            self.__temperature_values[i + 8] = self.convert_ad7998_temp(
-                self.__temperature_values_raw[i + 8]
-            )
+            if not self.__temperature_disabled[i + 8]:
+                self.__temperature_values[i + 8] = self.convert_ad7998_temp(
+                    self.__temperature_values_raw[i + 8]
+                )
             self.__temperature_set_points_raw[i + 8] = self.adc_temp_mon[2].read_input_scaled(i+4)
             self.__temperature_set_points[i + 8] = self.convert_ad7998_temp(
                 self.__temperature_set_points_raw[i + 8]
@@ -901,13 +909,11 @@ class PSCU(I2CContainer):
             self.__temperature_trips[i + 8] = not bool(mcp_mon_3[i])
             self.__temperature_traces[i + 8] = bool(mcp_mon_3[i+3])
 
-        for i in range(4):
-            self.__temperature_disabled[i + 4] = mcp_mon_0[i]
-
-        self.__temperature_disabled[10] = mcp_mon_0[4]
-
         # Read, convert and store all humidity values and setpoints from the ADCs and
         # extract and store all trip, trace and disabled states from the MCPs
+
+        self.__humidity_disabled[1] = mcp_mon_0[5]
+
         for i in range(self.num_humidities):
 
             self.__humidity_set_points_raw[i] = self.adc_misc[0].read_input_scaled(i+1)
@@ -915,14 +921,13 @@ class PSCU(I2CContainer):
                 self.__humidity_set_points_raw[i]
             )
             self.__humidity_values_raw[i] = self.adc_misc[1].read_input_scaled(i+1)
-            self.__humidity_values[i] = self.convert_ad7998_humidity(
-                self.__humidity_values_raw[i]
-            )
+            if not self.__humidity_disabled[i]:
+                self.__humidity_values[i] = self.convert_ad7998_humidity(
+                    self.__humidity_values_raw[i]
+                )
 
             self.__humidity_trips[i] = not bool(mcp_misc_1[i+1])
             self.__humidity_traces[i] = bool(mcp_misc_2[i])
-
-        self.__humidity_disabled[1] = mcp_mon_0[5]
 
         # Read, convert and store fan speed and setpoint ADC values and extract and store
         # the fan trip status
