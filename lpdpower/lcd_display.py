@@ -220,9 +220,13 @@ class LcdDisplay(object):
 
         for chan in range(start_chan, end_chan):
             if chan < num_temp_vals:
-                chan_temp = self.pscu.get_temperature(chan)
-                chan_trip = '*' if self.pscu.get_temperature_tripped(chan) else ' '
-                temp_disp = '{:2d}:{:4.1f}C{} '.format(chan+1, chan_temp, chan_trip)
+                chan_disabled = self.pscu.get_temperature_disabled(chan)
+                if chan_disabled:
+                    temp_disp = '{:2d}:N/C    '.format(chan+1)
+                else:
+                    chan_temp = self.pscu.get_temperature(chan)
+                    chan_trip = '*' if self.pscu.get_temperature_tripped(chan) else ' '
+                    temp_disp = '{:2d}:{:4.1f}C{} '.format(chan+1, chan_temp, chan_trip)
             else:
                 temp_disp = '\r'
 
@@ -245,9 +249,13 @@ class LcdDisplay(object):
         content += 'Humidity: {}\r'.format(state_str)
 
         for chan in range(self.pscu.num_humidities):
-            chan_humid = self.pscu.get_humidity(chan)
-            chan_trip = '*' if self.pscu.get_humidity_tripped(chan) else ' '
-            content += '{}:{:4.1f}%{} '.format(chan+1, chan_humid, chan_trip)
+            chan_disabled = self.pscu.get_humidity_disabled(chan)
+            if chan_disabled:
+                content += '{}:N/C    '.format(chan+1)
+            else:
+                chan_humid = self.pscu.get_humidity(chan)
+                chan_trip = '*' if self.pscu.get_humidity_tripped(chan) else ' '
+                content += '{}:{:4.1f}%{} '.format(chan+1, chan_humid, chan_trip)
 
         content += '\r\r'
 

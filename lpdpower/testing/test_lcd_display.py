@@ -26,7 +26,9 @@ class TestLcdDisplay():
         cls.pscu.num_humidities = 2
         cls.pscu.get_all_latched.return_value = [True]*4
         cls.pscu.get_temperature.return_value = 20.0
+        cls.pscu.get_temperature_disabled.return_value = False
         cls.pscu.get_humidity.return_value = 56.7
+        cls.pscu.get_humidity_disabled.return_value = False
         cls.pscu.get_fan_speed.return_value = 45.0
         cls.pscu.get_fan_target.return_value = 90
         cls.pscu.get_pump_flow.return_value = 4.2
@@ -123,22 +125,44 @@ class TestLcdDisplay():
 
     def test_temperature_pages(self):
 
+        self.pscu.get_temperature_disabled.return_value = False
         for page in range(self.display.num_temp_pages):
             content = self.display.temperature_page(page)
-            for call in ['get_temperature', 'get_temperature_latched', 'get_temperature_state', 'get_temperature_tripped']:
+            for call in [
+                    'get_temperature', 'get_temperature_latched', 'get_temperature_state',
+                    'get_temperature_tripped', 'get_temperature_disabled']:
                 assert_true(getattr(self.pscu, call).called, 'PSCU method {} not called'.format(call))
             assert_equal(type(content), str)
             assert_true(len(content) > 0)
             assert_true('Temp' in content)
 
+    def test_temperature_page_sensor_disabled(self):
+
+        self.pscu.get_temperature_disabled.return_value = True
+        content = self.display.temperature_page(0)
+        assert_equal(type(content), str)
+        assert_true(len(content) > 0)
+        assert_true('N/C' in content)
+
     def test_humidity_page(self):
 
+        self.pscu.get_humidity_disabled.return_value = False
         content = self.display.humidity_page()
-        for call in ['get_humidity', 'get_humidity_latched', 'get_humidity_state', 'get_humidity_tripped']:
+        for call in [
+                'get_humidity', 'get_humidity_latched', 'get_humidity_state',
+                'get_humidity_tripped', 'get_humidity_disabled']:
             assert_true(getattr(self.pscu, call).called, 'PSCU method {} not called'.format(call))
         assert_equal(type(content), str)
         assert_true(len(content) > 0)
         assert_true('Humidity' in content)
+
+    def test_humidity_page_disabled(self):
+
+        self.pscu.get_humidity_disabled.return_value = True
+        content = self.display.humidity_page()
+        assert_equal(type(content), str)
+        assert_true(len(content) > 0)
+        assert_true('N/C' in content)
 
     def test_fan_page(self):
 

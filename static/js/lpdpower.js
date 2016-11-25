@@ -4,6 +4,7 @@ const buttonOff = "btn-danger";
 const colorOk = "#5cb85c";
 const colorFail = "#d9534f";
 const colorUnknown = '#555555';
+const colorWarn = "#ffa500"
 
 function round1dp(flt)
 {
@@ -172,8 +173,8 @@ function generateTempSensors(count)
 		ret += `
 		<tr>
 			<th class="text-center">Temp ${id+1}</th>
-			<td><span id="tmp${id}-tmp"></span>°C</td>
-			<td><span id="tmp${id}-set"></span>°C</td>
+			<td><span id="tmp${id}-tmp"></span></td>
+			<td><span id="tmp${id}-set"></span></td>
 			<td><div id="tmp${id}-trace" class="status" ></div></td>
 			<td><div id="tmp${id}-enable" class="status" ></div></td>
 		    <td><div id="tmp${id}-trip" class="status"></div></td>
@@ -205,11 +206,20 @@ class TempSensor
 
 	update(data)
 	{
-		this.map.get("trip").style.backgroundColor = data.tripped ? colorFail : colorOk;
-		this.map.get("trace").style.backgroundColor = data.trace ? colorOk : colorFail;
-		this.map.get("tmp").innerHTML = round1dp(data.temperature);
-		this.map.get("set").innerHTML = round1dp(data.setpoint);
-		this.map.get("enable").style.backgroundColor = data.disabled ? colorFail : colorOk;
+	    this.map.get("trip").style.backgroundColor = data.tripped ? colorFail : colorOk;
+	    this.map.get("trace").style.backgroundColor = data.trace ? colorOk : colorFail;
+	    var temperatureVal = '';
+	    var setpointVal = '';
+	    if (data.disabled) {
+		temperatureVal = 'N/C';
+		setpointVal = 'N/C';
+	    } else {
+		temperatureVal = round1dp(data.temperature) + '°C';
+		setpointVal = round1dp(data.setpoint) + '°C';
+	    }
+	    this.map.get("tmp").innerHTML = temperatureVal;
+	    this.map.get("set").innerHTML = setpointVal;
+	    this.map.get("enable").style.backgroundColor = data.disabled ? colorWarn : colorOk;
 	}
 }
 
@@ -250,8 +260,8 @@ function generateHumiditySensors(count)
 		ret += `
 		<tr>
 			<th class="text-center">Humid ${id+1}</th>
-			<td><span id="h${id}-h"></span>%</td>
-			<td><span id="h${id}-set"></span>%</td>
+			<td><span id="h${id}-h"></span></td>
+			<td><span id="h${id}-set"></span></td>
 			<td><div id="h${id}-trace" class="status" ></div></td>
 			<td><div id="h${id}-enable" class="status" ></div></td>
 			<td><div id="h${id}-trip" class="status"></div></td>
@@ -283,11 +293,20 @@ class HumiditySensor
 
 	update(data)
 	{
-		this.map.get("trip").style.backgroundColor = data.tripped ? colorFail : colorOk;
-		this.map.get("trace").style.backgroundColor = data.trace ? colorOk : colorFail;
-		this.map.get("h").innerHTML = round1dp(data.humidity);
-		this.map.get("set").innerHTML = round1dp(data.setpoint);
-		this.map.get("enable").style.backgroundColor = data.disabled ? colorFail : colorOk;
+	    this.map.get("trip").style.backgroundColor = data.tripped ? colorFail : colorOk;
+	    this.map.get("trace").style.backgroundColor = data.trace ? colorOk : colorFail;
+	    var humidityValue = '';
+	    var setpointValue = '';
+	    if (data.disabled) {
+		humidityValue = 'N/C';
+		setpointValue = 'N/C'
+	    } else {
+		humidityValue = round1dp(data.humidity) + '%';
+		setpointValue = round1dp(data.setpoint) + '%';
+	    }
+	    this.map.get("h").innerHTML = humidityValue;
+	    this.map.get("set").innerHTML = setpointValue;
+	    this.map.get("enable").style.backgroundColor = data.disabled ? colorWarn : colorOk;
 	}
 }
 
