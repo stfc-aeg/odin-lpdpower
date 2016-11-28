@@ -49,6 +49,7 @@ class PSCU(I2CContainer):
         'N/C',
         'Coolant Out',
         'Coolant In',
+        'N/C',
     ]
 
     HUMIDITY_SENSOR_NAMES = [
