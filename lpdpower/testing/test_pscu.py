@@ -318,10 +318,10 @@ class TestPSCU():
     def test_convert_ad7998_humidity(self):
 
         expected_results = [
-            (0.00, 0.0),
-            (0.50, 64.103),
+            (0.00, -25.806),
+            (0.50, 54.839),
             (0.78, 100.0),
-            (1.00, 128.205),
+            (1.00, 135.484),
         ]
         for (scaled_adc_val, expected_humidity) in expected_results:
             converted_humidity = self.pscu.convert_ad7998_humidity(scaled_adc_val)
