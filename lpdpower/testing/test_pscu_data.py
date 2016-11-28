@@ -47,6 +47,11 @@ class TestTempData():
         self.temp_data.param_tree.get('disabled')
         self.pscu.get_temperature_disabled.assert_called_with(self.sensor_idx)
 
+    def test_name_get(self):
+        self.temp_data.param_tree.get('name')
+        self.pscu.get_temperature_name.assert_called_with(self.sensor_idx)
+
+
 class TestHumidityData():
 
     @classmethod
@@ -74,6 +79,11 @@ class TestHumidityData():
     def test_disabled_get(self):
         self.humidity_data.param_tree.get('disabled')
         self.pscu.get_humidity_disabled.assert_called_with(self.sensor_idx)
+
+    def test_name_get(self):
+        self.humidity_data.param_tree.get('name')
+        self.pscu.get_humidity_name.assert_called_with(self.sensor_idx)
+
 
 class TestPscuData():
 

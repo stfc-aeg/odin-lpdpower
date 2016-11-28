@@ -38,6 +38,7 @@ class TempData(object):
             "tripped": (self.get_tripped, None),
             "trace": (self.get_trace, None),
             "disabled": (self.get_disabled, None),
+            "name": (self.get_name, None),
         })
 
         self.pscu = pscu
@@ -108,6 +109,15 @@ class TempData(object):
         """
         return self.pscu.get_temperature_disabled(self.sensor_idx)
 
+    def get_name(self):
+        """Get the name of the temperature sensor.
+
+        This method returns the descriptive name of the temperature sensor.
+
+        :returns: sensor name as a string
+        """
+        return self.pscu.get_temperature_name(self.sensor_idx)
+
 
 class HumidityData(object):
     """Data container for a PSCU humidity sensor.
@@ -135,6 +145,7 @@ class HumidityData(object):
             "tripped": (self.get_tripped, None),
             "trace": (self.get_trace, None),
             "disabled": (self.get_disabled, None),
+            "name": (self.get_name, None),
         })
 
         self.pscu = pscu
@@ -204,6 +215,15 @@ class HumidityData(object):
         :returns: disabled status as boolean.
         """
         return self.pscu.get_humidity_disabled(self.sensor_idx)
+
+    def get_name(self):
+        """Get the name of the humidity sensor.
+
+        This method returns the descriptive name of the humidity sensor.
+
+        :returns: sensor name as a string
+        """
+        return self.pscu.get_humidity_name(self.sensor_idx)
 
 
 class PSCUDataError(Exception):
