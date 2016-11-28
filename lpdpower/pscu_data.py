@@ -39,6 +39,7 @@ class TempData(object):
             "trace": (self.get_trace, None),
             "disabled": (self.get_disabled, None),
             "name": (self.get_name, None),
+            'type': (self.get_type, None),
         })
 
         self.pscu = pscu
@@ -117,6 +118,15 @@ class TempData(object):
         :returns: sensor name as a string
         """
         return self.pscu.get_temperature_name(self.sensor_idx)
+
+    def get_type(self):
+        """Get the type of the temperature sensor.
+
+        This method returns the descriptive type of the temperature sensor.
+
+        :returns: sensor type as a string
+        """
+        return self.pscu.get_temperature_type(self.sensor_idx)
 
 
 class HumidityData(object):

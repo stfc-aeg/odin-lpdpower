@@ -85,6 +85,7 @@ class TestPSCU():
             ('get_temperature_trace', bool),
             ('get_temperature_disabled', bool),
             ('get_temperature_name', str),
+            ('get_temperature_type', str),
             ('get_humidity', float),
             ('get_humidity_volts', float),
             ('get_humidity_set_point', float),
