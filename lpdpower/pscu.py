@@ -38,6 +38,24 @@ class PSCU(I2CContainer):
     PUMP_VREF = 5.0
     POSITION_VREF = 5.0
 
+    TEMP_SENSOR_NAMES = [
+        'Vent 1',
+        'Vent 2',
+        'Intake 1',
+        'Intake 2',
+        'Rear Lower',
+        'Rear Upper',
+        'N/C',
+        'N/C',
+        'Coolant Out',
+        'Coolant In',
+    ]
+
+    HUMIDITY_SENSOR_NAMES = [
+        'Humidity Front',
+        'Humidity Rear',
+    ]
+
     def __init__(self, quad_enable_interval=DEFAULT_QUAD_ENABLE_INTERVAL,
                  detector_position_offset=DEFAULT_DETECTOR_POSITION_OFFSET):
         """Initialise the PSCU instance.
@@ -281,6 +299,19 @@ class PSCU(I2CContainer):
 
         return self.__temperature_disabled[sensor]
 
+    def get_temperature_name(self, sensor):
+        """Get the name of a PSCU temperature sensor.
+
+        This method returns the descriptive name for the specified PSCU temperature sensor.
+
+        :param sensor: temperature sensor index
+        :returns: temperature sensor decriptive name
+        """
+        if sensor >= self.num_temperatures or sensor < 0:
+            raise I2CException('Illegal sensor index {} specified'.format(sensor))
+
+        return PSCU.TEMP_SENSOR_NAMES[sensor]
+
     def get_humidity(self, sensor):
         """Get the value of a PSCU humidity sensor.
 
@@ -371,6 +402,19 @@ class PSCU(I2CContainer):
             raise I2CException('Illegal sensor index {} specified'.format(sensor))
 
         return self.__humidity_disabled[sensor]
+
+    def get_humidity_name(self, sensor):
+        """Get the name of a PSCU humidity sensor.
+
+        This method returns the descriptive name for the specified PSCU humidity sensor.
+
+        :param sensor: humidity sensor index
+        :returns: humidity sensor decriptive name
+        """
+        if sensor >= self.num_humidities or sensor < 0:
+            raise I2CException('Illegal sensor index {} specified'.format(sensor))
+
+        return PSCU.HUMIDITY_SENSOR_NAMES[sensor]
 
     def get_pump_flow(self):
         """Get the value of the PSCU pump flow sensor.
@@ -801,7 +845,7 @@ class PSCU(I2CContainer):
         """
         humidity_scale = 0.031
         humidity_offset = 0.8
-           
+
         humidity_percent = ((scaled_adc_val * PSCU.HUMIDITY_VREF) - humidity_offset) / humidity_scale
 
         return humidity_percent

@@ -76,7 +76,6 @@ class TestPSCU():
 
     def test_generate_indexed_getter_tests(self):
 
-
         for (method, return_type) in [
             ('get_temperature', float),
             ('get_temperature_volts', float),
@@ -85,6 +84,7 @@ class TestPSCU():
             ('get_temperature_tripped', bool),
             ('get_temperature_trace', bool),
             ('get_temperature_disabled', bool),
+            ('get_temperature_name', str),
             ('get_humidity', float),
             ('get_humidity_volts', float),
             ('get_humidity_set_point', float),
@@ -92,6 +92,7 @@ class TestPSCU():
             ('get_humidity_tripped', bool),
             ('get_humidity_trace', bool),
             ('get_humidity_disabled', bool),
+            ('get_humidity_name', str),
         ]:
             for (legal_sensor, label) in [(True, 'legal'), (False, 'illegal')]:
                 test_func = partial(self._test_pscu_indexed_getter, method, legal_sensor, return_type)
