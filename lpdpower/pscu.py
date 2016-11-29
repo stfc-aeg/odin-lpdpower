@@ -161,6 +161,7 @@ class PSCU(I2CContainer):
         self.__pump_set_point = 0.0
         self.__pump_set_point_raw = 0.0
         self.__pump_trip = False
+        self.__pump_mode = 'Under'
 
         # Fan
         self.__fan_speed = 0.0
@@ -169,6 +170,7 @@ class PSCU(I2CContainer):
         self.__fan_set_point = 0.0
         self.__fan_set_point_raw = 0.0
         self.__fan_trip = False
+        self.__fan_mode = 'Under'
 
         # Position
         self.__position = 0.0
@@ -492,6 +494,16 @@ class PSCU(I2CContainer):
         """
         return self.__pump_trip
 
+    def get_pump_mode(self):
+        """Get the mode of the PSCU pumpsensor.
+
+        This method returns the descriptive mode for the  PSCU pump sensor, i.e.
+        whether the sensor channel has an over- or under-flow trip condition.
+
+        :returns: pump sensor decriptive mode as string
+        """
+        return self.__pump_mode
+
     def get_fan_speed(self):
         """Get the current fan speed.
 
@@ -545,6 +557,16 @@ class PSCU(I2CContainer):
         :returns: fan speed trip status
         """
         return self.__fan_trip
+
+    def get_fan_mode(self):
+        """Get the mode of the PSCU fan sensor.
+
+        This method returns the descriptive mode for the  PSCU fan sensor, i.e.
+        whether the sensor channel has an over- or under-speed trip condition.
+
+        :returns: fan sensor decriptive mode as string
+        """
+        return self.__fan_mode
 
     def get_quad_trace(self, quad_idx):
         """Get the trace status for a specified quad.

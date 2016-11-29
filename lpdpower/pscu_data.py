@@ -314,6 +314,7 @@ class PSCUData(object):
                 "tripped": (self.pscu.get_fan_tripped, None),
                 "overall": (self.pscu.get_fan_state, None),
                 "latched": (self.pscu.get_fan_latched, None),
+                "mode": (self.pscu.get_fan_mode, None),
             },
             "pump": {
                 "flow": (self.pscu.get_pump_flow, None),
@@ -323,6 +324,7 @@ class PSCUData(object):
                 "tripped": (self.pscu.get_pump_tripped, None),
                 "overall": (self.pscu.get_pump_state, None),
                 "latched": (self.pscu.get_pump_latched, None),
+                "mode": (self.pscu.get_pump_mode, None),
             },
             "trace": {
                  "overall": (self.pscu.get_trace_state, None),
