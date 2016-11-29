@@ -53,8 +53,8 @@ class PSCU(I2CContainer):
     ]
 
     HUMIDITY_SENSOR_NAMES = [
-        'Humidity Front',
-        'Humidity Rear',
+        'Front',
+        'Rear',
     ]
 
     def __init__(self, quad_enable_interval=DEFAULT_QUAD_ENABLE_INTERVAL,
