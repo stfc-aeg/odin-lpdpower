@@ -85,7 +85,7 @@ class TestPSCU():
             ('get_temperature_trace', bool),
             ('get_temperature_disabled', bool),
             ('get_temperature_name', str),
-            ('get_temperature_type', str),
+            ('get_temperature_mode', str),
             ('get_humidity', float),
             ('get_humidity_volts', float),
             ('get_humidity_set_point', float),
@@ -94,6 +94,7 @@ class TestPSCU():
             ('get_humidity_trace', bool),
             ('get_humidity_disabled', bool),
             ('get_humidity_name', str),
+            ('get_humidity_mode', str),
         ]:
             for (legal_sensor, label) in [(True, 'legal'), (False, 'illegal')]:
                 test_func = partial(self._test_pscu_indexed_getter, method, legal_sensor, return_type)

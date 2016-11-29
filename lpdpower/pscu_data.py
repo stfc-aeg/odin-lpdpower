@@ -39,7 +39,7 @@ class TempData(object):
             "trace": (self.get_trace, None),
             "disabled": (self.get_disabled, None),
             "name": (self.get_name, None),
-            'type': (self.get_type, None),
+            'mode': (self.get_mode, None),
         })
 
         self.pscu = pscu
@@ -119,14 +119,14 @@ class TempData(object):
         """
         return self.pscu.get_temperature_name(self.sensor_idx)
 
-    def get_type(self):
-        """Get the type of the temperature sensor.
+    def get_mode(self):
+        """Get the mode of the temperature sensor.
 
-        This method returns the descriptive type of the temperature sensor.
+        This method returns the descriptive mode of the temperature sensor.
 
-        :returns: sensor type as a string
+        :returns: sensor mode as a string
         """
-        return self.pscu.get_temperature_type(self.sensor_idx)
+        return self.pscu.get_temperature_mode(self.sensor_idx)
 
 
 class HumidityData(object):
@@ -156,6 +156,7 @@ class HumidityData(object):
             "trace": (self.get_trace, None),
             "disabled": (self.get_disabled, None),
             "name": (self.get_name, None),
+            "mode": (self.get_mode, None),
         })
 
         self.pscu = pscu
@@ -219,7 +220,7 @@ class HumidityData(object):
     def get_disabled(self):
         """Get the disabled status of the humidity sensor.
 
-        This method returns the disabled status of the temperature sensor, i.e. if it
+        This method returns the disabled status of the humidity sensor, i.e. if it
         has been disabled from the overall interlock state by a jumper connection.
 
         :returns: disabled status as boolean.
@@ -234,6 +235,15 @@ class HumidityData(object):
         :returns: sensor name as a string
         """
         return self.pscu.get_humidity_name(self.sensor_idx)
+
+    def get_mode(self):
+        """Get the mode of the humidity sensor.
+
+        This method returns the descriptive mode of the humidity sensor.
+
+        :returns: sensor mode as a string
+        """
+        return self.pscu.get_humidity_mode(self.sensor_idx)
 
 
 class PSCUDataError(Exception):
