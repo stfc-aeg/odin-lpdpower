@@ -5,6 +5,7 @@ const colorOk = "#5cb85c";
 const colorFail = "#d9534f";
 const colorUnknown = '#555555';
 const colorWarn = "#ffa500"
+const quadNames = ['A', 'B', 'C', 'D'];
 
 function round1dp(flt)
 {
@@ -19,10 +20,11 @@ function round2dp(flt)
 
 function generateQuad(id)
 {
+    var quadName = quadNames[id];
 	return `
 <div class="caption">
 	<div class="container-fluid">
-		<div class="row"><h4>Quad ${id+1}:</h4></div>
+	    <div class="row"><h4>Quad ${quadName}:</h4></div>
 		<div class="row">
 			<div class="col-xs-5">Supply:</div>
 			<div id="q${id}-sv" class="col-xs-5">&nbsp;</div>
@@ -37,10 +39,10 @@ function generateQuad(id)
 	<thead>
 		<tr>
 			<th style="width:20%"></th>
-			<th class="text-center" style="width:20%;">Channel A</th>
-			<th class="text-center" style="width:20%;">Channel B</th>
-			<th class="text-center" style="width:20%;">Channel C</th>
-			<th class="text-center" style="width:20%;">Channel D</th>
+			<th class="text-center" style="width:20%;">Channel 1</th>
+			<th class="text-center" style="width:20%;">Channel 2</th>
+			<th class="text-center" style="width:20%;">Channel 3</th>
+			<th class="text-center" style="width:20%;">Channel 4</th>
 		</tr>
 	</thead>
 
