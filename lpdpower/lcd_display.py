@@ -65,7 +65,7 @@ class LcdDisplay(object):
 
         self.registered_pages.append(self.overview_page)
 
-        self.temps_per_page = 4
+        self.temps_per_page = 2
         self.num_temp_pages = int(round(float(self.pscu.num_temperatures) / self.temps_per_page))
 
         for page in range(self.num_temp_pages):
@@ -222,11 +222,14 @@ class LcdDisplay(object):
             if chan < num_temp_vals:
                 chan_disabled = self.pscu.get_temperature_disabled(chan)
                 if chan_disabled:
-                    temp_disp = '{:2d}:N/C    '.format(chan+1)
+                    temp_disp = '{:2d}:{:17s}'.format(chan+1, 'N/C')
                 else:
+                    chan_name = ''.join(self.pscu.get_temperature_name(chan).split(' '))
                     chan_temp = self.pscu.get_temperature(chan)
                     chan_trip = '*' if self.pscu.get_temperature_tripped(chan) else ' '
-                    temp_disp = '{:2d}:{:4.1f}C{} '.format(chan+1, chan_temp, chan_trip)
+                    temp_disp = '{:2d}:{: <10.10s}:{:4.1f}C{:1s}'.format(
+                        chan+1, chan_name, chan_temp, chan_trip
+                    )
             else:
                 temp_disp = '\r'
 
@@ -251,13 +254,14 @@ class LcdDisplay(object):
         for chan in range(self.pscu.num_humidities):
             chan_disabled = self.pscu.get_humidity_disabled(chan)
             if chan_disabled:
-                content += '{}:N/C    '.format(chan+1)
+                content += '{:2d}:{:17s}'.format(chan+1, 'N/C')
             else:
+                chan_name = ''.join(self.pscu.get_humidity_name(chan).split(' '))
                 chan_humid = self.pscu.get_humidity(chan)
                 chan_trip = '*' if self.pscu.get_humidity_tripped(chan) else ' '
-                content += '{}:{:4.1f}%{} '.format(chan+1, chan_humid, chan_trip)
-
-        content += '\r\r'
+                content += '{:2d}:{: <10.10s}:{:4.1f}%{:1s}'.format(
+                    chan+1, chan_name, chan_humid, chan_trip
+                )
 
         return content
 
