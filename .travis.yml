@@ -7,6 +7,8 @@ addons:
   apt:
     packages:
     - libzmq3-dev
+  code_climate:
+    repo_token: ef76afe3f9ae2674684b27eb61c9a08b08bf887a85a1f304a08c93ff12b9b3f7
 
 install:
 - python setup.py install
