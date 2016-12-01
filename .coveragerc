@@ -1,2 +1,4 @@
 [run]
-omit = *_version*
+omit =
+    *_version*
+    lpdpower/testing/*
