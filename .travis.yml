@@ -14,7 +14,7 @@ install:
 - python setup.py install
 - pip install -e .[test]
 - pip install coveralls
-- pip install codeclimate-test-reporting
+- pip install codeclimate-test-reporter
 
 script:
 - python setup.py nosetests
