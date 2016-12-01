@@ -26,8 +26,10 @@ class TestLcdDisplay():
         cls.pscu.num_humidities = 2
         cls.pscu.get_all_latched.return_value = [True]*4
         cls.pscu.get_temperature.return_value = 20.0
+        cls.pscu.get_temperature_name.return_value = 'Temp Sensor X'
         cls.pscu.get_temperature_disabled.return_value = False
         cls.pscu.get_humidity.return_value = 56.7
+        cls.pscu.get_humidity_name.return_value = 'Humidity Sensor Y'
         cls.pscu.get_humidity_disabled.return_value = False
         cls.pscu.get_fan_speed.return_value = 45.0
         cls.pscu.get_fan_target.return_value = 90
