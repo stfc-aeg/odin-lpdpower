@@ -14,6 +14,7 @@ install:
 - python setup.py install
 - pip install -e .[test]
 - pip install coveralls
+- pip install codeclimate-test-reporting
 
 script:
 - python setup.py nosetests
@@ -21,6 +22,7 @@ script:
 
 after_success:
 - coveralls
+- CODECLIMATE_REPO_TOKEN=ef76afe3f9ae2674684b27eb61c9a08b08bf887a85a1f304a08c93ff12b9b3f7 codeclimate-test-reporter
 
 notifications:
   slack:
