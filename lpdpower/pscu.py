@@ -38,6 +38,25 @@ class PSCU(I2CContainer):
     PUMP_VREF = 5.0
     POSITION_VREF = 5.0
 
+    TEMP_SENSOR_NAMES = [
+        'Vent 1',
+        'Vent 2',
+        'Intake 1',
+        'Intake 2',
+        'Rear Lower',
+        'Rear Upper',
+        'N/C',
+        'N/C',
+        'Coolant Out',
+        'Coolant In',
+        'N/C',
+    ]
+
+    HUMIDITY_SENSOR_NAMES = [
+        'Front',
+        'Rear',
+    ]
+
     def __init__(self, quad_enable_interval=DEFAULT_QUAD_ENABLE_INTERVAL,
                  detector_position_offset=DEFAULT_DETECTOR_POSITION_OFFSET):
         """Initialise the PSCU instance.
@@ -123,6 +142,7 @@ class PSCU(I2CContainer):
         self.__temperature_trips = [False] * self.num_temperatures
         self.__temperature_traces = [False] * self.num_temperatures
         self.__temperature_disabled = [False] * self.num_temperatures
+        self.__temperature_mode = ['Over'] * 8 + ['Under'] * 3
 
         # Humidity
         self.num_humidities = 2
@@ -133,6 +153,7 @@ class PSCU(I2CContainer):
         self.__humidity_trips = [False] * self.num_humidities
         self.__humidity_traces = [False] * self.num_humidities
         self.__humidity_disabled = [False] * self.num_humidities
+        self.__humidity_mode = ['Over'] * self.num_humidities
 
         # Pump
         self.__pump_flow = 0.0
@@ -140,6 +161,7 @@ class PSCU(I2CContainer):
         self.__pump_set_point = 0.0
         self.__pump_set_point_raw = 0.0
         self.__pump_trip = False
+        self.__pump_mode = 'Under'
 
         # Fan
         self.__fan_speed = 0.0
@@ -148,6 +170,7 @@ class PSCU(I2CContainer):
         self.__fan_set_point = 0.0
         self.__fan_set_point_raw = 0.0
         self.__fan_trip = False
+        self.__fan_mode = 'Under'
 
         # Position
         self.__position = 0.0
@@ -281,6 +304,33 @@ class PSCU(I2CContainer):
 
         return self.__temperature_disabled[sensor]
 
+    def get_temperature_name(self, sensor):
+        """Get the name of a PSCU temperature sensor.
+
+        This method returns the descriptive name for the specified PSCU temperature sensor.
+
+        :param sensor: temperature sensor index
+        :returns: temperature sensor decriptive name
+        """
+        if sensor >= self.num_temperatures or sensor < 0:
+            raise I2CException('Illegal sensor index {} specified'.format(sensor))
+
+        return PSCU.TEMP_SENSOR_NAMES[sensor]
+
+    def get_temperature_mode(self, sensor):
+        """Get the mode of a PSCU temperature sensor.
+
+        This method returns the descriptive mode for the specified PSCU temperature sensor, i.e.
+        whether the sensor channel has an over- or under-temperature trip condition.
+
+        :param sensor: temperature sensor index
+        :returns: temperature sensor decriptive mode as string
+        """
+        if sensor >= self.num_temperatures or sensor < 0:
+            raise I2CException('Illegal sensor index {} specified'.format(sensor))
+
+        return self.__temperature_mode[sensor]
+
     def get_humidity(self, sensor):
         """Get the value of a PSCU humidity sensor.
 
@@ -372,6 +422,33 @@ class PSCU(I2CContainer):
 
         return self.__humidity_disabled[sensor]
 
+    def get_humidity_name(self, sensor):
+        """Get the name of a PSCU humidity sensor.
+
+        This method returns the descriptive name for the specified PSCU humidity sensor.
+
+        :param sensor: humidity sensor index
+        :returns: humidity sensor decriptive name
+        """
+        if sensor >= self.num_humidities or sensor < 0:
+            raise I2CException('Illegal sensor index {} specified'.format(sensor))
+
+        return PSCU.HUMIDITY_SENSOR_NAMES[sensor]
+
+    def get_humidity_mode(self, sensor):
+        """Get the mode of a PSCU humidity sensor.
+
+        This method returns the descriptive mode for the specified PSCU humidity sensor, i.e.
+        whether the sensor channel has an over- or under-humidity trip condition.
+
+        :param sensor: humidity sensor index
+        :returns: humidity sensor decriptive mode as string
+        """
+        if sensor >= self.num_humidities or sensor < 0:
+            raise I2CException('Illegal sensor index {} specified'.format(sensor))
+
+        return self.__humidity_mode[sensor]
+
     def get_pump_flow(self):
         """Get the value of the PSCU pump flow sensor.
 
@@ -416,6 +493,16 @@ class PSCU(I2CContainer):
         :returns: pump flow sensor trip status
         """
         return self.__pump_trip
+
+    def get_pump_mode(self):
+        """Get the mode of the PSCU pumpsensor.
+
+        This method returns the descriptive mode for the  PSCU pump sensor, i.e.
+        whether the sensor channel has an over- or under-flow trip condition.
+
+        :returns: pump sensor decriptive mode as string
+        """
+        return self.__pump_mode
 
     def get_fan_speed(self):
         """Get the current fan speed.
@@ -470,6 +557,16 @@ class PSCU(I2CContainer):
         :returns: fan speed trip status
         """
         return self.__fan_trip
+
+    def get_fan_mode(self):
+        """Get the mode of the PSCU fan sensor.
+
+        This method returns the descriptive mode for the  PSCU fan sensor, i.e.
+        whether the sensor channel has an over- or under-speed trip condition.
+
+        :returns: fan sensor decriptive mode as string
+        """
+        return self.__fan_mode
 
     def get_quad_trace(self, quad_idx):
         """Get the trace status for a specified quad.
@@ -801,7 +898,7 @@ class PSCU(I2CContainer):
         """
         humidity_scale = 0.031
         humidity_offset = 0.8
-           
+
         humidity_percent = ((scaled_adc_val * PSCU.HUMIDITY_VREF) - humidity_offset) / humidity_scale
 
         return humidity_percent

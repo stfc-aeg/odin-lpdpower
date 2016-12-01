@@ -5,6 +5,7 @@ const colorOk = "#5cb85c";
 const colorFail = "#d9534f";
 const colorUnknown = '#555555';
 const colorWarn = "#ffa500"
+const quadNames = ['A', 'B', 'C', 'D'];
 
 function round1dp(flt)
 {
@@ -19,10 +20,11 @@ function round2dp(flt)
 
 function generateQuad(id)
 {
+    var quadName = quadNames[id];
 	return `
 <div class="caption">
 	<div class="container-fluid">
-		<div class="row"><h4>Quad ${id+1}:</h4></div>
+	    <div class="row"><h4>Quad ${quadName}:</h4></div>
 		<div class="row">
 			<div class="col-xs-5">Supply:</div>
 			<div id="q${id}-sv" class="col-xs-5">&nbsp;</div>
@@ -37,10 +39,10 @@ function generateQuad(id)
 	<thead>
 		<tr>
 			<th style="width:20%"></th>
-			<th class="text-center" style="width:20%;">Channel A</th>
-			<th class="text-center" style="width:20%;">Channel B</th>
-			<th class="text-center" style="width:20%;">Channel C</th>
-			<th class="text-center" style="width:20%;">Channel D</th>
+			<th class="text-center" style="width:20%;">Channel 1</th>
+			<th class="text-center" style="width:20%;">Channel 2</th>
+			<th class="text-center" style="width:20%;">Channel 3</th>
+			<th class="text-center" style="width:20%;">Channel 4</th>
 		</tr>
 	</thead>
 
@@ -156,9 +158,11 @@ function generateTempSensors(count)
 
 	<thead>
 		<tr>
-			<th class="text-center" style="width:20%;">Sensor</th>
-			<th class="text-center" style="width:25%;">Temp.</th>
-			<th class="text-center" style="width:25%;">Set Point</th>
+			<th class="text-center" style="width:10%;">Chan</th>
+			<th class="text-left"   style="width:20%;">Sensor</th>
+			<th class="text-center" style="width:15%;">Value</th>
+			<th class="text-center" style="width:15%;">Set Point</th>
+	                <th class="text-center" style="width:10%;">Trip Mode</th>
 			<th class="text-center" style="width:10%;">Trace</th>
 			<th class="text-center" style="width:10%;">Enable</th>
 			<th class="text-center" style="width:10%;">Tripped</th>
@@ -170,13 +174,15 @@ function generateTempSensors(count)
 
 	for(id = 0; id < count; ++id)
 	{
-		ret += `
+	    ret += `
 		<tr>
-			<th class="text-center">Temp ${id+1}</th>
-			<td><span id="tmp${id}-tmp"></span></td>
-			<td><span id="tmp${id}-set"></span></td>
-			<td><div id="tmp${id}-trace" class="status" ></div></td>
-			<td><div id="tmp${id}-enable" class="status" ></div></td>
+		    <th class="text-center">${id+1}</th>
+		    <th class="text-left"><span id="tmp${id}-name"></span></th>
+		    <td><span id="tmp${id}-tmp"></span></td>
+		    <td><span id="tmp${id}-set"></span></td>
+		    <td class="text-center"><span id="tmp${id}-mode"></span></td>
+		    <td><div id="tmp${id}-trace" class="status" ></div></td>
+		    <td><div id="tmp${id}-enable" class="status" ></div></td>
 		    <td><div id="tmp${id}-trip" class="status"></div></td>
 		</tr>
 		`;
@@ -189,38 +195,41 @@ function generateTempSensors(count)
 
 class TempSensor
 {
-	constructor(id)
-	{
-		this.map = new Map();
-		this.active = true;
+    constructor(id)
+    {
+	this.id = id;
+	this.map = new Map();
+	this.active = true;
 
-		var elements = document.querySelectorAll(`[id^='tmp${id}-']`);
-		for (var i = 0; i < elements.length; ++i)
-		{
-			var start = 4 + id.toString().length;
-			var key = elements[i].id.substr(start,
-						elements[i].id.length - start);
-			this.map.set(key, elements[i]);
-		}
-	}
-
-	update(data)
+	var elements = document.querySelectorAll(`[id^='tmp${id}-']`);
+	for (var i = 0; i < elements.length; ++i)
 	{
-	    this.map.get("trip").style.backgroundColor = data.tripped ? colorFail : colorOk;
-	    this.map.get("trace").style.backgroundColor = data.trace ? colorOk : colorFail;
-	    var temperatureVal = '';
-	    var setpointVal = '';
-	    if (data.disabled) {
-		temperatureVal = 'N/C';
-		setpointVal = 'N/C';
-	    } else {
-		temperatureVal = round1dp(data.temperature) + '°C';
-		setpointVal = round1dp(data.setpoint) + '°C';
-	    }
-	    this.map.get("tmp").innerHTML = temperatureVal;
-	    this.map.get("set").innerHTML = setpointVal;
-	    this.map.get("enable").style.backgroundColor = data.disabled ? colorWarn : colorOk;
+	    var start = 4 + id.toString().length;
+	    var key = elements[i].id.substr(start,
+					    elements[i].id.length - start);
+	    this.map.set(key, elements[i]);
 	}
+    }
+
+    update(data)
+    {
+	this.map.get("trip").style.backgroundColor = data.tripped ? colorFail : colorOk;
+	this.map.get("trace").style.backgroundColor = data.trace ? colorOk : colorFail;
+	var temperatureVal = '';
+	var setpointVal = '';
+	if (data.disabled) {
+	    temperatureVal = 'N/C';
+	    setpointVal = 'N/C';
+	} else {
+	    temperatureVal = round1dp(data.temperature) + '°C';
+	    setpointVal = round1dp(data.setpoint) + '°C';
+	}
+	this.map.get("name").innerHTML = data.name; 
+	this.map.get("mode").innerHTML = data.mode;
+	this.map.get("tmp").innerHTML = temperatureVal;
+	this.map.get("set").innerHTML = setpointVal;
+	this.map.get("enable").style.backgroundColor = data.disabled ? colorWarn : colorOk;
+    }
 }
 
 function generateHumiditySensors(count)
@@ -243,9 +252,11 @@ function generateHumiditySensors(count)
 
 	<thead>
 		<tr>
-			<th class="text-center" style="width:20%;">Sensor</th>
-			<th class="text-center" style="width:25%;">Humidity.</th>
-			<th class="text-center" style="width:25%;">Set Point</th>
+			<th class="text-center" style="width:10%;">Chan</th>
+			<th class="text-left"   style="width:20%;">Sensor</th>
+			<th class="text-center" style="width:15%;">Humidity</th>
+			<th class="text-center" style="width:15%;">Set Point</th>
+			<th class="text-center" style="width:10%;">Trip Mode</th>
 			<th class="text-center" style="width:10%;">Trace</th>
 			<th class="text-center" style="width:10%;">Enable</th>
 			<th class="text-center" style="width:10%;">Tripped</th>
@@ -257,14 +268,16 @@ function generateHumiditySensors(count)
 
 	for(id = 0; id < count; ++id)
 	{
-		ret += `
+	    ret += `
 		<tr>
-			<th class="text-center">Humid ${id+1}</th>
-			<td><span id="h${id}-h"></span></td>
-			<td><span id="h${id}-set"></span></td>
-			<td><div id="h${id}-trace" class="status" ></div></td>
-			<td><div id="h${id}-enable" class="status" ></div></td>
-			<td><div id="h${id}-trip" class="status"></div></td>
+                    <th class="text-center">${id+1}</th>
+		    <th class="text-left"><span id="h${id}-name"></span></th>
+		    <td><span id="h${id}-h"></span></td>
+		    <td><span id="h${id}-set"></span></td>
+		    <td><span id="h${id}-mode"></span></td>
+		    <td><div id="h${id}-trace" class="status" ></div></td>
+		    <td><div id="h${id}-enable" class="status" ></div></td>
+		    <td><div id="h${id}-trip" class="status"></div></td>
 		</tr>
 		`;
 	}
@@ -304,6 +317,8 @@ class HumiditySensor
 		humidityValue = round1dp(data.humidity) + '%';
 		setpointValue = round1dp(data.setpoint) + '%';
 	    }
+	    this.map.get("name").innerHTML = data.name;
+	    this.map.get("mode").innerHTML = data.mode;
 	    this.map.get("h").innerHTML = humidityValue;
 	    this.map.get("set").innerHTML = setpointValue;
 	    this.map.get("enable").style.backgroundColor = data.disabled ? colorWarn : colorOk;
@@ -330,10 +345,13 @@ function generatePumpSensors(count)
 
 	<thead>
 		<tr>
-			<th class="text-center" style="width:20%;">Sensor</th>
-			<th class="text-center" style="width:25%;">Flow</th>
-			<th class="text-center" style="width:25%;">Set Point</th>
-			<th class="text-center" style="width:20%;"></th>
+	                <th class="text-center" style="width:10%;">Chan</th>
+			<th class="text-left"   style="width:20%;">Sensor</th>
+			<th class="text-center" style="width:15%;">Flow</th>
+			<th class="text-center" style="width:15%;">Set Point</th>
+			<th class="text-center" style="width:10%;">Trip Mode</th>
+			<th class="text-center" style="width:10%;"></th>
+			<th class="text-center" style="width:10%;"></th>
 			<th class="text-center" style="width:10%;">Tripped</th>
 		</tr>
 	</thead>
@@ -345,9 +363,12 @@ function generatePumpSensors(count)
 	{
 		ret += `
 		<tr>
-			<th class="text-center">Pump ${id+1}</th>
+     		        <th class="text-center">${id+1}</th>
+			<th class="text-left">Pump</th>
 			<td><span id="p${id}-flow">0</span>l/min</td>
 			<td><span id="p${id}-set">0</span>l/min</td>
+			<td><span id="p${id}-mode">Hmm</span></td>
+			<td></td>
 			<td></td>
 			<td><div id="p${id}-trip" class="status"></div></td>
 		</tr>
@@ -361,26 +382,27 @@ function generatePumpSensors(count)
 
 class PumpSensor
 {
-	constructor(id)
-	{
-		this.map = new Map();
+    constructor(id)
+    {
+	this.map = new Map();
 
-		var elements = document.querySelectorAll(`[id^='p${id}-']`);
-		for (var i = 0; i < elements.length; ++i)
-		{
-			var start = 2 + id.toString().length;
-			var key = elements[i].id.substr(start,
-						elements[i].id.length - start);
-			this.map.set(key, elements[i]);
-		}
-	}
-
-	update(data)
+	var elements = document.querySelectorAll(`[id^='p${id}-']`);
+	for (var i = 0; i < elements.length; ++i)
 	{
-		this.map.get("trip").style.backgroundColor = data.tripped ? colorFail : colorOk;
-		this.map.get("flow").innerHTML = round1dp(data.flow);
-		this.map.get("set").innerHTML = round1dp(data.setpoint);
+	    var start = 2 + id.toString().length;
+	    var key = elements[i].id.substr(start,
+					    elements[i].id.length - start);
+	    this.map.set(key, elements[i]);
 	}
+    }
+
+    update(data)
+    {
+	this.map.get("trip").style.backgroundColor = data.tripped ? colorFail : colorOk;
+	this.map.get("flow").innerHTML = round1dp(data.flow);
+	this.map.get("set").innerHTML = round1dp(data.setpoint);
+	this.map.get("mode").innerHTML = data.mode;
+    }
 }
 
 function generateFanSensors(count)
@@ -403,11 +425,12 @@ function generateFanSensors(count)
 
 	<thead>
 		<tr>
-			<th class="text-center" style="width:20%;">Sensor</th>
-			<th class="text-center" style="width:20%;">Current Speed</th>
-			<th class="text-center" style="width:20%;">Set Point</th>
-			<!-- <th class="text-center" style="width:14%;">Potentiometer</th> -->
-			<th class="text-center" style="width:30%;">Target Speed</th>
+	                <th class="text-center" style="width:10%;">Chan</th>
+			<th class="text-left" style="width:20%;">Sensor</th>
+			<th class="text-center" style="width:15%;">Speed</th>
+			<th class="text-center" style="width:15%;">Set Point</th>
+			<th class="text-center" style="width:10%;">Trip Mode</th>
+			<th class="text-center" style="width:20%;">Target Speed</th>
 			<th class="text-center" style="width:10%;">Tripped</th>
 		</tr>
 	</thead>
@@ -419,10 +442,11 @@ function generateFanSensors(count)
 	{
 		ret += `
 		<tr>
-			<th class="text-center">Fan ${id+1}</th>
+			<th class="text-center">${id+1}</th>
+		        <th class="text-left">Fan</th>
 			<td><span id="f${id}-speed">0</span>Hz</td>
 			<td><span id="f${id}-set">0</span>Hz</td>
-			<!-- <td><span id="f${id}-pot">0</span>%</td> -->
+			<td><span id="f${id}-mode">?</span></td>
 			<td>
 				<div class="input-group">
 					<input class="form-control" type="text" id="f${id}-target" aria-label="Target fan speed (Hz)">
@@ -444,34 +468,34 @@ function generateFanSensors(count)
 
 class FanSensor
 {
-	constructor(id)
-	{
-		this.map = new Map();
-		this.target = 0.0;
+    constructor(id)
+    {
+	this.map = new Map();
+	this.target = 0.0;
 
-		var elements = document.querySelectorAll(`[id^='f${id}-']`);
-		for (var i = 0; i < elements.length; ++i)
-		{
-			var start = 2 + id.toString().length;
-			var key = elements[i].id.substr(start,
-						elements[i].id.length - start);
-			this.map.set(key, elements[i]);
-		}
+	var elements = document.querySelectorAll(`[id^='f${id}-']`);
+	for (var i = 0; i < elements.length; ++i)
+	{
+	    var start = 2 + id.toString().length;
+	    var key = elements[i].id.substr(start,
+					    elements[i].id.length - start);
+	    this.map.set(key, elements[i]);
 	}
+    }
 
-	update(data)
-	{
-		this.map.get("trip").style.backgroundColor = data.tripped ? colorFail : colorOk;
-		this.map.get("speed").innerHTML = round1dp(data.currentspeed);
-		//this.map.get("pot").innerHTML = round1dp(data.potentiometer);
+    update(data)
+    {
+	this.map.get("trip").style.backgroundColor = data.tripped ? colorFail : colorOk;
+	this.map.get("speed").innerHTML = round1dp(data.currentspeed);
+	this.map.get("mode").innerHTML = data.mode;
     	this.map.get("set").innerHTML = round1dp(data.setpoint);
 
-		if(data.target != this.target)
-		{
-			this.map.get("target").placeholder = data.target.toString();
-			this.target = data.target;
-		}
+	if(data.target != this.target)
+	{
+	    this.map.get("target").placeholder = data.target.toString();
+	    this.target = data.target;
 	}
+    }
 }
 
 //Add templates to page
