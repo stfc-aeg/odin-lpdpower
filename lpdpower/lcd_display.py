@@ -403,21 +403,17 @@ class LcdDisplay(object):
             quad_fuse_volts = self.pscu.quad[quad].get_fuse_voltage(quad_chan)
             quad_current = self.pscu.quad[quad].get_channel_current(quad_chan)
 
-            # Check if the fuse is blown - if the supply voltage is present (i.e. above 24V),
-            # determine if there is a significant difference between the fuse and supply voltage.
-            # If so, replace the default line with a 'fuse blow?' message.
-            fuse_ok = True
-            if quad_supply_volts > 24.0:
-                fuse_delta_volts = abs(quad_fuse_volts - quad_supply_volts)
-                if fuse_delta_volts > 2.0:
-                    fuse_ok = False
-
-            if fuse_ok:
+            # If either of the FET failed or fuse blown flags are true, display an error message,
+            # otherwise show the channel ouptut voltage and current.
+            if self.pscu.quad[quad].get_fet_failed(quad_chan):
+                content += '{}:FET failed?({:4.1f}V)'.format(
+                    quad_chan+1, quad_fuse_volts)
+            elif self.pscu.quad[quad].get_fuse_blown(quad_chan):
+                content += '{}:Fuse blown?({:4.1f}V)'.format(
+                    quad_chan+1, quad_fuse_volts)
+            else:
                 content += '{}:{} {:4.1f}V {:4.1f}A OK'.format(
                     quad_chan+1, quad_enable, quad_volts, quad_current)
-            else:
-                content += '{}:Fuse blow? ({:4.1f}V)'.format(
-                    quad_chan+1, quad_fuse_volts)
 
         return content
 
