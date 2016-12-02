@@ -34,6 +34,17 @@
 	justify-content: center;
 }
 
+.quad-chan-status {
+    height: 25px;
+    width: 70%;
+    border-radius: 3px;
+    color: #ffffff;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .vertical-align {
 	display: flex;
 	align-items: center;

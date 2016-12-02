@@ -36,6 +36,14 @@ class TestChannelData():
         response = self.channel_data.param_tree.get('fusevoltage')
         assert_equal(type(response['fusevoltage']), float)
 
+    def test_channel_fuse_blown(self):
+        response = self.channel_data.param_tree.get('fuseblown')
+        assert_equal(type(response['fuseblown']), bool)
+
+    def test_channel_fet_failed(self):
+        response = self.channel_data.param_tree.get('fetfailed')
+        assert_equal(type(response['fetfailed']), bool)
+
     def test_channel_enable_get(self):
         response = self.channel_data.param_tree.get('enabled')
         assert_equal(type(response['enabled']), bool)
@@ -43,7 +51,7 @@ class TestChannelData():
     def test_channel_enable_set(self):
         enable = True
         # Force underlying Quad enable value so test can validate call tree
-        self.quad._Quad__channelEnable[self.channel] = enable       
+        self.quad._Quad__channel_enable[self.channel] = enable
         self.channel_data.param_tree.set('enabled', enable)
         response = self.channel_data.param_tree.get('enabled')
         assert_equal(response['enabled'], enable)
