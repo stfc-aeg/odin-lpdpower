@@ -231,8 +231,8 @@ class TestLcdDisplay():
             for chan in range(2):
                 content = self.display.quad_page(quad, chan*2)
                 for call in [
-                    'get_supply_voltage', 'get_enable', 'get_channel_voltage',
-                    'get_channel_current', 'get_fuse_blown', 'get_fet_failed',
+                    'get_enable', 'get_channel_voltage', 'get_channel_current',
+                    'get_fuse_blown', 'get_fet_failed',
                 ]:
                     assert_true(getattr(self.pscu.quad[quad], call).called, 'PSCU method {} not called'.format(call))
                 assert_equal(type(content), str)

@@ -391,10 +391,7 @@ class LcdDisplay(object):
         content = self.page_header()
 
         quad_chans = [start_chan, start_chan+1]
-
-        quad_supply_volts = self.pscu.quad[quad].get_supply_voltage()
         quad_name = ['A', 'B', 'C', 'D'][quad]
-
         content += 'Quad: {} Chans: {}/{} \r'.format(quad_name, *[chan+1 for chan in quad_chans])
 
         for quad_chan in quad_chans:
