@@ -21,121 +21,123 @@ function round2dp(flt)
 function generateQuad(id)
 {
     var quadName = quadNames[id];
-	return `
-<div class="caption">
-	<div class="container-fluid">
-	    <div class="row"><h4>Quad ${quadName}:</h4></div>
-		<div class="row">
-			<div class="col-xs-5">Supply:</div>
-			<div id="q${id}-sv" class="col-xs-5">&nbsp;</div>
-		</div>
-		<div class="row">
-			<div class="col-xs-5">Trace:</div>
-			<div id="q${id}-trace"  class="col-xs-5 status vertical-align">&nbsp;</div>
-		</div>
-	</div>
-</div>
-<table class="table table-striped">
-	<thead>
-		<tr>
-			<th style="width:20%"></th>
-			<th class="text-center" style="width:20%;">Channel 1</th>
-			<th class="text-center" style="width:20%;">Channel 2</th>
-			<th class="text-center" style="width:20%;">Channel 3</th>
-			<th class="text-center" style="width:20%;">Channel 4</th>
-		</tr>
-	</thead>
+    return `
+  <div class="caption">
+    <div class="container-fluid">
+      <div class="row"><h4>Quad ${quadName}:</h4></div>
+      <div class="row">
+        <div class="col-xs-5">Supply:</div>
+        <div id="q${id}-sv" class="col-xs-5">&nbsp;</div>
+      </div>
+      <div class="row">
+        <div class="col-xs-5">Trace:</div>
+        <div id="q${id}-trace"  class="col-xs-5 status vertical-align">&nbsp;</div>
+      </div>
+    </div>
+  </div>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th style="width:20%"></th>
+        <th class="text-center" style="width:20%;">Channel 1</th>
+        <th class="text-center" style="width:20%;">Channel 2</th>
+        <th class="text-center" style="width:20%;">Channel 3</th>
+        <th class="text-center" style="width:20%;">Channel 4</th>
+      </tr>
+    </thead>
 
-	<tbody>
-		<tr>
-			<th scope="row">Voltage</th>
-			<td><span id="q${id}-v0"></span>V</td>
-			<td><span id="q${id}-v1"></span>V</td>
-			<td><span id="q${id}-v2"></span>V</td>
-			<td><span id="q${id}-v3"></span>V</td>
-		</tr>
+    <tbody>
+      <tr>
+        <th scope="row">Voltage</th>
+        <td><span id="q${id}-v0"></span>V</td>
+        <td><span id="q${id}-v1"></span>V</td>
+        <td><span id="q${id}-v2"></span>V</td>
+        <td><span id="q${id}-v3"></span>V</td>
+      </tr>
 
-		<tr>
-			<th scope="row">Fuse Voltage</th>
-			<td><span id="q${id}-f0"></span>V</td>
-			<td><span id="q${id}-f1"></span>V</td>
-			<td><span id="q${id}-f2"></span>V</td>
-			<td><span id="q${id}-f3"></span>V</td>
-		</tr>
+      <tr>
+        <th scope="row">Current</th>
+        <td><span id="q${id}-a0"></span>A</td>
+        <td><span id="q${id}-a1"></span>A</td>
+        <td><span id="q${id}-a2"></span>A</td>
+        <td><span id="q${id}-a3"></span>A</td>
+      </tr>
 
-		<tr>
-			<th scope="row">Current</th>
-			<td><span id="q${id}-a0"></span>A</td>
-			<td><span id="q${id}-a1"></span>A</td>
-			<td><span id="q${id}-a2"></span>A</td>
-			<td><span id="q${id}-a3"></span>A</td>
-		</tr>
+      <tr>
+        <th scope="row">Fuse Status</th>
+        <td align="center"><span id="q${id}-f0" class="quad-chan-status"></span></td>
+        <td align="center"><span id="q${id}-f1" class="quad-chan-status"></span></td>
+        <td align="center"><span id="q${id}-f2" class="quad-chan-status"></span></td>
+        <td align="center"><span id="q${id}-f3" class="quad-chan-status"></span></td>
+      </tr>
 
-		<tr>
-			<td></td>
-			<td><button id="q${id}-btn0" type="button" class="btn btn-success" onclick="quadEnable(${id}, 0)">Disable</button></td>
-			<td><button id="q${id}-btn1" type="button" class="btn btn-success" onclick="quadEnable(${id}, 1)">Disable</button></td>
-			<td><button id="q${id}-btn2" type="button" class="btn btn-success" onclick="quadEnable(${id}, 2)">Disable</button></td>
-			<td><button id="q${id}-btn3" type="button" class="btn btn-success" onclick="quadEnable(${id}, 3)">Disable</button></td>
-		</tr>
-	</tbody>
+      <tr>
+        <th scope="row">Output FET Status</th>
+        <td align="center"><span id="q${id}-fet0" class="quad-chan-status"></span></td>
+        <td align="center"><span id="q${id}-fet1" class="quad-chan-status"></span></td>
+        <td align="center"><span id="q${id}-fet2" class="quad-chan-status"></span></td>
+        <td align="center"><span id="q${id}-fet3" class="quad-chan-status"></span></td>
+      </tr>
+
+      <tr>
+      <tr>
+        <td></td>
+        <td><button id="q${id}-btn0" type="button" class="btn btn-success" onclick="quadEnable(${id}, 0)">Disable</button></td>
+        <td><button id="q${id}-btn1" type="button" class="btn btn-success" onclick="quadEnable(${id}, 1)">Disable</button></td>
+        <td><button id="q${id}-btn2" type="button" class="btn btn-success" onclick="quadEnable(${id}, 2)">Disable</button></td>
+        <td><button id="q${id}-btn3" type="button" class="btn btn-success" onclick="quadEnable(${id}, 3)">Disable</button></td>
+      </tr>
+    </tbody>
 </table>
 	`;
 }
 
 class Quad
 {
-	constructor(id)
+    constructor(id)
+    {
+	this.map = new Map();
+	this.enabled = [true,true,true,true] //Channel enabled states
+	this.trace = false;
+	var elements = document.querySelectorAll(`[id^='q${id}-']`);
+	for (var i = 0; i < elements.length; ++i)
 	{
-		this.map = new Map();
-		this.enabled = [true,true,true,true] //Channel enabled states
-		this.trace = false;
-		var elements = document.querySelectorAll(`[id^='q${id}-']`);
-		for (var i = 0; i < elements.length; ++i)
-		{
-			var start = 2 + id.toString().length;
-			var key = elements[i].id.substr(start,
-						elements[i].id.length - start);
-			this.map.set(key, elements[i]);
-		}
+	    var start = 2 + id.toString().length;
+	    var key = elements[i].id.substr(start,
+					    elements[i].id.length - start);
+	    this.map.set(key, elements[i]);
 	}
+    }
 
-	update(data)
-	{
-		//Update all the values in the table
-		//Channel voltages
+    update(data)
+    {
+        //Update all the values in the table
     	this.map.get("sv").innerHTML = round1dp(data.supply) + 'V';
-		this.map.get("v0").innerHTML = round1dp(data.channels[0].voltage);
-		this.map.get("v1").innerHTML = round1dp(data.channels[1].voltage);
-		this.map.get("v2").innerHTML = round1dp(data.channels[2].voltage);
-		this.map.get("v3").innerHTML = round1dp(data.channels[3].voltage);
 
-		//Channel voltages after fuse
-		this.map.get("f0").innerHTML = round1dp(data.channels[0].fusevoltage);
-		this.map.get("f1").innerHTML = round1dp(data.channels[1].fusevoltage);
-		this.map.get("f2").innerHTML = round1dp(data.channels[2].fusevoltage);
-		this.map.get("f3").innerHTML = round1dp(data.channels[3].fusevoltage);
-
-		//Channel currents
-		this.map.get("a0").innerHTML = round1dp(data.channels[0].current);
-		this.map.get("a1").innerHTML = round1dp(data.channels[1].current);
-		this.map.get("a2").innerHTML = round1dp(data.channels[2].current);
-		this.map.get("a3").innerHTML = round1dp(data.channels[3].current);
-
-		for (var chan = 0; chan < 4; chan++)
-		{
-			var elem_name = "btn" + chan.toString();
-			var el = this.map.get(elem_name);
-			update_button_state(el, data.channels[chan].enabled, 'Disable', 'Enable')
-			this.enabled[chan] = data.channels[chan].enabled
-		}
-
-	}
-
-	updateTrace(value)
+	for (var chan = 0; chan < 4; chan++)
 	{
-		update_status_box(this.map.get('trace'), value, 'OK', 'Error')
+	    var chan_name = chan.toString();
+	    
+	    this.map.get("v" + chan_name).innerHTML = round1dp(data.channels[chan].voltage);
+	    this.map.get("a" + chan_name).innerHTML = round1dp(data.channels[chan].current);
+
+	    var fuse_update_str = round1dp(data.channels[chan].fusevoltage) + 'V';
+	    update_status_box(this.map.get("f" + chan_name), 
+			      !data.channels[chan].fuseblown, 
+			      'OK:' + fuse_update_str, 'BLOWN:' + fuse_update_str);
+	    
+	    update_status_box(this.map.get("fet" + chan_name),
+			      !data.channels[chan].fetfailed, 'OK', 'FAILED');
+	    
+	    update_button_state(this.map.get("btn" + chan_name), 
+				data.channels[chan].enabled, 'Disable', 'Enable');
 	}
+    }
+
+    updateTrace(value)
+    {
+	update_status_box(this.map.get('trace'), value, 'OK', 'Error')
+    }
 }
 
 function generateTempSensors(count)
