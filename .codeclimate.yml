@@ -22,6 +22,7 @@ ratings:
   - "**.py"
   - "**.rb"
 exclude_paths:
-  - "server/odin/testing/**/*"
-  - "server/odin/static/js/bootstrap*/**/*"
-  - "server/odin/static/js/jquery*.js"
+  - "lpdpower/testing/"
+  - "lpdpower/_version.py"
+  - "versioneer.py"
+  - "static/"
