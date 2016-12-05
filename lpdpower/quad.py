@@ -229,8 +229,6 @@ class Quad(I2CContainer):
                 if not self.__channel_enable[channel]:
                     fet_delta_volts = abs(self.__channel_voltage[channel] - self.__supply_voltage)
                     self.__fet_failed[channel] = (fet_delta_volts < self.FET_FAILED_DELTA)
-                    if self.__fet_failed[channel]:
-                        logging.info('FET {} {} {} {}'.format(channel, self.__fet_failed[channel], self.__channel_voltage[channel], fet_delta_volts))
                 else:
                     self.__fet_failed[channel] = False
  
