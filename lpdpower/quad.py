@@ -11,6 +11,7 @@ from lpdpower.i2c_container import I2CContainer
 from lpdpower.mcp23008 import MCP23008
 from lpdpower.ad7998 import AD7998
 
+import logging
 
 class Quad(I2CContainer):
     """Quad class.
@@ -28,7 +29,7 @@ class Quad(I2CContainer):
     FUSE_BLOWN_DELTA = 2.0
 
     # Output FET failed voltage detection threshold
-    FET_FAILED_THRESHOLD = 5.0
+    FET_FAILED_DELTA = 5.0
 
     def __init__(self):
         """Initialise the Quad device.
@@ -226,8 +227,10 @@ class Quad(I2CContainer):
                 # is present (i.e. above 24V), determine if there is a significant ouput voltage
                 # when a channel is disabled.
                 if not self.__channel_enable[channel]:
-                    self.__fet_failed[channel] = (
-                        self.__channel_voltage[channel] > self.FET_FAILED_THRESHOLD
-                    )
+                    fet_delta_volts = abs(self.__channel_voltage[channel] - self.__supply_voltage)
+                    self.__fet_failed[channel] = (fet_delta_volts < self.FET_FAILED_DELTA)
+                    if self.__fet_failed[channel]:
+                        logging.info('FET {} {} {} {}'.format(channel, self.__fet_failed[channel], self.__channel_voltage[channel], fet_delta_volts))
                 else:
                     self.__fet_failed[channel] = False
+ 
