@@ -36,7 +36,7 @@ set_hostname()
 {
     orig_hostname=$(hostname)
     changed=0
-    
+
     echo "Updating host name to $pscu_hostname"
 
     if [ $orig_hostname != $pscu_hostname ]; then
@@ -119,7 +119,7 @@ modify_runlevel()
 		if [ $? == 0 ]; then
 		    echo "OK"
                 fi
-            done 
+            done
 
 	    echo "  Forcing systemd to use multi-user target as default"
 	    ln -sf /lib/systemd/system/multi-user.target /lib/systemd/system/default.target
@@ -132,7 +132,7 @@ modify_runlevel()
 	    else
                 echo "  OK, default systemctl target is aleady ${systemctl_target}"
             fi
-	else 
+	else
 	    echo "  Unrecognised Debian release: {$release_version}, skipping this step"
         fi
     else
@@ -151,7 +151,7 @@ install_apt_pkgs()
 	if [ $? != 0 ]; then
 	    install_pkgs+=($pkg)
 	fi
-    done 
+    done
 
     if [ ${#install_pkgs[@]} != 0 ]; then
 	echo "  Packages to install : ${install_pkgs[@]}"
@@ -202,7 +202,7 @@ install_supervisord()
 {
     echo "Installing supervisord packages:"
     install_apt_pkgs supervisor
-    
+
     echo "Ensuring supervisor init script checks for log directory"
     supervisor_init=/etc/init.d/supervisor
     #logdircmd='test -d $LOGDIR || mkdir -p $LOGDIR'
@@ -252,7 +252,7 @@ suppress_debian_login_reminder()
 	    echo "  OK, reminder not found in $file"
         fi
     done
-    
+
 }
 
 fix_python_dist_permissions()
@@ -272,7 +272,7 @@ delete_default_account()
     # Temp add account to allow it to be deleted - REMOVE THIS
 #    adduser --disabled-password --gecos "Debian User A,,," $def_account
 #    usermod -G adm,kmem,dialout,cdrom,floppy,audio,dip,video,plugdev,users,netdev,i2c,admin,spi,systemd-journal,weston-launch,xenomai $def_account
- 
+
     echo "Deleting default user account ($def_account)"
     /usr/bin/id $def_account >/dev/null 2>&1
     if [ $? == 0 ]; then
@@ -304,7 +304,7 @@ create_pscu_account()
 	echo "  No $pscu_account password set, please set one now:"
 	passwd ${pscu_account}
     fi
-    
+
 }
 
 create_pscu_venv()
@@ -330,7 +330,7 @@ EOF
     else
 	echo "  OK, ${lpdpower_dir} already exists"
     fi
-	
+
 }
 
 install_odin_lpdpower()
@@ -348,7 +348,7 @@ set_pscu_splashscreen()
     echo "Setting PSCU LCD splash screen"
     sudo -u ${pscu_account} /bin/bash <<EOF
         /bin/echo -n "  "
-        ${lpdpower_dir}/scripts/lcdsetsplash       
+        ${lpdpower_dir}/scripts/lcdsetsplash
 EOF
 }
 
@@ -423,7 +423,7 @@ set_rootfs_readonly()
 
     orig_fstab=$(mktemp /tmp/etc_fstab_orig.XXXXX)
     cp -f $etc_fstab ${orig_fstab}
-    
+
 
     root_mntops=$(grep " / " $etc_fstab | awk '{print $4}' | sed 's/,/ /g')
     has_ro_opt=0
@@ -447,8 +447,8 @@ set_rootfs_readonly()
 
     create_tempfs_fstab_entry ${etc_fstab} '/var/log'  '1777' '128M'
     create_tempfs_fstab_entry ${etc_fstab} '/var/lib/dhcp' '1777' '1M'
-    create_tempfs_fstab_entry ${etc_fstab} '/var/lib/sudo' '1777' '1M'
-    create_tempfs_fstab_entry ${etc_fstab} '/tmp' '0700' '32M'
+    create_tempfs_fstab_entry ${etc_fstab} '/var/lib/sudo' '0700' '1M'
+    create_tempfs_fstab_entry ${etc_fstab} '/tmp' '1777' '32M'
 
     if [ $fstab_modified != 0 ]; then
 	echo "  Making backup copy of ${etc_fstab} to ${etc_fstab}.orig"
