@@ -30,8 +30,8 @@ class TestQuad():
 
     def test_init(self):
 
-        assert_equal(self.quad.mcp.bus, self.quad.adcPower.bus)
-        assert_equal(self.quad.mcp.bus, self.quad.adcFuse.bus)
+        assert_equal(self.quad.mcp.bus, self.quad.adc_power.bus)
+        assert_equal(self.quad.mcp.bus, self.quad.adc_fuse.bus)
 
     def test_poll(self):
 
@@ -97,6 +97,28 @@ class TestQuad():
             "{} is not a channel on the Quad. Must be between 0 & 3".format(bad_channel)):
             self.quad.get_fuse_voltage(bad_channel)
 
+    def test_get_channel_fuse_blown(self):
+
+        assert_equal(type(self.quad.get_fuse_blown(0)), bool)
+
+    def test_get_channel_fuse_blown_bad_channel(self):
+
+        bad_channel = 4
+        with assert_raises_regexp(I2CException,
+            "{} is not a channel on the Quad. Must be between 0 & 3".format(bad_channel)):
+            self.quad.get_fuse_blown(bad_channel)
+
+    def test_get_channel_fet_failed(self):
+
+        assert_equal(type(self.quad.get_fet_failed(0)), bool)
+
+    def test_get_channel_fet_failed_bad_channel(self):
+
+        bad_channel = 4
+        with assert_raises_regexp(I2CException,
+            "{} is not a channel on the Quad. Must be between 0 & 3".format(bad_channel)):
+            self.quad.get_fet_failed(bad_channel)
+
     def test_get_channel_enable(self):
 
         assert_equal(type(self.quad.get_enable(0)), bool)
@@ -145,3 +167,48 @@ class TestQuad():
         with assert_raises_regexp(I2CException,
             "{} is not a channel on the Quad. Must be between 0 & 3".format(bad_channel)):
             self.quad.set_enable(bad_channel, False)
+
+    def test_fuse_blown(self):
+
+        read_scaled_inputs = [0.0, 0.0, 0.0125] * self.quad.NUM_CHANNELS + [0.6]
+        fuse_blown = self._read_fuse_blown(read_scaled_inputs)
+        assert_equal(fuse_blown, [True] * self.quad.NUM_CHANNELS)
+
+    def test_fuse_not_blown(self):
+
+        read_scaled_inputs = [0.0, 0.0, 0.576] * self.quad.NUM_CHANNELS + [0.6]
+        fuse_blown = self._read_fuse_blown(read_scaled_inputs)
+        assert_equal(fuse_blown, [False] * self.quad.NUM_CHANNELS)
+
+    def _read_fuse_blown(self, read_scaled_inputs):
+        with patch('lpdpower.quad.AD7998.read_input_scaled', side_effect=read_scaled_inputs):
+            self.quad.poll_all_sensors()
+            fuse_blown = [
+                self.quad.get_fuse_blown(chan) for chan in range(self.quad.NUM_CHANNELS)
+            ]
+        return fuse_blown
+
+    def test_fet_failed(self):
+
+        read_scaled_inputs = [0.6, 0.0, 0.576] * self.quad.NUM_CHANNELS + [0.6]
+        channel_enables = [True, False, True, False]
+        fet_failed = self._read_fet_failed(read_scaled_inputs, channel_enables)
+        assert_equal(fet_failed, [not enable for enable in channel_enables])
+
+    def test_fet_not_failed(self):
+
+        read_scaled_inputs = [0.05625, 0.0, 0.6] + [0.6, 0.0, 0.6]*3 + [0.6]
+        channel_enables = [False, True, True, True]
+        fet_failed = self._read_fet_failed(read_scaled_inputs, channel_enables)
+        assert_equal(fet_failed, [False]*self.quad.NUM_CHANNELS)
+
+    def _read_fet_failed(self, read_scaled_inputs, channel_enables):
+
+        with patch('lpdpower.quad.AD7998.read_input_scaled', side_effect=read_scaled_inputs):
+            with patch('lpdpower.quad.MCP23008.input_pins',  return_value=channel_enables):
+                self.quad.poll_all_sensors()
+                fet_failed = [
+                    self.quad.get_fet_failed(chan) for chan in range(self.quad.NUM_CHANNELS)
+                ]
+
+        return fet_failed

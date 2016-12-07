@@ -76,7 +76,6 @@ class TestPSCU():
 
     def test_generate_indexed_getter_tests(self):
 
-
         for (method, return_type) in [
             ('get_temperature', float),
             ('get_temperature_volts', float),
@@ -85,6 +84,8 @@ class TestPSCU():
             ('get_temperature_tripped', bool),
             ('get_temperature_trace', bool),
             ('get_temperature_disabled', bool),
+            ('get_temperature_name', str),
+            ('get_temperature_mode', str),
             ('get_humidity', float),
             ('get_humidity_volts', float),
             ('get_humidity_set_point', float),
@@ -92,6 +93,8 @@ class TestPSCU():
             ('get_humidity_tripped', bool),
             ('get_humidity_trace', bool),
             ('get_humidity_disabled', bool),
+            ('get_humidity_name', str),
+            ('get_humidity_mode', str),
         ]:
             for (legal_sensor, label) in [(True, 'legal'), (False, 'illegal')]:
                 test_func = partial(self._test_pscu_indexed_getter, method, legal_sensor, return_type)
@@ -122,12 +125,14 @@ class TestPSCU():
           ('get_pump_set_point', float),
           ('get_pump_set_point_volts', float),
           ('get_pump_tripped', bool),
+          ('get_pump_mode', str),
           ('get_fan_speed', float),
           ('get_fan_speed_volts', float),
           ('get_fan_set_point', float),
           ('get_fan_set_point_volts', float),
           ('get_fan_target', float),
           ('get_fan_tripped', bool),
+          ('get_fan_mode', str),
           ('get_position', float),
           ('get_position_volts', float),
           ('get_armed', bool),
@@ -318,10 +323,10 @@ class TestPSCU():
     def test_convert_ad7998_humidity(self):
 
         expected_results = [
-            (0.00, 0.0),
-            (0.50, 64.103),
+            (0.00, -25.806),
+            (0.50, 54.839),
             (0.78, 100.0),
-            (1.00, 128.205),
+            (1.00, 135.484),
         ]
         for (scaled_adc_val, expected_humidity) in expected_results:
             converted_humidity = self.pscu.convert_ad7998_humidity(scaled_adc_val)

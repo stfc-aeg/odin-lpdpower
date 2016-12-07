@@ -65,7 +65,7 @@ class LcdDisplay(object):
 
         self.registered_pages.append(self.overview_page)
 
-        self.temps_per_page = 4
+        self.temps_per_page = 2
         self.num_temp_pages = int(round(float(self.pscu.num_temperatures) / self.temps_per_page))
 
         for page in range(self.num_temp_pages):
@@ -220,9 +220,16 @@ class LcdDisplay(object):
 
         for chan in range(start_chan, end_chan):
             if chan < num_temp_vals:
-                chan_temp = self.pscu.get_temperature(chan)
-                chan_trip = '*' if self.pscu.get_temperature_tripped(chan) else ' '
-                temp_disp = '{:2d}:{:4.1f}C{} '.format(chan+1, chan_temp, chan_trip)
+                chan_disabled = self.pscu.get_temperature_disabled(chan)
+                if chan_disabled:
+                    temp_disp = '{:2d}:{:17s}'.format(chan+1, 'N/C')
+                else:
+                    chan_name = ''.join(self.pscu.get_temperature_name(chan).split(' '))
+                    chan_temp = self.pscu.get_temperature(chan)
+                    chan_trip = '*' if self.pscu.get_temperature_tripped(chan) else ' '
+                    temp_disp = '{:2d}:{: <10.10s}:{:4.1f}C{:1s}'.format(
+                        chan+1, chan_name, chan_temp, chan_trip
+                    )
             else:
                 temp_disp = '\r'
 
@@ -245,11 +252,16 @@ class LcdDisplay(object):
         content += 'Humidity: {}\r'.format(state_str)
 
         for chan in range(self.pscu.num_humidities):
-            chan_humid = self.pscu.get_humidity(chan)
-            chan_trip = '*' if self.pscu.get_humidity_tripped(chan) else ' '
-            content += '{}:{:4.1f}%{} '.format(chan+1, chan_humid, chan_trip)
-
-        content += '\r\r'
+            chan_disabled = self.pscu.get_humidity_disabled(chan)
+            if chan_disabled:
+                content += '{:2d}:{:17s}'.format(chan+1, 'N/C')
+            else:
+                chan_name = ''.join(self.pscu.get_humidity_name(chan).split(' '))
+                chan_humid = self.pscu.get_humidity(chan)
+                chan_trip = '*' if self.pscu.get_humidity_tripped(chan) else ' '
+                content += '{:2d}:{: <10.10s}:{:4.1f}%{:1s}'.format(
+                    chan+1, chan_name, chan_humid, chan_trip
+                )
 
         return content
 
@@ -361,8 +373,8 @@ class LcdDisplay(object):
 
         quad_supply_volts = [self.pscu.quad[quad].get_supply_voltage() for quad in range(4)]
 
-        content += '1: {:4.1f}V 2:{:4.1f}V\r'.format(quad_supply_volts[0], quad_supply_volts[1])
-        content += '3: {:4.1f}V 4:{:4.1f}V\r'.format(quad_supply_volts[2], quad_supply_volts[3])
+        content += 'A: {:4.1f}V B:{:4.1f}V\r'.format(quad_supply_volts[0], quad_supply_volts[1])
+        content += 'C: {:4.1f}V D:{:4.1f}V\r'.format(quad_supply_volts[2], quad_supply_volts[3])
 
         return content
 
@@ -379,10 +391,8 @@ class LcdDisplay(object):
         content = self.page_header()
 
         quad_chans = [start_chan, start_chan+1]
-
-        quad_supply_volts = self.pscu.quad[quad].get_supply_voltage()
-
-        content += 'Quad: {} Chans: {}/{} \r'.format(quad + 1, *[chan+1 for chan in quad_chans])
+        quad_name = ['A', 'B', 'C', 'D'][quad]
+        content += 'Quad: {} Chans: {}/{} \r'.format(quad_name, *[chan+1 for chan in quad_chans])
 
         for quad_chan in quad_chans:
             quad_enable = ('ON ' if self.pscu.quad[quad].get_enable(quad_chan) else 'OFF')
@@ -390,21 +400,17 @@ class LcdDisplay(object):
             quad_fuse_volts = self.pscu.quad[quad].get_fuse_voltage(quad_chan)
             quad_current = self.pscu.quad[quad].get_channel_current(quad_chan)
 
-            # Check if the fuse is blown - if the supply voltage is present (i.e. above 24V),
-            # determine if there is a significant difference between the fuse and supply voltage.
-            # If so, replace the default line with a 'fuse blow?' message.
-            fuse_ok = True
-            if quad_supply_volts > 24.0:
-                fuse_delta_volts = abs(quad_fuse_volts - quad_supply_volts)
-                if fuse_delta_volts > 2.0:
-                    fuse_ok = False
-
-            if fuse_ok:
+            # If either of the FET failed or fuse blown flags are true, display an error message,
+            # otherwise show the channel ouptut voltage and current.
+            if self.pscu.quad[quad].get_fet_failed(quad_chan):
+                content += '{}:FET failed?({:4.1f}V)'.format(
+                    quad_chan+1, quad_fuse_volts)
+            elif self.pscu.quad[quad].get_fuse_blown(quad_chan):
+                content += '{}:Fuse blown?({:4.1f}V)'.format(
+                    quad_chan+1, quad_fuse_volts)
+            else:
                 content += '{}:{} {:4.1f}V {:4.1f}A OK'.format(
                     quad_chan+1, quad_enable, quad_volts, quad_current)
-            else:
-                content += '{}:Fuse blow? ({:4.1f}V)'.format(
-                    quad_chan+1, quad_fuse_volts)
 
         return content
 

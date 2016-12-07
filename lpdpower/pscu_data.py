@@ -38,6 +38,8 @@ class TempData(object):
             "tripped": (self.get_tripped, None),
             "trace": (self.get_trace, None),
             "disabled": (self.get_disabled, None),
+            "name": (self.get_name, None),
+            'mode': (self.get_mode, None),
         })
 
         self.pscu = pscu
@@ -108,6 +110,24 @@ class TempData(object):
         """
         return self.pscu.get_temperature_disabled(self.sensor_idx)
 
+    def get_name(self):
+        """Get the name of the temperature sensor.
+
+        This method returns the descriptive name of the temperature sensor.
+
+        :returns: sensor name as a string
+        """
+        return self.pscu.get_temperature_name(self.sensor_idx)
+
+    def get_mode(self):
+        """Get the mode of the temperature sensor.
+
+        This method returns the descriptive mode of the temperature sensor.
+
+        :returns: sensor mode as a string
+        """
+        return self.pscu.get_temperature_mode(self.sensor_idx)
+
 
 class HumidityData(object):
     """Data container for a PSCU humidity sensor.
@@ -135,6 +155,8 @@ class HumidityData(object):
             "tripped": (self.get_tripped, None),
             "trace": (self.get_trace, None),
             "disabled": (self.get_disabled, None),
+            "name": (self.get_name, None),
+            "mode": (self.get_mode, None),
         })
 
         self.pscu = pscu
@@ -198,12 +220,30 @@ class HumidityData(object):
     def get_disabled(self):
         """Get the disabled status of the humidity sensor.
 
-        This method returns the disabled status of the temperature sensor, i.e. if it
+        This method returns the disabled status of the humidity sensor, i.e. if it
         has been disabled from the overall interlock state by a jumper connection.
 
         :returns: disabled status as boolean.
         """
         return self.pscu.get_humidity_disabled(self.sensor_idx)
+
+    def get_name(self):
+        """Get the name of the humidity sensor.
+
+        This method returns the descriptive name of the humidity sensor.
+
+        :returns: sensor name as a string
+        """
+        return self.pscu.get_humidity_name(self.sensor_idx)
+
+    def get_mode(self):
+        """Get the mode of the humidity sensor.
+
+        This method returns the descriptive mode of the humidity sensor.
+
+        :returns: sensor mode as a string
+        """
+        return self.pscu.get_humidity_mode(self.sensor_idx)
 
 
 class PSCUDataError(Exception):
@@ -274,6 +314,7 @@ class PSCUData(object):
                 "tripped": (self.pscu.get_fan_tripped, None),
                 "overall": (self.pscu.get_fan_state, None),
                 "latched": (self.pscu.get_fan_latched, None),
+                "mode": (self.pscu.get_fan_mode, None),
             },
             "pump": {
                 "flow": (self.pscu.get_pump_flow, None),
@@ -283,6 +324,7 @@ class PSCUData(object):
                 "tripped": (self.pscu.get_pump_tripped, None),
                 "overall": (self.pscu.get_pump_state, None),
                 "latched": (self.pscu.get_pump_latched, None),
+                "mode": (self.pscu.get_pump_mode, None),
             },
             "trace": {
                  "overall": (self.pscu.get_trace_state, None),

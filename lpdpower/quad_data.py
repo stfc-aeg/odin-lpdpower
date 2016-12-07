@@ -34,6 +34,8 @@ class ChannelData(object):
             "voltage": (self.get_voltage, None),
             "current": (self.get_current, None),
             "fusevoltage": (self.get_fuse, None),
+            "fuseblown": (self.get_fuse_blown, None),
+            "fetfailed": (self.get_fet_failed, None),
             "enabled": (self.get_enable, self.set_enable),
             })
 
@@ -46,6 +48,15 @@ class ChannelData(object):
         """
         return self.quad.get_channel_voltage(self.channel_idx)
 
+    def get_current(self):
+        """Get the quad channel output current.
+
+        This method returns the quad output channel current.
+
+        :returns: output channel current in Amps
+        """
+        return self.quad.get_channel_current(self.channel_idx)
+
     def get_fuse(self):
         """Get the quad channel fuse voltage.
 
@@ -55,14 +66,23 @@ class ChannelData(object):
         """
         return self.quad.get_fuse_voltage(self.channel_idx)
 
-    def get_current(self):
-        """Get the quad channel output current.
+    def get_fuse_blown(self):
+        """Get the quad channel fuse blown status.
 
-        This method returns the quad output channel current.
+        This method returns the quad output fuse blown status.
 
-        :returns: output channel current in Amps
+        :returns: quad output channel fuse blown status as bool
         """
-        return self.quad.get_channel_current(self.channel_idx)
+        return self.quad.get_fuse_blown(self.channel_idx)
+
+    def get_fet_failed(self):
+        """Get the quad channel FET failure status.
+
+        This method returns the quad output FET failure status.
+
+        :returns: quad output channel FET failure status as bool
+        """
+        return self.quad.get_fet_failed(self.channel_idx)
 
     def get_enable(self):
         """Get the quad channel enable status.

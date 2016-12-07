@@ -26,18 +26,26 @@ class TestLcdDisplay():
         cls.pscu.num_humidities = 2
         cls.pscu.get_all_latched.return_value = [True]*4
         cls.pscu.get_temperature.return_value = 20.0
+        cls.pscu.get_temperature_name.return_value = 'Temp Sensor X'
+        cls.pscu.get_temperature_disabled.return_value = False
         cls.pscu.get_humidity.return_value = 56.7
+        cls.pscu.get_humidity_name.return_value = 'Humidity Sensor Y'
+        cls.pscu.get_humidity_disabled.return_value = False
         cls.pscu.get_fan_speed.return_value = 45.0
         cls.pscu.get_fan_target.return_value = 90
         cls.pscu.get_pump_flow.return_value = 4.2
         cls.pscu.get_position.return_value = 11.36
 
         cls.pscu.quad = [Mock()]*4
+        quad_fuse_blown = [True, False, False, False] * cls.pscu.num_quads
+        quad_fet_failed = [False, True, False, False] * cls.pscu.num_quads
         for q in range(cls.pscu.num_quads):
             cls.pscu.quad[q].get_supply_voltage.return_value = 48.1
             cls.pscu.quad[q].get_channel_voltage.return_value = 48.0
             cls.pscu.quad[q].get_fuse_voltage = cls.fuse_voltage
             cls.pscu.quad[q].get_channel_current.return_value = 16.0
+            cls.pscu.quad[q].get_fuse_blown.side_effect = quad_fuse_blown
+            cls.pscu.quad[q].get_fet_failed.side_effect = quad_fet_failed
 
         cls.serial_dev = '/dev/null'
         cls.baud = 57600
@@ -123,22 +131,44 @@ class TestLcdDisplay():
 
     def test_temperature_pages(self):
 
+        self.pscu.get_temperature_disabled.return_value = False
         for page in range(self.display.num_temp_pages):
             content = self.display.temperature_page(page)
-            for call in ['get_temperature', 'get_temperature_latched', 'get_temperature_state', 'get_temperature_tripped']:
+            for call in [
+                    'get_temperature', 'get_temperature_latched', 'get_temperature_state',
+                    'get_temperature_tripped', 'get_temperature_disabled']:
                 assert_true(getattr(self.pscu, call).called, 'PSCU method {} not called'.format(call))
             assert_equal(type(content), str)
             assert_true(len(content) > 0)
             assert_true('Temp' in content)
 
+    def test_temperature_page_sensor_disabled(self):
+
+        self.pscu.get_temperature_disabled.return_value = True
+        content = self.display.temperature_page(0)
+        assert_equal(type(content), str)
+        assert_true(len(content) > 0)
+        assert_true('N/C' in content)
+
     def test_humidity_page(self):
 
+        self.pscu.get_humidity_disabled.return_value = False
         content = self.display.humidity_page()
-        for call in ['get_humidity', 'get_humidity_latched', 'get_humidity_state', 'get_humidity_tripped']:
+        for call in [
+                'get_humidity', 'get_humidity_latched', 'get_humidity_state',
+                'get_humidity_tripped', 'get_humidity_disabled']:
             assert_true(getattr(self.pscu, call).called, 'PSCU method {} not called'.format(call))
         assert_equal(type(content), str)
         assert_true(len(content) > 0)
         assert_true('Humidity' in content)
+
+    def test_humidity_page_disabled(self):
+
+        self.pscu.get_humidity_disabled.return_value = True
+        content = self.display.humidity_page()
+        assert_equal(type(content), str)
+        assert_true(len(content) > 0)
+        assert_true('N/C' in content)
 
     def test_fan_page(self):
 
@@ -195,17 +225,27 @@ class TestLcdDisplay():
 
     def test_quad_page(self):
 
+        fuse_blown_seen = False
+        fet_failed_seen = False
         for quad in range(4):
             for chan in range(2):
                 content = self.display.quad_page(quad, chan*2)
                 for call in [
-                    'get_supply_voltage', 'get_enable', 'get_channel_voltage', 'get_channel_current'
+                    'get_enable', 'get_channel_voltage', 'get_channel_current',
+                    'get_fuse_blown', 'get_fet_failed',
                 ]:
                     assert_true(getattr(self.pscu.quad[quad], call).called, 'PSCU method {} not called'.format(call))
                 assert_equal(type(content), str)
                 assert_true(len(content) > 0)
                 assert_true('Quad' in content)
                 assert_true('Chans' in content)
+                if 'Fuse blown' in content:
+                    fuse_blown_seen = True
+                if 'FET failed' in content:
+                    fet_failed_seen = True
+
+        assert_true(fuse_blown_seen)
+        assert_true(fet_failed_seen)
 
     def test_system_page(self):
 

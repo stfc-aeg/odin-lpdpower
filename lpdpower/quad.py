@@ -11,6 +11,7 @@ from lpdpower.i2c_container import I2CContainer
 from lpdpower.mcp23008 import MCP23008
 from lpdpower.ad7998 import AD7998
 
+import logging
 
 class Quad(I2CContainer):
     """Quad class.
@@ -20,6 +21,15 @@ class Quad(I2CContainer):
 
     # Number of output channels on the Quad box
     NUM_CHANNELS = 4
+
+    # Nominal supply voltage
+    SUPPLY_VOLTAGE_NOMINAL = 48.0
+
+    # Fuse blown voltage detection threshold
+    FUSE_BLOWN_DELTA = 2.0
+
+    # Output FET failed voltage detection threshold
+    FET_FAILED_DELTA = 5.0
 
     def __init__(self):
         """Initialise the Quad device.
@@ -43,15 +53,17 @@ class Quad(I2CContainer):
             self.mcp.setup(i, MCP23008.IN)
 
         # Attach ADC devices for monitoring
-        self.adcPower = self.attach_device(AD7998, 0x22)
-        self.adcFuse = self.attach_device(AD7998, 0x21)
+        self.adc_power = self.attach_device(AD7998, 0x22)
+        self.adc_fuse = self.attach_device(AD7998, 0x21)
 
         # Create internal buffers for all sensor channels
-        self.__channelVoltage = [0.0] * self.num_channels
-        self.__channelCurrent = [0.0] * self.num_channels
-        self.__fuseVoltage = [0.0] * self.num_channels
-        self.__channelEnable = [False] * self.num_channels
-        self.__supplyVoltage = 0.0
+        self.__channel_voltage = [0.0] * self.num_channels
+        self.__channel_current = [0.0] * self.num_channels
+        self.__fuse_voltage = [0.0] * self.num_channels
+        self.__fuse_blown = [False] * self.num_channels
+        self.__fet_failed = [False] * self.num_channels
+        self.__channel_enable = [False] * self.num_channels
+        self.__supply_voltage = 0.0
 
     def get_channel_voltage(self, channel):
         """Get output channel voltage.
@@ -65,7 +77,7 @@ class Quad(I2CContainer):
             raise I2CException(
                 "%s is not a channel on the Quad. Must be between 0 & 3" % channel)
 
-        return self.__channelVoltage[channel]
+        return self.__channel_voltage[channel]
 
     def get_channel_current(self, channel):
         """Get output channel current.
@@ -79,7 +91,7 @@ class Quad(I2CContainer):
             raise I2CException(
                 "%s is not a channel on the Quad. Must be between 0 & 3" % channel)
 
-        return self.__channelCurrent[channel]
+        return self.__channel_current[channel]
 
     def get_fuse_voltage(self, channel):
         """Get output channel fuse voltage.
@@ -92,7 +104,33 @@ class Quad(I2CContainer):
         if channel > 3 or channel < 0:
             raise I2CException("%s is not a channel on the Quad. Must be between 0 & 3" % channel)
 
-        return self.__fuseVoltage[channel]
+        return self.__fuse_voltage[channel]
+
+    def get_fuse_blown(self, channel):
+        """Get output channel fuse blown status.
+
+        This method returns the fuse blown status for the specified channel.
+
+        :param channel: channel to get value for
+        :return channel fuse blown status as bool
+        """
+        if channel > 3 or channel < 0:
+            raise I2CException("%s is not a channel on the Quad. Must be between 0 & 3" % channel)
+
+        return self.__fuse_blown[channel]
+
+    def get_fet_failed(self, channel):
+        """Get output channel FET failure status.
+
+        This method returns the FET failure status for the specified channel.
+
+        :param channel: channel to get value for
+        :return channel FET failure status as bool
+        """
+        if channel > 3 or channel < 0:
+            raise I2CException("%s is not a channel on the Quad. Must be between 0 & 3" % channel)
+
+        return self.__fet_failed[channel]
 
     def get_enable(self, channel):
         """Get output channel enable.
@@ -105,7 +143,7 @@ class Quad(I2CContainer):
         if channel > 3 or channel < 0:
             raise I2CException("%s is not a channel on the Quad. Must be between 0 & 3" % channel)
 
-        return self.__channelEnable[channel]
+        return self.__channel_enable[channel]
 
     def get_supply_voltage(self):
         """Get the Quad box supply voltage.
@@ -114,7 +152,7 @@ class Quad(I2CContainer):
 
         :return supply voltage in volts
         """
-        return self.__supplyVoltage
+        return self.__supply_voltage
 
     def set_enable(self, channel, enabled):
         """Set the output enable for a given channel.
@@ -165,13 +203,32 @@ class Quad(I2CContainer):
         """
         # Read and udpate the output enable states
         enable_pins = range(4, 4 + self.NUM_CHANNELS)
-        self.__channelEnable = self.mcp.input_pins(enable_pins)
+        self.__channel_enable = self.mcp.input_pins(enable_pins)
 
         # For each channel read an dupate the voltage and current values
         for channel in range(self.NUM_CHANNELS):
-            self.__channelVoltage[channel] = self.adcPower.read_input_scaled(channel) * 5 * 16
-            self.__channelCurrent[channel] = self.adcPower.read_input_scaled(channel + 4) * 5 * 4
-            self.__fuseVoltage[channel] = self.adcFuse.read_input_scaled(channel) * 5 * 16
+            self.__channel_voltage[channel] = self.adc_power.read_input_scaled(channel) * 5 * 16
+            self.__channel_current[channel] = self.adc_power.read_input_scaled(channel + 4) * 5 * 4
+            self.__fuse_voltage[channel] = self.adc_fuse.read_input_scaled(channel) * 5 * 16
 
         # Read and update the supply voltage
-        self.__supplyVoltage = self.adcFuse.read_input_scaled(4) * 5 * 16
+        self.__supply_voltage = self.adc_fuse.read_input_scaled(4) * 5 * 16
+
+        if self.__supply_voltage > (self.SUPPLY_VOLTAGE_NOMINAL / 2.0):
+            for channel in range(self.NUM_CHANNELS):
+
+                # Check if the fuse is blown for each channel - if the supply voltage is present
+                # (i.e. above 24V), determine if there is a significant difference between the
+                # fuse and supply voltage.
+                fuse_delta_volts = abs(self.__fuse_voltage[channel] - self.__supply_voltage)
+                self.__fuse_blown[channel] = (fuse_delta_volts > self.FUSE_BLOWN_DELTA)
+
+                # Check if the output FET has failed closed for each channel. If the supply voltage
+                # is present (i.e. above 24V), determine if there is a significant ouput voltage
+                # when a channel is disabled.
+                if not self.__channel_enable[channel]:
+                    fet_delta_volts = abs(self.__channel_voltage[channel] - self.__supply_voltage)
+                    self.__fet_failed[channel] = (fet_delta_volts < self.FET_FAILED_DELTA)
+                else:
+                    self.__fet_failed[channel] = False
+ 
