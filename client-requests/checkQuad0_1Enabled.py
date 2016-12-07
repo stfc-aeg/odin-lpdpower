@@ -1,5 +1,5 @@
 ''' Check if each quad's channel is enabled (or not) '''
-import requests, pprint
+import requests
 import sys
 
 pscu_host = "beagle03.aeg.lan"
@@ -8,14 +8,9 @@ if len(sys.argv) > 1:
 url = 'http://{:s}:8888/api/0.1/lpdpower/'.format(pscu_host)
 try:
     response = requests.get(url)
-    #response.json().keys()
-    #[u'fan', u'enableInterval', u'temperature', u'trace', u'overall', u'pump', u'humidity', u'allEnabled', u'displayError', u'position', u'quad', u'armed', u'latched']
-    pp = pprint.PrettyPrinter(indent=2)
-    #pp.pprint("Quad 0 Supplies:")
-    #pp.pprint(response.json()['quad']['quads']['0'] )
-    
-    #pp.pprint("Quad 1 Supplies:")
-    #pp.pprint(response.json()['quad']['quads']['1'] )
+    if response.status_code != requests.codes.OK:
+        print("Error: {}".format(requests.status_codes._codes[response.status_code][0]))
+        sys.exit(-1)
     
     quadKeys = response.json()['quad']['quads']
     for quad in range( len(quadKeys) ):         # Loop over Quads..
@@ -23,4 +18,4 @@ try:
             print("Quad{}, Channel{} is enabled? {}".format(quad, channel, quadKeys[str(quad)]['channels'][str(channel)]['enabled'] ))
         print("---------------")
 except Exception as e:
-    print("Error: ", e)
+    print("Exception: {}".format(e))

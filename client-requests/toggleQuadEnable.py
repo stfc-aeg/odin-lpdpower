@@ -8,25 +8,37 @@ def toggleQuadEnable(base_url, quad, channel):
 
     pp = pprint.PrettyPrinter()
     
-    # Get the appropriate quad channel status
-    response = requests.get(url)
+    try:
+        # Get the appropriate quad channel status
+        response = requests.get(url)
+    except Exception as e:
+        print "(1) Requests get() Error: ", e
+        return
     chan_status   = response.json()[str(channel)]
-    print "Quad {} channel {} status before toggling enable: {}".format(quad, channel, chan_status['enabled'])
-    #pp.pprint(chan_status)
+    print "Quad {} channel {} status before toggling enable: {}".format(
+        quad, channel, chan_status['enabled'])
+
     chan_enable = chan_status['enabled']
     
     # Toggle the enable state
     payload = {"enabled": not chan_enable}
-    rep = requests.put(url, data=json.dumps(payload), headers=headers)
-  
-    if rep.status_code != 200:
+    try:
+        rep = requests.put(url, data=json.dumps(payload), headers=headers)
+    except Exception as e:
+        print "Requests put() Error: ", e
+        return
+    if rep.status_code != requests.codes.OK:
         print "error:  {} Couldn't change quad {} channel {}".format(rep.status_code, quad, channel)
     else:
         print "Success (Code:{}) changed quad {} channel {} to: {}".format(rep.status_code, quad, channel, payload['enabled'])
   
     time.sleep(0.5)
     # Get the status again
-    response = requests.get(url)
+    try:
+        response = requests.get(url)
+    except Exception as e:
+        print "(2) Requests get() Error: ", e
+        return
     chan_status = response.json()[str(channel)]
 
     print "Quad {} channel {} status after toggling enable: {}".format(quad, channel, chan_status['enabled'])

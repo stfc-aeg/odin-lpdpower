@@ -12,6 +12,9 @@ print("Continuously reading all temperatures: (Use Ctrl-C to close script)")
 try:
     while True:
         theLot = requests.get(url)
+        if theLot.status_code != requests.codes.OK:
+            print("Error: {}".format(requests.status_codes._codes[theLot.status_code][0]))
+            sys.exit(-1)
         # Read all 11 temperatures, display on the same line
         for index in range(11):
             print("{}: {:.1f}C  ".format(index, theLot.json()['temperature']['sensors'][str(index)]['temperature']), end=' ')
@@ -23,7 +26,7 @@ try:
         time.sleep(0.2)
         print("\r", end=' ')
 except Exception as e:
-    print("Error: ", e)
+    print("Exception: {}".format(e))
 except KeyboardInterrupt:
     # The user pressed Ctrl-C (to stop the script) 
     print("\n")

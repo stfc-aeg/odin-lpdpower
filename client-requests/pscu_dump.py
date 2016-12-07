@@ -17,7 +17,10 @@ pp = pprint.PrettyPrinter()
 
 try:
     response = requests.get(url)
+    if response.status_code != requests.codes.OK:
+        print "Error {} Couldn't get() data".format(response.status_code)
+        sys.exit(-1)
     pscu_status = response.json()
     pp.pprint(pscu_status)
 except Exception as e:
-    print "Error: ", e
+    print("Exception: {}".format(e))
