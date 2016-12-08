@@ -336,9 +336,9 @@ class TestPSCU():
 
         expected_results = [
             (0.0, 0.0),
-            (0.5, 27.778),
-            (0.9, 50.0),
-            (1.0, 55.556),
+            (0.5, 1666.667),
+            (0.9, 3000.0),
+            (1.0, 3333.333),
         ]
         for (scaled_adc_val, expected_speed) in expected_results:
             converted_speed = self.pscu.convert_ad7998_fan(scaled_adc_val)
