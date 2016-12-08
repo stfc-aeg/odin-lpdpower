@@ -913,7 +913,7 @@ class PSCU(I2CContainer):
         :returns: fan speed value in RPM.
         """
         fan_scale = 4.5
-        fan_max = 50.0
+        fan_max = 3000.0
 
         fan_rpm = ((scaled_adc_val * PSCU.FAN_VREF) / fan_scale) * fan_max
 
