@@ -507,9 +507,9 @@ class PSCU(I2CContainer):
     def get_fan_speed(self):
         """Get the current fan speed.
 
-        This method returns the current LPD fan speed in Hz.
+        This method returns the current LPD fan speed in RPM.
 
-        :returns: fan speed in Hz
+        :returns: fan speed in RPM
         """
         return self.__fan_speed
 
@@ -525,9 +525,9 @@ class PSCU(I2CContainer):
     def get_fan_set_point(self):
         """Get the current fan speed set point.
 
-        This method returns the current LPD fan speed set point in Hz.
+        This method returns the current LPD fan speed set point in RPM.
 
-        :returns: fan speed set point in Hz
+        :returns: fan speed set point in RPM
         """
         return self.__fan_set_point
 
@@ -907,17 +907,17 @@ class PSCU(I2CContainer):
         """Convert a scaled ADC reading into fan speed.
 
         This method takes a scaled ADC channel reading, i.e. as returned by the
-        read_input_scaled() method and converts it into fan speed in Hertz.
+        read_input_scaled() method and converts it into fan speed in RPM.
 
         :input scaled_adc_val ADC channel reading as fraction of full-scale
-        :returns: fan speed value in Hertz.
+        :returns: fan speed value in RPM.
         """
         fan_scale = 4.5
         fan_max = 50.0
 
-        fan_hertz = ((scaled_adc_val * PSCU.FAN_VREF) / fan_scale) * fan_max
+        fan_rpm = ((scaled_adc_val * PSCU.FAN_VREF) / fan_scale) * fan_max
 
-        return fan_hertz
+        return fan_rpm
 
     def convert_ad7998_pump(self, scaled_adc_val):
         """Convert a scaled ADC reading into pump flow rate.
