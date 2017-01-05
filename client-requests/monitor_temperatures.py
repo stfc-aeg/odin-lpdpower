@@ -1,8 +1,8 @@
 #!~/develop/projects/odin/venv/bin/python
 ''' Readout 1/second all temperature sensors until the user interrupts '''
-from __future__ import print_function#, division, absolute_import
+from __future__ import print_function
 
-import requests, sys, time
+import requests, sys, time, httplib
 
 pscu_host = "beagle03.aeg.lan"
 if len(sys.argv) > 1:
@@ -13,7 +13,7 @@ try:
     while True:
         theLot = requests.get(url)
         if theLot.status_code != requests.codes.OK:
-            print("Error: {}".format(requests.status_codes._codes[theLot.status_code][0]))
+            print("Error: {}".format(httplib.responses[theLot.status_code]))
             sys.exit(-1)
         # Read all 11 temperatures, display on the same line
         for index in range(11):

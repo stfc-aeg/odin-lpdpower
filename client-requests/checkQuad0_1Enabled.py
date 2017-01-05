@@ -1,5 +1,5 @@
 ''' Check if each quad's channel is enabled (or not) '''
-import requests
+import requests, httplib
 import sys
 
 pscu_host = "beagle03.aeg.lan"
@@ -9,7 +9,7 @@ url = 'http://{:s}:8888/api/0.1/lpdpower/'.format(pscu_host)
 try:
     response = requests.get(url)
     if response.status_code != requests.codes.OK:
-        print("Error: {}".format(requests.status_codes._codes[response.status_code][0]))
+        print("Error: {}".format(httplib.responses[response.status_code]))
         sys.exit(-1)
     
     quadKeys = response.json()['quad']['quads']

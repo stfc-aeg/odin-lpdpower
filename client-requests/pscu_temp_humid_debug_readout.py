@@ -1,6 +1,6 @@
 ''' ckd27546 - read out each temperature and humidity sensor's value, actual and in volts, ditto for its' setpoint '''
 
-import requests, json
+import requests, json, httplib
 import time, sys, datetime
 
 pscu_host='beagle03.aeg.lan'
@@ -11,7 +11,7 @@ url = 'http://{:s}:8888/api/0.1/lpdpower/'.format(pscu_host)
 try:
     response = requests.get(url)
     if response.status_code != requests.codes.OK:
-        print("Error: {}.".format(requests.status_codes._codes[response.status_code][0]))
+        print("Error: {}.".format(httplib.responses[response.status_code]))
         sys.exit(-1)
 except Exception as e:
     print("Exception: {}".format(e))
@@ -32,7 +32,7 @@ try:
         try:
             response = requests.get(url)
             if response.status_code != requests.codes.OK:
-                print("Failure: {}".format(requests.status_codes._codes[response.status_code][0]))
+                print("Failure: {}".format(httplib.responses[response.status_code]))
                 sys.exit(-1)
         except Exception as e:
             print("Exception: {}".format(e))

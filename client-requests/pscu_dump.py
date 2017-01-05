@@ -4,7 +4,7 @@ Dump PSCU data tree (but in a formatted display)
 @author: ckd27546
 '''
 import requests, json
-import pprint 
+import pprint, httplib 
 import sys
 
 pscu_host='beagle03.aeg.lan'
@@ -18,7 +18,7 @@ pp = pprint.PrettyPrinter()
 try:
     response = requests.get(url)
     if response.status_code != requests.codes.OK:
-        print "Error {} Couldn't get() data".format(response.status_code)
+        print("Error: {}; Couldn't get() data".format(httplib.responses[response.status_code]))
         sys.exit(-1)
     pscu_status = response.json()
     pp.pprint(pscu_status)

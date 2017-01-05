@@ -1,6 +1,6 @@
 ''' Provide control to PSCU's hardware; Used by other scripts '''
 from __future__ import print_function
-import requests, sys, time, json, pprint
+import requests, sys, time, json, pprint, httplib
 
 class PSCUClient(object):
     ''' Provide access to PSCU's i2c devices '''
@@ -17,7 +17,7 @@ class PSCUClient(object):
             self.response = requests.get(self.url)
             if self.response.status_code != requests.codes.OK:
                 print("Initialisation Error: {}".format(
-                    requests.status_codes._codes[self.response.status_code][0]))
+                    httplib.responses[self.response.status_code]))
                 sys.exit(-1)
         except Exception as e:
             print("Exception: {}".format(e))
@@ -45,7 +45,7 @@ class PSCUClient(object):
         payload = {"armed": bToggle}
         rep = requests.put(self.url, data=json.dumps(payload), headers=self.headers)
         if rep.status_code != requests.codes.OK:
-            print("Error: {}. Couldn't updated key 'arm'!".format(requests.status_codes._codes[rep.status_code][0]))
+            print("Error: {}. Couldn't updated key 'arm'!".format(httplib.responses[rep.status_code]))
             sys.exit(-1)
      
     def setQuadChannel(self, quad, channel, bEnable):
@@ -59,7 +59,7 @@ class PSCUClient(object):
         rep = requests.put( self.url + path, data=json.dumps(payload), headers=self.headers)
         if rep.status_code != requests.codes.OK:
             print("Error: {}. Couldn't change Quad{:s}'s channel {}"
-                  .format(requests.status_codes._codes[rep.status_code][0], 
+                  .format(httplib.responses[rep.status_code],
                           PSCUClient.LIST_QUADS[quad], channel))
             sys.exit(-1)
         else:
@@ -71,7 +71,7 @@ class PSCUClient(object):
         rp = requests.get(path)
         if rp.status_code != requests.codes.OK:
             print("Error {}: getKey() failed on key '{}'"
-                  .format(requests.status_codes._codes[rp.status_code][0], aKey))
+                  .format(httplib.responses[rp.status_code], aKey))
             sys.exit(-1)
         return rp.json()[aKey]
 
@@ -86,7 +86,7 @@ class PSCUClient(object):
         rep = requests.put(path, data=json.dumps(payload), headers=self.headers)
         if rep.status_code != requests.codes.OK:
             print("Error {}: Couldn't change key: '{}' to be '{}' in path: '{}'"
-                  .format(requests.status_codes._codes[rep.status_code][0], aKey, aValue, path))
+                  .format(httplib.responses[rep.status_code], aKey, aValue, path))
             sys.exit(-1)
         else:
             if self.bDebug:
