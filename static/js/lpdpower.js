@@ -117,19 +117,19 @@ class Quad
         for (var chan = 0; chan < 4; chan++)
         {
             var chan_name = chan.toString();
-            
+
             this.map.get("v" + chan_name).innerHTML = round1dp(data.channels[chan].voltage);
             this.map.get("a" + chan_name).innerHTML = round1dp(data.channels[chan].current);
 
             var fuse_update_str = round1dp(data.channels[chan].fusevoltage) + 'V';
-            update_status_box(this.map.get("f" + chan_name), 
-                              !data.channels[chan].fuseblown, 
+            update_status_box(this.map.get("f" + chan_name),
+                              !data.channels[chan].fuseblown,
                               'OK:' + fuse_update_str, 'BLOWN:' + fuse_update_str);
-            
+
             update_status_box(this.map.get("fet" + chan_name),
                               !data.channels[chan].fetfailed, 'OK', 'FAILED');
-            
-            update_button_state(this.map.get("btn" + chan_name), 
+
+            update_button_state(this.map.get("btn" + chan_name),
                                 data.channels[chan].enabled, 'Disable', 'Enable');
             this.enabled[chan] = data.channels[chan].enabled;
         }
@@ -225,7 +225,7 @@ class TempSensor
             temperatureVal = round1dp(data.temperature) + '°C';
             setpointVal = round1dp(data.setpoint) + '°C';
         }
-        this.map.get("name").innerHTML = data.name; 
+        this.map.get("name").innerHTML = data.name;
         this.map.get("mode").innerHTML = data.mode;
         this.map.get("tmp").innerHTML = temperatureVal;
         this.map.get("set").innerHTML = setpointVal;
@@ -439,12 +439,12 @@ function generateFanSensors(count)
           <tr>
             <th class="text-center">${id+1}</th>
             <th class="text-left">Fan</th>
-            <td><span id="f${id}-speed">0</span>Hz</td>
-            <td><span id="f${id}-set">0</span>Hz</td>
+            <td><span id="f${id}-speed">0</span>rpm</td>
+            <td><span id="f${id}-set">0</span>rpm</td>
             <td><span id="f${id}-mode">?</span></td>
             <td>
               <div class="input-group">
-                <input class="form-control" type="text" id="f${id}-target" aria-label="Target fan speed (Hz)">
+                <input class="form-control" type="text" id="f${id}-target" aria-label="Target fan speed (rpm)">
                 <span class="input-group-addon">%</span>
                 <span class="input-group-btn">
                   <button class="btn btn-default" type="button" onclick="updateSpeed(${id})">Set</button>
@@ -513,7 +513,7 @@ var fan_sensor;
 
 var global_elems = new Map();
 $(document).ready(function() {
-                      
+
     //Get sensors and cache DOM elements
     for(var i = 0; i < 4; ++i)
         quads.push(new Quad(i));
