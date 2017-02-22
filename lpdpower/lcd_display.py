@@ -83,7 +83,7 @@ class LcdDisplay(object):
             for chan in range(2):
                 self.registered_pages.append(partial(self.quad_page, quad, chan*2))
 
-        self.registered_pages.append(self.system_page)
+        # self.registered_pages.append(self.system_page)
 
         # Set up LCD display buffer, colour, time format
         self.lcd_buffer = ""
