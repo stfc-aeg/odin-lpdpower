@@ -6,7 +6,7 @@ Created on Aug 23, 2016
 import requests, json
 import pprint 
 
-url = 'http://192.168.0.158:8888/api/0.1/lpdpower/'
+url = 'http://pscu:8888/api/0.1/lpdpower/'
 
 pp = pprint.PrettyPrinter()
 

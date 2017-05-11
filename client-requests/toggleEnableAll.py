@@ -2,8 +2,8 @@ import requests, json
 
 def toggleEnableAll():
     
-    base_url = 'http://beagle03.aeg.lan:8888/api/0.1/lpdpower/'
-    enable_path = 'allenabled'
+    base_url = 'http://pscu:8888/api/0.1/lpdpower/'
+    enable_path = 'allEnabled'
     headers = {'Content-Type': 'application/json'}
     
     url = base_url + enable_path
@@ -16,9 +16,9 @@ def toggleEnableAll():
         return
     
     
-    enabled = response.json()['allenabled']
+    enabled = response.json()[enable_path]
     print "Current quad enableAll state is {}".format(enabled)
-    payload = {'enableall': not enabled}
+    payload = {enable_path: not enabled}
 
     response = requests.put(base_url, data=json.dumps(payload), headers=headers)
     
@@ -28,7 +28,7 @@ def toggleEnableAll():
         )
         return
     
-    print "Quad enableAll state is now {}".format(response.json()['enableall'])
+    print "Quad enableAll state is now {}".format(response.json()[enable_path])
     
 if __name__ == '__main__':
     toggleEnableAll()
