@@ -91,6 +91,9 @@ ENV/
 # PyCharm project settings
 .idea/
 
+# VSCode project settings
+.vscode/
+
 # CTAGS tags files
 tags
 .tags
