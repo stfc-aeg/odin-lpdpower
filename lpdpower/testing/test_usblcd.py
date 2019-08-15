@@ -6,9 +6,10 @@ Tim Nicholls, STFC Application Engineering
 import sys
 if sys.version_info[0] == 3:  # pragma: no cover
     from unittest.mock import Mock, patch, call
+    PY3 = True
 else:                         # pragma: no cover
     from mock import Mock, patch, call
-
+    PY3 = False
 from nose.tools import *
 
 sys.modules['serial'] = Mock()
@@ -41,7 +42,10 @@ class TestUsbLcd():
 
         cmds.insert(0, UsbLcd.CMD_START)
 
-        calls = [call(chr(cmd)) for cmd in cmds]
+        if PY3:
+            calls = [call(bytes(cmds))]
+        else:
+            calls = [call(chr(cmd)) for cmd in cmds]
         return calls
 
     def test_00_init(self):
@@ -67,6 +71,8 @@ class TestUsbLcd():
 
         write_cmd = 'text'
         self.lcd.write(write_cmd)
+        if PY3:
+            write_cmd = write_cmd.encode()
         self.serial.write.assert_called_with(write_cmd)
 
     def test_set_splash_text(self):

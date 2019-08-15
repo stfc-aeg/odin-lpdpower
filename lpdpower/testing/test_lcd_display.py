@@ -6,8 +6,10 @@ Tim Nicholls, STFC Application Engineering
 import sys
 if sys.version_info[0] == 3:  # pragma: no cover
     from unittest.mock import Mock, patch, call
+    PY3 = True
 else:                         # pragma: no cover
     from mock import Mock, patch, call
+    PY3 = False
 
 from nose.tools import *
 
@@ -121,7 +123,10 @@ class TestLcdDisplay():
     def test_update(self):
 
         self.display.update()
-        self.display.lcd.ser.write.assert_any_call(self.display.lcd_buffer)
+        buffer = self.display.lcd_buffer
+        if PY3:
+            buffer = buffer.encode()
+        self.display.lcd.ser.write.assert_any_call(buffer)
 
     def test_format_state_str(self):
 

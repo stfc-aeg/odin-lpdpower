@@ -9,7 +9,8 @@ This class requires the python serial module to communicate with the USB
 serial device created by the host operating system,
 """
 import serial
-
+import sys
+PY3 = sys.version_info >= (3,)
 
 class UsbLcd(object):
     """UsbLcd - driver class for a LCD module with Adafruit USB backpack.
@@ -64,8 +65,12 @@ class UsbLcd(object):
         :param cmd_list list of commands to send
         """
         cmd_list.insert(0, UsbLcd.CMD_START)
-        for i in range(0, len(cmd_list)):
-            self.ser.write(chr(cmd_list[i]))
+
+        if PY3:
+            self.ser.write(bytes(cmd_list))
+        else:
+            for i in range(0, len(cmd_list)):
+                self.ser.write(chr(cmd_list[i]))
 
     def home(self):
         """Set the display cursor to the home position.
@@ -88,7 +93,10 @@ class UsbLcd(object):
 
         :param text: text string to write to the display
         """
-        self.ser.write(text)
+        if PY3:
+            self.ser.write(text.encode())
+        else:
+            self.ser_write(text)
 
     def set_splash_text(self, text):
         """Set the splash text for the display.
