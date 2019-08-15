@@ -225,7 +225,7 @@ class TempSensor
             temperatureVal = round1dp(data.temperature) + '°C';
             setpointVal = round1dp(data.setpoint) + '°C';
         }
-        this.map.get("name").innerHTML = data.name;
+        this.map.get("name").innerHTML = data.sensor_name;
         this.map.get("mode").innerHTML = data.mode;
         this.map.get("tmp").innerHTML = temperatureVal;
         this.map.get("set").innerHTML = setpointVal;
@@ -316,7 +316,7 @@ class HumiditySensor
             humidityValue = round1dp(data.humidity) + '%';
             setpointValue = round1dp(data.setpoint) + '%';
         }
-        this.map.get("name").innerHTML = data.name;
+        this.map.get("name").innerHTML = data.sensor_name;
         this.map.get("mode").innerHTML = data.mode;
         this.map.get("h").innerHTML = humidityValue;
         this.map.get("set").innerHTML = setpointValue;

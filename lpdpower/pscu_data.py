@@ -41,7 +41,7 @@ class TempData(object):
             "tripped": (self.get_tripped, None),
             "trace": (self.get_trace, None),
             "disabled": (self.get_disabled, None),
-            "name": (self.get_name, None),
+            "sensor_name": (self.get_name, None),
             'mode': (self.get_mode, None),
         })
 
@@ -158,7 +158,7 @@ class HumidityData(object):
             "tripped": (self.get_tripped, None),
             "trace": (self.get_trace, None),
             "disabled": (self.get_disabled, None),
-            "name": (self.get_name, None),
+            "sensor_name": (self.get_name, None),
             "mode": (self.get_mode, None),
         })
 
