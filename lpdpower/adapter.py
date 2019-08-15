@@ -38,6 +38,7 @@ class LPDPowerAdapter(ApiAdapter):
         pscu_data_options = {
             'quad_enable_interval': float(self.options.get('quad_enable_interval', 1.0)),
             'detector_position_offset': float(self.options.get('detector_position_offset', 0.0)),
+            'i2c_bus_number': int(self.options.get('i2c_bus_number', 1)),
         }
 
         # Create a PSCUData instance

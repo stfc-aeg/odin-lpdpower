@@ -32,6 +32,7 @@ class PSCU(I2CContainer):
     ALL_PINS = [0, 1, 2, 3, 4, 5, 6, 7]
     DEFAULT_QUAD_ENABLE_INTERVAL = 1.0
     DEFAULT_DETECTOR_POSITION_OFFSET = 0.0
+    DEFAULT_I2C_BUS_NUMBER = 1
     TEMP_VREF = 3.0
     HUMIDITY_VREF = 5.0
     FAN_VREF = 5.0
@@ -58,7 +59,8 @@ class PSCU(I2CContainer):
     ]
 
     def __init__(self, quad_enable_interval=DEFAULT_QUAD_ENABLE_INTERVAL,
-                 detector_position_offset=DEFAULT_DETECTOR_POSITION_OFFSET):
+                 detector_position_offset=DEFAULT_DETECTOR_POSITION_OFFSET,
+                 i2c_bus_number=DEFAULT_I2C_BUS_NUMBER):
         """Initialise the PSCU instance.
 
         The constructor initialises the PSCU instance, setting up all the I2C
@@ -67,12 +69,17 @@ class PSCU(I2CContainer):
 
         :param quad_enable_interval: time interval between quad enable commands
         """
-        # Turn off exception raising in the I2C device class
-        I2CDevice.disable_exceptions()
-
-        # Set up the quad enable interval with the specified value
+        # Set up the quad enable interval, detector position offset and I2C bus number
+        # with the specified values
         self.quad_enable_interval = quad_enable_interval
         self.detector_position_offset = detector_position_offset
+        self.i2c_bus_number = i2c_bus_number
+
+        # Set the default bus number for all I2C devices
+        I2CDevice.set_default_i2c_bus(self.i2c_bus_number)
+
+        # Turn off exception raising in the I2C device class
+        I2CDevice.disable_exceptions()
 
         # Create the TCA I2C bus multiplexer instance
         self.tca = TCA9548(0x70)

@@ -42,7 +42,7 @@ class I2CDevice(object):
     """
 
     _enable_exceptions = False
-    _default_i2c_bus = 2
+    _default_i2c_bus = 1
 
     ERROR = -1
 
