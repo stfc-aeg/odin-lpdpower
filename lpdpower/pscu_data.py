@@ -30,6 +30,9 @@ class TempData(object):
         :param pscu: PSCU object to use to access the sensor
         :param sensor_idx: sensor index on PSCU
         """
+        self.pscu = pscu
+        self.sensor_idx = sensor_idx
+
         self.param_tree = ParameterTree({
             "temperature": (self.get_temperature, None),
             "temperature_volts": (self.get_temperature_volts, None),
@@ -41,9 +44,6 @@ class TempData(object):
             "name": (self.get_name, None),
             'mode': (self.get_mode, None),
         })
-
-        self.pscu = pscu
-        self.sensor_idx = sensor_idx
 
     def get_temperature(self):
         """Get the current temperature read by the sensor.
@@ -147,6 +147,9 @@ class HumidityData(object):
         :param pscu: PSCU object to use to access the sensor
         :param sensor_idx: sensor index on PSCU
         """
+        self.pscu = pscu
+        self.sensor_idx = sensor_idx
+
         self.param_tree = ParameterTree({
             "humidity": (self.get_humidity, None),
             "humidity_volts": (self.get_humidity_volts, None),
@@ -159,8 +162,6 @@ class HumidityData(object):
             "mode": (self.get_mode, None),
         })
 
-        self.pscu = pscu
-        self.sensor_idx = sensor_idx
 
     def get_humidity(self):
         """Get the current humidity read by the sensor.
