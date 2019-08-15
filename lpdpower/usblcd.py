@@ -96,7 +96,7 @@ class UsbLcd(object):
         if PY3:
             self.ser.write(text.encode())
         else:
-            self.ser_write(text)
+            self.ser.write(text)
 
     def set_splash_text(self, text):
         """Set the splash text for the display.
