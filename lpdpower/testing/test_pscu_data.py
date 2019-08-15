@@ -48,7 +48,7 @@ class TestTempData():
         self.pscu.get_temperature_disabled.assert_called_with(self.sensor_idx)
 
     def test_name_get(self):
-        self.temp_data.param_tree.get('name')
+        self.temp_data.param_tree.get('sensor_name')
         self.pscu.get_temperature_name.assert_called_with(self.sensor_idx)
 
     def test_mode_get(self):
@@ -84,11 +84,7 @@ class TestHumidityData():
         self.pscu.get_humidity_disabled.assert_called_with(self.sensor_idx)
 
     def test_name_get(self):
-        self.humidity_data.param_tree.get('name')
-        self.pscu.get_humidity_name.assert_called_with(self.sensor_idx)
-
-    def test_name_get(self):
-        self.humidity_data.param_tree.get('name')
+        self.humidity_data.param_tree.get('sensor_name')
         self.pscu.get_humidity_name.assert_called_with(self.sensor_idx)
 
     def test_mode_get(self):
@@ -123,13 +119,14 @@ class TestPscuData():
     def test_set_param(self):
 
         enabled = True
+        self.pscu_data.param_tree._tree['allEnabled']._type = bool
         self.pscu_data.set('allEnabled', enabled)
         self.pscu.enable_all.assert_called_with(enabled)
 
     def test_get_missing_param(self):
 
         missing_param = 'missing_param'
-        with assert_raises_regexp(PSCUDataError, 'The path {} is invalid'.format(missing_param)):
+        with assert_raises_regexp(PSCUDataError, 'Invalid path: {}'.format(missing_param)):
             self.pscu_data.get(missing_param)
 
     def test_set_missing_param(self):
