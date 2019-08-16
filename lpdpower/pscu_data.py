@@ -10,6 +10,7 @@ James Hogge, STFC Application Engineering Group.
 from odin.adapters.parameter_tree import ParameterTree, ParameterTreeError
 from lpdpower.temp_data import TempData
 from lpdpower.humidity_data import HumidityData
+from lpdpower.leak_data import LeakData
 from lpdpower.quad_data import QuadData
 from lpdpower.pscu import PSCU
 
@@ -48,12 +49,15 @@ class PSCUData(object):
         # Get the QuadData containers associated with the PSCU
         self.quad_data = [QuadData(quad=q) for q in self.pscu.quad]
 
-        # Get the temperature and humidity containers associated with the PSCU
+        # Get the temperature, humidity and leak sensor containers associated with the PSCU
         self.temperature_data = [
             TempData(self.pscu, i) for i in range(self.pscu.num_temperatures)
         ]
         self.humidity_data = [
             HumidityData(self.pscu, i) for i in range(self.pscu.num_humidities)
+        ]
+        self.leak_data = [
+            LeakData(self.pscu, i) for i in range(self.pscu.num_leak_sensors)
         ]
 
         # Build the parameter tree of the PSCU
@@ -68,7 +72,8 @@ class PSCUData(object):
                 "latched": (self.pscu.get_temperature_latched,  None),
             },
             "humidity": {
-                "sensors": [h.param_tree for h in self.humidity_data],
+                "sensors": [h.param_tree for h in self.humidity_data] +
+                    [l.param_tree for l in self.leak_data],
                 "overall": (self.pscu.get_humidity_state, None),
                 "latched": (self.pscu.get_humidity_latched, None),
             },

@@ -35,6 +35,7 @@ class PSCU(I2CContainer):
     DEFAULT_I2C_BUS_NUMBER = 1
     TEMP_VREF = 3.0
     HUMIDITY_VREF = 5.0
+    LEAK_VREF = 5.0
     FAN_VREF = 5.0
     PUMP_VREF = 5.0
     POSITION_VREF = 5.0
@@ -54,8 +55,11 @@ class PSCU(I2CContainer):
     ]
 
     HUMIDITY_SENSOR_NAMES = [
-        'Front',
         'Rear',
+    ]
+
+    LEAK_SENSOR_NAMES = [
+        'Leak'
     ]
 
     def __init__(self, quad_enable_interval=DEFAULT_QUAD_ENABLE_INTERVAL,
@@ -152,7 +156,10 @@ class PSCU(I2CContainer):
         self.__temperature_mode = ['Over'] * 8 + ['Under'] * 3
 
         # Humidity
-        self.num_humidities = 2
+        self.num_humidities = 1
+        self.__humidity_adc_chan_offset = 2
+        self.__humidity_trip_chan_offset = 2
+        self.__humidity_trace_chan_offset = 1
         self.__humidity_values = [0.0] * self.num_humidities
         self.__humidity_values_raw = [0.0] * self.num_humidities
         self.__humidity_set_points = [0.0] * self.num_humidities
@@ -161,6 +168,20 @@ class PSCU(I2CContainer):
         self.__humidity_traces = [False] * self.num_humidities
         self.__humidity_disabled = [False] * self.num_humidities
         self.__humidity_mode = ['Over'] * self.num_humidities
+
+        # Leak detection sensors
+        self.num_leak_sensors = 1
+        self.__leak_adc_chan_offset = 1
+        self.__leak_trip_chan_offset = 1
+        self.__leak_trace_chan_offset = 0
+        self.__leak_values = [0.0] * self.num_leak_sensors
+        self.__leak_values_raw = [0.0] * self.num_leak_sensors
+        self.__leak_set_points = [0.0] * self.num_leak_sensors
+        self.__leak_set_points_raw = [0.0] * self.num_leak_sensors
+        self.__leak_trips = [False] * self.num_leak_sensors
+        self.__leak_traces = [False] * self.num_leak_sensors
+        self.__leak_disabled = [False] * self.num_leak_sensors
+        self.__leak_mode = ['Under'] * self.num_leak_sensors
 
         # Pump
         self.__pump_flow = 0.0
@@ -455,6 +476,124 @@ class PSCU(I2CContainer):
             raise I2CException('Illegal sensor index {} specified'.format(sensor))
 
         return self.__humidity_mode[sensor]
+
+    def get_leak_impedance(self, sensor):
+        """Get the value of a PSCU leak sensor.
+
+        This method returns the current impedance value of the specified sensor.
+
+        :param sensor: leak sensor index
+        :returns: leak impedance value for sensor in megaohms
+        """
+        if sensor >= self.num_leak_sensors or sensor < 0:
+            raise I2CException('Illegal sensor index {} specified'.format(sensor))
+
+        return self.__leak_values[sensor]
+
+    def get_leak_volts(self, sensor):
+        """Get the raw value of a PSCU leak sensor.
+
+        This method returns the current raw leak value of the specified sensor.
+
+        :param sensor: leak sensor index
+        :returns: raw leak value for sensor
+        """
+        if sensor >= self.num_leak_sensors or sensor < 0:
+            raise I2CException('Illegal sensor index {} specified'.format(sensor))
+
+        return self.__leak_values_raw[sensor] * PSCU.LEAK_VREF
+
+    def get_leak_set_point(self, sensor):
+        """Get the set point of a PSCU leak sensor.
+
+        This method returns the current set point for the specified leak sensor.
+
+        :param sensor: leak sensor index
+        :returns: value of the leak sensor set point
+        """
+        if sensor >= self.num_leak_sensors or sensor < 0:
+            raise I2CException('Illegal sensor index {} specified'.format(sensor))
+
+        return self.__leak_set_points[sensor]
+
+    def get_leak_set_point_volts(self, sensor):
+        """Get the raw set point of a PSCU leak sensor.
+
+        This method returns the current set point for the specified leak sensor.
+
+        :param sensor: leak sensor index
+        :returns: raw value of the leak sensor set point in volts
+        """
+        if sensor >= self.num_leak_sensors or sensor < 0:
+            raise I2CException('Illegal sensor index {} specified'.format(sensor))
+
+        return self.__leak_set_points_raw[sensor] * PSCU.LEAK_VREF
+
+    def get_leak_tripped(self, sensor):
+        """Get the trip status of a PSCU leak sensor.
+
+        This method returns the current trip status for the specified leak sensor.
+
+        :param sensor: leak sensor index
+        :returns: leak sensor trip status
+        """
+        if sensor >= self.num_leak_sensors or sensor < 0:
+            raise I2CException('Illegal sensor index {} specified'.format(sensor))
+
+        return self.__leak_trips[sensor]
+
+    def get_leak_trace(self, sensor):
+        """Get the trip status of a PSCU leak sensor.
+
+        This method returns the current trace status for the specified leak sensor.
+
+        :param sensor: leak sensor index
+        :returns: leak sensor trace status
+        """
+        if sensor >= self.num_leak_sensors or sensor < 0:
+            raise I2CException('Illegal sensor index {} specified'.format(sensor))
+
+        return self.__leak_traces[sensor]
+
+    def get_leak_disabled(self, sensor):
+        """Get the disabled status of a PSCU leak sensor.
+
+        This method returns the current disable status for the specified leak sensor.
+
+        :param sensor: leak sensor index
+        :returns: leak sensor disable status
+        """
+        if sensor >= self.num_leak_sensors or sensor < 0:
+            raise I2CException('Illegal sensor index {} specified'.format(sensor))
+
+        return self.__leak_disabled[sensor]
+
+    def get_leak_name(self, sensor):
+        """Get the name of a PSCU leak sensor.
+
+        This method returns the descriptive name for the specified PSCU leak sensor.
+
+        :param sensor: leak sensor index
+        :returns: leak sensor decriptive name
+        """
+        if sensor >= self.num_leak_sensors or sensor < 0:
+            raise I2CException('Illegal sensor index {} specified'.format(sensor))
+
+        return PSCU.LEAK_SENSOR_NAMES[sensor]
+
+    def get_leak_mode(self, sensor):
+        """Get the mode of a PSCU leak sensor.
+
+        This method returns the descriptive mode for the specified PSCU leak sensor, i.e.
+        whether the sensor channel has an over- or under-impedance trip condition.
+
+        :param sensor: leak sensor index
+        :returns: leak sensor decriptive mode as string
+        """
+        if sensor >= self.num_leak_sensors or sensor < 0:
+            raise I2CException('Illegal sensor index {} specified'.format(sensor))
+
+        return self.__leak_mode[sensor]
 
     def get_pump_flow(self):
         """Get the value of the PSCU pump flow sensor.
@@ -898,7 +1037,7 @@ class PSCU(I2CContainer):
         """Convert a scaled ADC reading into humidity.
 
         This method takes a scaled ADC channel reading, i.e. as returned by the
-        read_input_scaled() method and converts it into temperature in percent.
+        read_input_scaled() method and converts it into humidity in percent.
 
         :input scaled_adc_val ADC channel reading as fraction of full-scale
         :returns: humidity value in percent.
@@ -909,6 +1048,27 @@ class PSCU(I2CContainer):
         humidity_percent = ((scaled_adc_val * PSCU.HUMIDITY_VREF) - humidity_offset) / humidity_scale
 
         return humidity_percent
+
+    def convert_ad7998_leak_impedance(self, scaled_adc_val):
+        """Convert a scaled ADC reading into leak sensor impedance.
+
+        This method takes a scaled ADC channel reading, i.e. as returned by the
+        read_input_scaled() method and converts it into leak impedance in megaohms.
+
+        :input scaled_adc_val ADC channel reading as fraction of full-scale
+        :returns: leak impedance value in megaohms.
+        """
+        leak_max_voltage = 2.5 
+        leak_sense_current = 150e-9
+
+        leak_sensor_voltage = scaled_adc_val * PSCU.LEAK_VREF
+        leak_impedance = (
+            (leak_max_voltage - (leak_sensor_voltage / leak_max_voltage)) / leak_sense_current
+        )
+
+        leak_impedance_megaohm = leak_impedance / 1.0e6
+
+        return leak_impedance_megaohm
 
     def convert_ad7998_fan(self, scaled_adc_val):
         """Convert a scaled ADC reading into fan speed.
@@ -1016,22 +1176,50 @@ class PSCU(I2CContainer):
         # Read, convert and store all humidity values and setpoints from the ADCs and
         # extract and store all trip, trace and disabled states from the MCPs
 
-        self.__humidity_disabled[1] = mcp_mon_0[5]
+        #self.__humidity_disabled[1] = mcp_mon_0[5]
 
         for i in range(self.num_humidities):
 
-            self.__humidity_set_points_raw[i] = self.adc_misc[0].read_input_scaled(i+1)
+            self.__humidity_set_points_raw[i] = self.adc_misc[0].read_input_scaled(
+                i + self.__humidity_adc_chan_offset
+            )
             self.__humidity_set_points[i] = self.convert_ad7998_humidity(
                 self.__humidity_set_points_raw[i]
             )
-            self.__humidity_values_raw[i] = self.adc_misc[1].read_input_scaled(i+1)
+            self.__humidity_values_raw[i] = self.adc_misc[1].read_input_scaled(
+                i + self.__humidity_adc_chan_offset
+            )
             if not self.__humidity_disabled[i]:
                 self.__humidity_values[i] = self.convert_ad7998_humidity(
                     self.__humidity_values_raw[i]
                 )
 
-            self.__humidity_trips[i] = not bool(mcp_misc_1[i+1])
-            self.__humidity_traces[i] = bool(mcp_misc_2[i])
+            self.__humidity_trips[i] = not bool(mcp_misc_1[i + self.__humidity_trip_chan_offset])
+            self.__humidity_traces[i] = bool(mcp_misc_2[i + self.__humidity_trace_chan_offset])
+
+        # Read, convert and store all leak sensor values and setpoints from the ADCs and
+        # extract and store all trip, trace and disabled states from the MCPs
+
+        self.__leak_disabled[0] = mcp_mon_0[5]
+
+        for i in range(self.num_leak_sensors):
+
+            self.__leak_set_points_raw[i] = self.adc_misc[0].read_input_scaled(
+                i + self.__leak_adc_chan_offset
+            )
+            self.__leak_set_points[i] = self.convert_ad7998_leak_impedance(
+                self.__leak_set_points_raw[i]
+            )
+            self.__leak_values_raw[i] = self.adc_misc[1].read_input_scaled(
+                i + self.__leak_adc_chan_offset
+            )
+            if not self.__leak_disabled[i]:
+                self.__leak_values[i] = self.convert_ad7998_leak_impedance(
+                    self.__leak_values_raw[i]
+                )
+
+            self.__leak_trips[i] = not bool(mcp_misc_1[i + self.__leak_trip_chan_offset])
+            self.__leak_traces[i] = bool(mcp_misc_2[i + self.__leak_trace_chan_offset])
 
         # Read, convert and store fan speed and setpoint ADC values and extract and store
         # the fan trip status

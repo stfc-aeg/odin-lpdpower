@@ -27,6 +27,7 @@ class TestPscuData():
         cls.pscu.num_humidities = 2
         cls.pscu.num_temperatures = 11
         cls.pscu.num_quads = 4
+        cls.pscu.num_leak_sensors = 1
         cls.pscu.quad = [Mock()] * cls.pscu.num_quads
         for quad in cls.pscu.quad:
             quad.num_channels = 4

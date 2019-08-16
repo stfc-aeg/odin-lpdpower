@@ -95,6 +95,15 @@ class TestPSCU():
             ('get_humidity_disabled', bool),
             ('get_humidity_name', str),
             ('get_humidity_mode', str),
+            ('get_leak_impedance', float),
+            ('get_leak_volts', float),
+            ('get_leak_set_point', float),
+            ('get_leak_set_point_volts', float),
+            ('get_leak_tripped', bool),
+            ('get_leak_trace', bool),
+            ('get_leak_disabled', bool),
+            ('get_leak_name', str),
+            ('get_leak_mode', str),
         ]:
             for (legal_sensor, label) in [(True, 'legal'), (False, 'illegal')]:
                 test_func = partial(self._test_pscu_indexed_getter, method, legal_sensor, return_type)
@@ -105,7 +114,7 @@ class TestPSCU():
 
     def _test_pscu_indexed_getter(self, method, is_legal, return_type):
 
-        legal_sensor = 1
+        legal_sensor = 0
         illegal_sensor = 12
 
         if is_legal:
@@ -331,6 +340,18 @@ class TestPSCU():
         for (scaled_adc_val, expected_humidity) in expected_results:
             converted_humidity = self.pscu.convert_ad7998_humidity(scaled_adc_val)
             assert_almost_equal(converted_humidity, expected_humidity, places=3)
+
+    def test_convert_ad7998_leak_impedance(self):
+
+        expected_results = [
+            (0.00, 16.667),
+            (0.20, 14.000),
+            (0.50, 10.000),
+            (1.00, 3.333)
+        ]
+        for (scaled_adc_val, expected_impedance) in expected_results:
+            converted_impedance = self.pscu.convert_ad7998_leak_impedance(scaled_adc_val)
+            assert_almost_equal(converted_impedance, expected_impedance, places=3)
 
     def test_convert_ad7998_fan(self):
 
