@@ -48,9 +48,11 @@ class TestLPDPowerAdapter():
         response = self.adapter.get(bad_path, self.request)
         assert_equal(response.status_code, 400)
         assert_true('error' in response.data)
-        assert_equal(response.data['error'], 'The path {} is invalid'.format(bad_path))
+        assert_equal(response.data['error'], 'Invalid path: {}'.format(bad_path))
 
     def test_put(self):
+
+        self.adapter.pscuData.param_tree._tree['allEnabled']._type = bool
 
         request_body = {'allEnabled': True}
         self.request.body = json.dumps(request_body)

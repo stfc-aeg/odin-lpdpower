@@ -225,7 +225,7 @@ class TempSensor
             temperatureVal = round1dp(data.temperature) + '°C';
             setpointVal = round1dp(data.setpoint) + '°C';
         }
-        this.map.get("name").innerHTML = data.name;
+        this.map.get("name").innerHTML = data.sensor_name;
         this.map.get("mode").innerHTML = data.mode;
         this.map.get("tmp").innerHTML = temperatureVal;
         this.map.get("set").innerHTML = setpointVal;
@@ -233,12 +233,12 @@ class TempSensor
     }
 }
 
-function generateHumiditySensors(count)
+function generateHumidityLeakSensors(h_count, l_count)
 {
     var ret = `
       <div class="caption">
 	<div class="container-fluid">
-	  <div class="row"><h4>Humidity:</h4></div>
+	  <div class="row"><h4>Humidity/Leak:</h4></div>
 	  <div class="row caption-row">
 	    <div class="col-xs-5">Status:</div>
 	    <div id="h-health" class="col-xs-5 status vertical-align">&nbsp;</div>
@@ -254,7 +254,7 @@ function generateHumiditySensors(count)
 	  <tr>
 	    <th class="text-center" style="width:10%;">Chan</th>
 	    <th class="text-left"   style="width:20%;">Sensor</th>
-	    <th class="text-center" style="width:15%;">Humidity</th>
+	    <th class="text-center" style="width:15%;">Value</th>
 	    <th class="text-center" style="width:15%;">Set Point</th>
 	    <th class="text-center" style="width:10%;">Trip Mode</th>
 	    <th class="text-center" style="width:10%;">Trace</th>
@@ -265,7 +265,7 @@ function generateHumiditySensors(count)
       <tbody>
     `;
 
-    for(id = 0; id < count; ++id)
+    for(id = 0; id < h_count; ++id)
     {
         ret += `
           <tr>
@@ -277,6 +277,22 @@ function generateHumiditySensors(count)
             <td><div id="h${id}-trace" class="status" ></div></td>
             <td><div id="h${id}-enable" class="status" ></div></td>
             <td><div id="h${id}-trip" class="status"></div></td>
+          </tr>
+        `;
+    }
+
+    for(id = 0; id < l_count; ++id)
+    {
+        ret += `
+          <tr>
+            <th class="text-center">${id+1+h_count}</th>
+            <th class="text-left"><span id="l${id}-name"></span></th>
+            <td><span id="l${id}-h"></span></td>
+            <td><span id="l${id}-set"></span></td>
+            <td><span id="l${id}-mode"></span></td>
+            <td><div id="l${id}-trace" class="status" ></div></td>
+            <td><div id="l${id}-enable" class="status" ></div></td>
+            <td><div id="l${id}-trip" class="status"></div></td>
           </tr>
         `;
     }
@@ -316,9 +332,47 @@ class HumiditySensor
             humidityValue = round1dp(data.humidity) + '%';
             setpointValue = round1dp(data.setpoint) + '%';
         }
-        this.map.get("name").innerHTML = data.name;
+        this.map.get("name").innerHTML = data.sensor_name;
         this.map.get("mode").innerHTML = data.mode;
         this.map.get("h").innerHTML = humidityValue;
+        this.map.get("set").innerHTML = setpointValue;
+        this.map.get("enable").style.backgroundColor = data.disabled ? colorWarn : colorOk;
+    }
+}
+
+class LeakSensor
+{
+    constructor(id)
+    {
+        this.map = new Map();
+        this.active = true;
+
+        var elements = document.querySelectorAll(`[id^='l${id}-']`);
+        for (var i = 0; i < elements.length; ++i)
+        {
+            var start = 2 + id.toString().length;
+            var key = elements[i].id.substr(start,
+                                            elements[i].id.length - start);
+            this.map.set(key, elements[i]);
+        }
+    }
+
+    update(data)
+    {
+        this.map.get("trip").style.backgroundColor = data.tripped ? colorFail : colorOk;
+        this.map.get("trace").style.backgroundColor = data.trace ? colorOk : colorFail;
+        var leakValue = '';
+        var setpointValue = '';
+        if (data.disabled) {
+            leakValue = 'N/C';
+            setpointValue = 'N/C'
+        } else {
+            leakValue = round1dp(data.leak_impedance) + 'M&#8486';
+            setpointValue = round1dp(data.setpoint) + 'M&#8486';
+        }
+        this.map.get("name").innerHTML = data.sensor_name;
+        this.map.get("mode").innerHTML = data.mode;
+        this.map.get("h").innerHTML = leakValue;
         this.map.get("set").innerHTML = setpointValue;
         this.map.get("enable").style.backgroundColor = data.disabled ? colorWarn : colorOk;
     }
@@ -500,7 +554,7 @@ lpdpower_html += generateQuad(1);
 lpdpower_html += generateQuad(2);
 lpdpower_html += generateQuad(3);
 lpdpower_html += generateTempSensors(11);
-lpdpower_html += generateHumiditySensors(2);
+lpdpower_html += generateHumidityLeakSensors(1,1);
 lpdpower_html += generatePumpSensors(1);
 lpdpower_html += generateFanSensors(1);
 $("#lpdpower").html(lpdpower_html);
@@ -508,6 +562,7 @@ $("#lpdpower").html(lpdpower_html);
 var quads = [];
 var temp_sensors = [];
 var humidity_sensors = [];
+var leak_sensors = [];
 var pump_sensor;
 var fan_sensor;
 
@@ -519,8 +574,10 @@ $(document).ready(function() {
         quads.push(new Quad(i));
     for(var i = 0; i < 11; ++i)
         temp_sensors.push(new TempSensor(i));
-    for(var i = 0; i < 2; ++i)
+    for(var i = 0; i < 1; ++i)
         humidity_sensors.push(new HumiditySensor(i));
+        for(var i = 0; i < 1; ++i)
+        leak_sensors.push(new LeakSensor(i));
 
     pump_sensor = new PumpSensor(0);
     fan_sensor = new FanSensor(0);
@@ -577,6 +634,10 @@ function updateAll()
         //Handle humidity sensors
         for(var i = 0; i < humidity_sensors.length; ++i)
             humidity_sensors[i].update(response.humidity.sensors[i]);
+
+        var leak_sensor_offset = humidity_sensors.length;
+        for(var i = 0; i < leak_sensors.length; ++i)
+             leak_sensors[i].update(response.humidity.sensors[i + leak_sensor_offset]);
 
         //Handle pump sensor
         pump_sensor.update(response.pump);

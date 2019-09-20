@@ -6,8 +6,10 @@ Tim Nicholls, STFC Application Engineering
 import sys
 if sys.version_info[0] == 3:  # pragma: no cover
     from unittest.mock import Mock, patch, call
+    PY3 = True
 else:                         # pragma: no cover
     from mock import Mock, patch, call
+    PY3 = False
 
 from nose.tools import *
 
@@ -24,6 +26,7 @@ class TestLcdDisplay():
         cls.pscu.num_quads = 4
         cls.pscu.num_temperatures = 11
         cls.pscu.num_humidities = 2
+        cls.pscu.num_leak_sensors = 1
         cls.pscu.get_all_latched.return_value = [True]*4
         cls.pscu.get_temperature.return_value = 20.0
         cls.pscu.get_temperature_name.return_value = 'Temp Sensor X'
@@ -31,6 +34,9 @@ class TestLcdDisplay():
         cls.pscu.get_humidity.return_value = 56.7
         cls.pscu.get_humidity_name.return_value = 'Humidity Sensor Y'
         cls.pscu.get_humidity_disabled.return_value = False
+        cls.pscu.get_leak_impedance.return_value = 16.6
+        cls.pscu.get_leak_name.return_value = 'Leak Sensor Z'
+        cls.pscu.get_leak_disabled.return_value = False
         cls.pscu.get_fan_speed.return_value = 45.0
         cls.pscu.get_fan_target.return_value = 90
         cls.pscu.get_pump_flow.return_value = 4.2
@@ -121,7 +127,10 @@ class TestLcdDisplay():
     def test_update(self):
 
         self.display.update()
-        self.display.lcd.ser.write.assert_any_call(self.display.lcd_buffer)
+        buffer = self.display.lcd_buffer
+        if PY3:
+            buffer = buffer.encode()
+        self.display.lcd.ser.write.assert_any_call(buffer)
 
     def test_format_state_str(self):
 
@@ -166,6 +175,26 @@ class TestLcdDisplay():
 
         self.pscu.get_humidity_disabled.return_value = True
         content = self.display.humidity_page()
+        assert_equal(type(content), str)
+        assert_true(len(content) > 0)
+        assert_true('N/C' in content)
+
+    def test_leak_page(self):
+
+        self.pscu.get_leak_disabled.return_value = False
+        content = self.display.leak_page()
+        for call in [
+                'get_leak_impedance', 'get_humidity_latched', 'get_humidity_state',
+                'get_leak_tripped', 'get_leak_disabled']:
+            assert_true(getattr(self.pscu, call).called, 'PSCU method {} not called'.format(call))
+        assert_equal(type(content), str)
+        assert_true(len(content) > 0)
+        assert_true('Leak' in content)
+
+    def test_leak_page_disabled(self):
+
+        self.pscu.get_leak_disabled.return_value = True
+        content = self.display.leak_page()
         assert_equal(type(content), str)
         assert_true(len(content) > 0)
         assert_true('N/C' in content)

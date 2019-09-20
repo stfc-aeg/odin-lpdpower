@@ -42,7 +42,16 @@ class TestI2CDevice(object):
     def test_device_init(self):
 
         assert_equal(self.device_address, self.device.address)
+        assert_equal(self.device_busnum, self.device.busnum)
         assert_equal(self.device_debug, self.device.debug)
+
+    def test_change_default_bus(self):
+
+        default_i2c_bus = 0
+        I2CDevice.set_default_i2c_bus(default_i2c_bus)
+
+        new_device = I2CDevice(self.device_address, debug=self.device_debug)
+        assert_equal(default_i2c_bus, new_device.busnum)
 
     def test_pre_access_called(self):
 
