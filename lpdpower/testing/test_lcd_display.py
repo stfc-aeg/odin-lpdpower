@@ -159,42 +159,29 @@ class TestLcdDisplay():
         assert_true(len(content) > 0)
         assert_true('N/C' in content)
 
-    def test_humidity_page(self):
+    def test_humidity_leak_page(self):
 
         self.pscu.get_humidity_disabled.return_value = False
-        content = self.display.humidity_page()
+        self.pscu.get_leak_disabled.return_value = False
+        content = self.display.humidity_leak_page()
         for call in [
                 'get_humidity', 'get_humidity_latched', 'get_humidity_state',
                 'get_humidity_tripped', 'get_humidity_disabled']:
             assert_true(getattr(self.pscu, call).called, 'PSCU method {} not called'.format(call))
-        assert_equal(type(content), str)
-        assert_true(len(content) > 0)
-        assert_true('Humidity' in content)
-
-    def test_humidity_page_disabled(self):
-
-        self.pscu.get_humidity_disabled.return_value = True
-        content = self.display.humidity_page()
-        assert_equal(type(content), str)
-        assert_true(len(content) > 0)
-        assert_true('N/C' in content)
-
-    def test_leak_page(self):
-
-        self.pscu.get_leak_disabled.return_value = False
-        content = self.display.leak_page()
         for call in [
                 'get_leak_impedance', 'get_humidity_latched', 'get_humidity_state',
                 'get_leak_tripped', 'get_leak_disabled']:
             assert_true(getattr(self.pscu, call).called, 'PSCU method {} not called'.format(call))
         assert_equal(type(content), str)
         assert_true(len(content) > 0)
+        assert_true('Humid' in content)
         assert_true('Leak' in content)
 
-    def test_leak_page_disabled(self):
+    def test_humidity_leak_page_disabled(self):
 
+        self.pscu.get_humidity_disabled.return_value = True
         self.pscu.get_leak_disabled.return_value = True
-        content = self.display.leak_page()
+        content = self.display.humidity_leak_page()
         assert_equal(type(content), str)
         assert_true(len(content) > 0)
         assert_true('N/C' in content)
