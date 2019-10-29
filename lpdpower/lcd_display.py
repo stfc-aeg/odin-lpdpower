@@ -71,8 +71,7 @@ class LcdDisplay(object):
         for page in range(self.num_temp_pages):
             self.registered_pages.append(partial(self.temperature_page, page))
 
-        self.registered_pages.append(self.humidity_page)
-        self.registered_pages.append(self.leak_page)
+        self.registered_pages.append(self.humidity_leak_page)
         self.registered_pages.append(self.fan_page)
         self.registered_pages.append(self.pump_page)
         self.registered_pages.append(self.position_page)
@@ -238,10 +237,11 @@ class LcdDisplay(object):
 
         return content
 
-    def humidity_page(self):
-        """Render the PSCU humidity status page.
+    def humidity_leak_page(self):
+        """Render the PSCU humidity and leak status page.
 
-        This method renders a humidity page, showing the state of the PSCU humidity sensors.
+        This method renders a humidity/leak page, showing the state of the PSCU humidity and leak
+        sensors.
 
         :return: rendered page as a string
         """
@@ -250,38 +250,24 @@ class LcdDisplay(object):
         state_str = self.format_state_str(
             self.pscu.get_humidity_state(), self.pscu.get_humidity_latched())
 
-        content += 'Humidity: {}\r'.format(state_str)
+        content += 'Humid/Leak:{}\r'.format(state_str)
 
+        tot_chan = 0
         for chan in range(self.pscu.num_humidities):
+            tot_chan += 1
             chan_disabled = self.pscu.get_humidity_disabled(chan)
             if chan_disabled:
                 content += '{:2d}:{:17s}'.format(chan+1, 'N/C')
             else:
-                chan_name = ''.join(self.pscu.get_humidity_name(chan).split(' '))
+                chan_name = 'Humid'+''.join(self.pscu.get_humidity_name(chan).split(' '))
                 chan_humid = self.pscu.get_humidity(chan)
                 chan_trip = '*' if self.pscu.get_humidity_tripped(chan) else ' '
                 content += '{:2d}:{: <10.10s}:{:4.1f}%{:1s}'.format(
-                    chan+1, chan_name, chan_humid, chan_trip
+                    tot_chan, chan_name, chan_humid, chan_trip
                 )
 
-        content += '\r'*(2-self.pscu.num_humidities)        
-        return content
-
-    def leak_page(self):
-        """Render the PSCU leak status page.
-
-        This method renders a leak page, showing the state of the PSCU leak sensors.
-
-        :return: rendered page as a string
-        """
-        content = self.page_header()
-
-        state_str = self.format_state_str(
-            self.pscu.get_humidity_state(), self.pscu.get_humidity_latched())
-
-        content += 'Leak: {}\r'.format(state_str)
-
         for chan in range(self.pscu.num_leak_sensors):
+            tot_chan += 1
             chan_disabled = self.pscu.get_leak_disabled(chan)
             if chan_disabled:
                 content += '{:2d}:{:17s}'.format(chan+1, 'N/C')
@@ -290,10 +276,10 @@ class LcdDisplay(object):
                 chan_imped = self.pscu.get_leak_impedance(chan)
                 chan_trip = '*' if self.pscu.get_leak_tripped(chan) else ' '
                 content += '{:2d}:{: <10.10s}:{:4.1f}M{:1s}'.format(
-                    chan+1, chan_name, chan_imped, chan_trip
+                    tot_chan, chan_name, chan_imped, chan_trip
                 )
 
-        content += '\r'*(2-self.pscu.num_leak_sensors)
+        content += '\r'*(2-tot_chan)
         return content
 
     def fan_page(self):
