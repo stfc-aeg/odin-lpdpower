@@ -55,7 +55,7 @@ class PSCU(I2CContainer):
     ]
 
     HUMIDITY_SENSOR_NAMES = [
-        'Rear',
+        'Humidity',
     ]
 
     LEAK_SENSOR_NAMES = [
