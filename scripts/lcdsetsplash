@@ -13,6 +13,6 @@ try:
 
     lcd.clear()
     lcd.write(msg)
-    print 'LCD splashscreen updated'
+    print('LCD splashscreen updated')
 except Exception as e:
-    print 'LCD splashscreen update failed: {}'.format(e)
+    print('LCD splashscreen update failed: {}'.format(e))
