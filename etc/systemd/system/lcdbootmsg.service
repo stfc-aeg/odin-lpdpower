@@ -1,6 +1,7 @@
 [Unit]
 Description=Print boot status message to PSCU front-panel LCD
-After=udev.service
+Wants=dev-ttyACM0.device
+After=udev.service dev-ttyACM0.device
 Before=basic.target
 DefaultDependencies=no
 

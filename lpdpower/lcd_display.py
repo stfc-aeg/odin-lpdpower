@@ -259,7 +259,7 @@ class LcdDisplay(object):
             if chan_disabled:
                 content += '{:2d}:{:17s}'.format(chan+1, 'N/C')
             else:
-                chan_name = 'Humid'+''.join(self.pscu.get_humidity_name(chan).split(' '))
+                chan_name = ''.join(self.pscu.get_humidity_name(chan).split(' '))
                 chan_humid = self.pscu.get_humidity(chan)
                 chan_trip = '*' if self.pscu.get_humidity_tripped(chan) else ' '
                 content += '{:2d}:{: <10.10s}:{:4.1f}%{:1s}'.format(
