@@ -15,6 +15,8 @@ ntp_servers="time.rl.ac.uk"
 
 def_account_groups=''
 
+pip_version='pip3'
+
 check_root ()
 {
     if [[ $EUID -ne 0 ]]; then
@@ -78,13 +80,12 @@ set_hostname()
 set_timezone()
 {
     echo "Setting timezone to ${timezone}"
-    etc_timezone=/etc/timezone
-    if [ $(cat ${etc_timezone}) != ${timezone} ]; then
-	cp ${etc_timezone} ${etc_timezone}.orig
-	echo ${timezone} > ${etc_timezone}
+    target_zoneinfo="/usr/share/zoneinfo/${timezone}"
+    if [ $(readlink /etc/localtime) != $target_zoneinfo ]; then
+        ln -sf $target_zoneinfo /etc/localtime
 	dpkg-reconfigure -f noninteractive tzdata
     else
-	echo "  OK, timezone already correctly configured"
+    	echo "  OK, timezone already correctly configured"
     fi
 }
 
@@ -124,7 +125,7 @@ modify_runlevel()
 	    echo "  Forcing systemd to use multi-user target as default"
 	    ln -sf /lib/systemd/system/multi-user.target /lib/systemd/system/default.target
 
-	elif [ ${release_version} == '8' ]; then
+	elif [ ${release_version} -ge 8 ]; then
 
 	    systemctl_target='multi-user.target'
 	    if [ $(systemctl get-default) != ${systemctl_target} ]; then
@@ -182,6 +183,7 @@ install_ntp()
     if [ $? != 0 ]; then
 	cp -f ${ntp_conf} ${ntp_conf}.orig
 	sed -e '/^server/ s/^#*/#/' -i ${ntp_conf}
+	sed -e '/^pool/ s/^#*/#/' -i ${ntp_conf}
 	echo "" >> ${ntp_conf}
 	for server in ${wanted_servers}; do
 	    echo "server ${server} iburst" >> ${ntp_conf}
@@ -195,6 +197,32 @@ install_ntp()
     else
 	echo "no modification required"
     fi
+
+}
+
+disable_unused_services()
+{
+
+    unused_services="nginx.service bonescript.service bonescript-autorun.service wpa_supplicant.service alsa-state.service"
+    /bin/echo "Disabling unused services"
+    for service in ${unused_services}; do
+        service_enabled=$(systemctl is-enabled ${service})
+        if [ ${service_enabled} == 'enabled' ]; then
+            /bin/echo -n "  Disabling service ${service}: "
+            systemctl disable ${service}
+            if [ $? == 0 ]; then
+                echo "done"
+            fi
+        elif [ ${service_enabled} == 'static' ]; then
+            /bin/echo -n "  Masking static service ${service}: "
+            systemctl mask ${service}
+            if [ $? == 0 ]; then
+                echo "done"
+            fi
+        else
+            /bin/echo "  ${service} is already disabled or masked"
+        fi
+    done
 
 }
 
@@ -218,9 +246,9 @@ install_supervisord()
 install_virtualenv()
 {
     echo "Installing python virtualenv:"
-    pip freeze | grep -q virtualenv
+    ${pip_version} freeze | grep -q virtualenv
     if [ $? != 0 ]; then
-	echo pip install virtualenv
+	${pip_version}  install virtualenv
     else
 	echo "  Virtualenv already installed"
     fi
@@ -356,7 +384,7 @@ install_pscu_startup()
 {
     echo "Installing PSCU startup scripts"
 
-    /bin/echo -n "  Copying LCD boot message service script: "
+    /bin/echo -n "  Copying LCD boot message systemd service script: "
     /usr/bin/install -v -b -t /etc/systemd/system ${lpdpower_dir}/etc/systemd/system/lcdbootmsg.service
     /bin/echo -n "  Enabling in systemd: "
     systemctl enable lcdbootmsg.service
@@ -364,28 +392,28 @@ install_pscu_startup()
 	echo "done"
     fi
 
-    /bin/echo -n "  Copying PSCU supervisord config file: "
-    /usr/bin/install -v -b -t /etc/supervisor/conf.d ${lpdpower_dir}/etc/supervisor/conf.d/pscu.conf
+    /bin/echo -n "  Copying PSCU systemd service file: "
+    /usr/bin/install -v -b -t /etc/systemd/system ${lpdpower_dir}/etc/systemd/system/pscu.service
+    /bin/echo -n  "  Enabling in systemd: "
+    systemctl enable pscu.service
+    if [ $? == 0 ]; then
+        echo "done"
+    fi
 
-    /bin/echo -n "  Reloading supervisord configuration: "
-    supervisorctl reload
+    /bin/echo -n  "  Starting PSCU service: "
+    systemctl start pscu.service
+    if [ $? == 0 ]; then
+        echo "done"
+    fi
 
     /bin/echo -n "  Checking PSCU is running: "
-    retries=0
-    max_retries=5
-    while [ $retries -lt $max_retries ]; do
-	pscu_status=$(supervisorctl status pscu | awk '{print $2}')
-	if [ $pscu_status != 'STARTING' ]; then
-	    break
-	fi
-	sleep 1
-	((retries++))
-    done
-    if [ $pscu_status != 'RUNNING' ] || [ ${retries} -ge ${max_retries} ]; then
-	echo "Error - PSCU failed to start up, status is currently ${pscu_status}"
+    pscu_status=$(systemctl is-active pscu.service)
+    if [ $pscu_status != 'active' ]; then
+       echo "Error - PSCU failed to start up, status is currently ${pscu_status}"
     else
-	echo "OK"
+       echo "OK"
     fi
+
 }
 
 create_tempfs_fstab_entry()
@@ -448,6 +476,9 @@ set_rootfs_readonly()
     create_tempfs_fstab_entry ${etc_fstab} '/var/log'  '1777' '128M'
     create_tempfs_fstab_entry ${etc_fstab} '/var/lib/dhcp' '1777' '1M'
     create_tempfs_fstab_entry ${etc_fstab} '/var/lib/sudo' '0700' '1M'
+    create_tempfs_fstab_entry ${etc_fstab} '/var/lib/systemd' '0755' '1M'
+    create_tempfs_fstab_entry ${etc_fstab} '/var/lib/logrotate' '0755' '1M'
+    create_tempfs_fstab_entry ${etc_fstab} '/var/tmp' '1777' '1M'
     create_tempfs_fstab_entry ${etc_fstab} '/tmp' '1777' '32M'
 
     if [ $fstab_modified != 0 ]; then
@@ -472,9 +503,10 @@ update_system
 modify_runlevel
 install_mdns
 install_ntp
-install_supervisord
+disable_unused_services
+####install_supervisord
 install_virtualenv
-fix_python_dist_permissions
+####fix_python_dist_permissions
 suppress_sshd_banner
 suppress_debian_login_reminder
 delete_default_account
